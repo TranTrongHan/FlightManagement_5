@@ -86,7 +86,7 @@ class Route(db.Model):
 
 #####################################
 class RouteDetails(db.Model):
-    # id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     airport_role = Column(Enum(AirportRole),nullable=False)
     stop_time = Column(Float(),nullable=False)
     note = Column(String(255),nullable=True)
@@ -152,8 +152,8 @@ class Seat(db.Model):
 #####################################
 class Ticket(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    customer_id = Column(Integer,ForeignKey(Customer.id),nullable=False)
-    flight_id = Column(Integer,ForeignKey(Flight.id),nullable=False)
+    customer_id = Column(Integer,ForeignKey(Customer.id),nullable=False,primary_key=True)
+    flight_id = Column(Integer,ForeignKey(Flight.id),nullable=False,primary_key=True)
     fareclass_id = Column(Integer,ForeignKey(FareClass.id),nullable=False)
     # seat_id  = relationship("Seat",uselist=False)
     seat_id = Column(Integer,ForeignKey(Seat.id),nullable=True,unique=True)
@@ -260,19 +260,19 @@ if __name__ == "__main__":
         #                     route16, route17, route18, route19, route20])
         # db.session.commit()
         #
-        # route_details1 = RouteDetails(airport_role=AirportRole.DEPARTURE,stop_time="1.1", airport_id='1', routes_id='1')
-        # route_details2 = RouteDetails(airport_role=AirportRole.ARRIVAL,stop_time="1.3", airport_id='2', routes_id='1')
-        # route_details3 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.15", airport_id='7', routes_id='7')
-        # route_details4 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.2", airport_id='8', routes_id='7')
-        # route_details5 = RouteDetails(airport_role=AirportRole.INTERMEDIATE, stop_time="1.4", airport_id='2', routes_id='7')
-        # route_details6 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="0.8", airport_id='15', routes_id='19')
-        # route_details7 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="0.7", airport_id='3', routes_id='19')
-        # route_details8 = RouteDetails(airport_role=AirportRole.INTERMEDIATE, stop_time="1", airport_id='11', routes_id='19')
-        # route_details9 = RouteDetails(airport_role=AirportRole.INTERMEDIATE, stop_time="1.25", airport_id='12', routes_id='19')
-        #
-        # db.session.add_all([route_details1,route_details2,route_details3, route_details4, route_details5,
-        #                   route_details6 ,route_details7, route_details8, route_details9])
-        # db.session.commit()
+        route_details1 = RouteDetails(airport_role=AirportRole.DEPARTURE,stop_time="1.1", airport_id='1', routes_id='1')
+        route_details2 = RouteDetails(airport_role=AirportRole.ARRIVAL,stop_time="1.3", airport_id='2', routes_id='1')
+        route_details3 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.15", airport_id='7', routes_id='7')
+        route_details4 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.2", airport_id='8', routes_id='7')
+        route_details5 = RouteDetails(airport_role=AirportRole.INTERMEDIATE, stop_time="1.4", airport_id='2', routes_id='7')
+        route_details6 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="0.8", airport_id='15', routes_id='19')
+        route_details7 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="0.7", airport_id='3', routes_id='19')
+        route_details8 = RouteDetails(airport_role=AirportRole.INTERMEDIATE, stop_time="1", airport_id='11', routes_id='19')
+        route_details9 = RouteDetails(airport_role=AirportRole.INTERMEDIATE, stop_time="1.25", airport_id='12', routes_id='19')
+
+        db.session.add_all([route_details1,route_details2,route_details3, route_details4, route_details5,
+                          route_details6 ,route_details7, route_details8, route_details9])
+        db.session.commit()
         # # num_of_airport = Column(Integer, nullable=False)
         #     # minimum_duration = Column(Integer, nullable=False)
         #     # num_of_intermediate_airport = Column(Integer, nullable=False)
@@ -366,41 +366,41 @@ if __name__ == "__main__":
         #                     seat26,seat27,seat28,seat29,seat30])
         # db.session.commit()
         #
-        # ticket1 = Ticket(customer_id='1',flight_id='1',fareclass_id='1',seat_id='1')
-        # ticket2 = Ticket(customer_id='2',flight_id='2',fareclass_id='2',seat_id='2')
-        # ticket3 = Ticket(customer_id='3',flight_id='3',fareclass_id='1',seat_id='3')
-        # ticket4 = Ticket(customer_id='4',flight_id='4',fareclass_id='2',seat_id='4')
-        # ticket5 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='5')
-        # ticket6 = Ticket(customer_id='2',flight_id='1',fareclass_id='2',seat_id='6')
-        # ticket7 = Ticket(customer_id='3',flight_id='2',fareclass_id='1',seat_id='7')
-        # ticket8 = Ticket(customer_id='4',flight_id='3',fareclass_id='1',seat_id='8')
-        # ticket9 = Ticket(customer_id='1',flight_id='4',fareclass_id='2',seat_id='9')
-        # ticket10 = Ticket(customer_id='2',flight_id='5',fareclass_id='2',seat_id='10')
-        # ticket11 = Ticket(customer_id='3',flight_id='1',fareclass_id='1',seat_id='11')
-        # ticket12 = Ticket(customer_id='4',flight_id='2',fareclass_id='1',seat_id='12')
-        # ticket13 = Ticket(customer_id='1',flight_id='3',fareclass_id='1',seat_id='13')
-        # ticket14 = Ticket(customer_id='2',flight_id='4',fareclass_id='2',seat_id='14')
-        # ticket15 = Ticket(customer_id='3',flight_id='5',fareclass_id='1',seat_id='15')
-        # ticket16 = Ticket(customer_id='4',flight_id='1',fareclass_id='1',)
-        # ticket17 = Ticket(customer_id='1',flight_id='2',fareclass_id='2',)
-        # ticket18 = Ticket(customer_id='2',flight_id='3',fareclass_id='1',)
-        # ticket19 = Ticket(customer_id='3',flight_id='4',fareclass_id='1',)
-        # ticket20 = Ticket(customer_id='4',flight_id='5',fareclass_id='2',)
-        # ticket21 = Ticket(customer_id='1',flight_id='1',fareclass_id='2',)
-        # ticket22 = Ticket(customer_id='2',flight_id='2',fareclass_id='1',)
-        # ticket23 = Ticket(customer_id='3',flight_id='3',fareclass_id='2',)
-        # ticket24 = Ticket(customer_id='4',flight_id='4',fareclass_id='2',)
-        # ticket25= Ticket(customer_id='1',flight_id='5',fareclass_id='1',)
-        # ticket26 = Ticket(customer_id='2',flight_id='1',fareclass_id='2',)
-        # ticket27= Ticket(customer_id='3',flight_id='2',fareclass_id='1',)
-        # ticket28= Ticket(customer_id='4',flight_id='3',fareclass_id='2',)
-        # ticket29 = Ticket(customer_id='1',flight_id='4',fareclass_id='1',)
-        # ticket30= Ticket(customer_id='2',flight_id='5',fareclass_id='1',)
-        # db.session.add_all([ticket1,ticket2,ticket3,ticket4,ticket5,
-        #                     ticket6,ticket7,ticket8,ticket9,ticket10,
-        #                     ticket11,ticket12,ticket13,ticket14,ticket15,
-        #                     ticket16,ticket17,ticket18,ticket19,ticket20,
-        #                     ticket21,ticket22,ticket23,ticket24,ticket25,
-        #                     ticket26,ticket27,ticket28,ticket29,ticket30])
-        # db.session.commit()
+        ticket1 = Ticket(customer_id='1',flight_id='1',fareclass_id='1',seat_id='1')
+        ticket2 = Ticket(customer_id='2',flight_id='2',fareclass_id='2',seat_id='2')
+        ticket3 = Ticket(customer_id='3',flight_id='3',fareclass_id='1',seat_id='3')
+        ticket4 = Ticket(customer_id='4',flight_id='4',fareclass_id='2',seat_id='4')
+        ticket5 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='5')
+        ticket6 = Ticket(customer_id='2',flight_id='1',fareclass_id='2',seat_id='6')
+        ticket7 = Ticket(customer_id='3',flight_id='2',fareclass_id='1',seat_id='7')
+        ticket8 = Ticket(customer_id='4',flight_id='3',fareclass_id='1',seat_id='8')
+        ticket9 = Ticket(customer_id='1',flight_id='4',fareclass_id='2',seat_id='9')
+        ticket10 = Ticket(customer_id='2',flight_id='5',fareclass_id='2',seat_id='10')
+        ticket11 = Ticket(customer_id='3',flight_id='1',fareclass_id='1',seat_id='11')
+        ticket12 = Ticket(customer_id='4',flight_id='2',fareclass_id='1',seat_id='12')
+        ticket13 = Ticket(customer_id='1',flight_id='3',fareclass_id='1',seat_id='13')
+        ticket14 = Ticket(customer_id='2',flight_id='4',fareclass_id='2',seat_id='14')
+        ticket15 = Ticket(customer_id='3',flight_id='5',fareclass_id='1',seat_id='15')
+        ticket16 = Ticket(customer_id='4',flight_id='1',fareclass_id='1',)
+        ticket17 = Ticket(customer_id='1',flight_id='2',fareclass_id='2',)
+        ticket18 = Ticket(customer_id='2',flight_id='3',fareclass_id='1',)
+        ticket19 = Ticket(customer_id='3',flight_id='4',fareclass_id='1',)
+        ticket20 = Ticket(customer_id='4',flight_id='5',fareclass_id='2',)
+        ticket21 = Ticket(customer_id='1',flight_id='1',fareclass_id='2',)
+        ticket22 = Ticket(customer_id='2',flight_id='2',fareclass_id='1',)
+        ticket23 = Ticket(customer_id='3',flight_id='3',fareclass_id='2',)
+        ticket24 = Ticket(customer_id='4',flight_id='4',fareclass_id='2',)
+        ticket25= Ticket(customer_id='1',flight_id='5',fareclass_id='1',)
+        ticket26 = Ticket(customer_id='2',flight_id='1',fareclass_id='2',)
+        ticket27= Ticket(customer_id='3',flight_id='2',fareclass_id='1',)
+        ticket28= Ticket(customer_id='4',flight_id='3',fareclass_id='2',)
+        ticket29 = Ticket(customer_id='1',flight_id='4',fareclass_id='1',)
+        ticket30= Ticket(customer_id='2',flight_id='5',fareclass_id='1',)
+        db.session.add_all([ticket1,ticket2,ticket3,ticket4,ticket5,
+                            ticket6,ticket7,ticket8,ticket9,ticket10,
+                            ticket11,ticket12,ticket13,ticket14,ticket15,
+                            ticket16,ticket17,ticket18,ticket19,ticket20,
+                            ticket21,ticket22,ticket23,ticket24,ticket25,
+                            ticket26,ticket27,ticket28,ticket29,ticket30])
+        db.session.commit()
 
