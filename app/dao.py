@@ -1,18 +1,21 @@
-from app.models import Flight, RouteDetails, Airport
+from app.models import Flight, Route, Airport
 
+def load_route():
+    return Route.query.all()
+
+def load_specific_routes(takeoffId = None, landingairportId=None):
+    if takeoffId or landingairportId:
+        return Route.query.filter(Route.take_off_airport_id == takeoffId)
+
+def load_airport_id(airportrole =None):
+    if(airportrole):
+        query = Route.query.order_by('name').filter(Route.take_off_airport_id)
+    else:
+        query = Route.query.order_by('name').filter(Route.landing_airport_id)
+    return query
 
 def load_airport():
     return Airport.query.all()
 
-
-def load_routesdetails(role):
-    query = RouteDetails.query
-    query = query.filter(RouteDetails.airport_role.__eq__(role))
-    return query
-
-
-def find_flight(departure=None, arrival=None):
-    if departure:
-        return Flight.query.filter(Flight.route_id == int(departure))
-    if arrival:
-        return Flight.query.filter(Flight.route_id == arrival)
+def load_flights():
+    return Flight.query.all()

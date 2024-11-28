@@ -5,13 +5,15 @@
 <div class="container mt-3 bg-primary rounded">
     <form method="post">
         <div class="row">
+
             <div class="col-md-5 mt-3">
                 <label class="fs-3 text-uppercase fw-bold text-white">Nơi đi:</label>
-                <select name="departure" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
-                    {% for r in routes_depart %}
-                    {% for airp in airports %}
-                    {% if r.airport_id == airp.id  %}
-                    <option value="{{r.routes_id}} ">{{airp.name}}</option>
+                <select name="take_off" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
+                        id="takeoffSelect" event="click">
+                    {% for airport in take_off_airports %}
+                    {% for airportName in airports %}
+                    {% if airport.id == airportName.id %}
+                    <option id="selected_option" value="{{airport.id}}">{{airportName.name}}</option>
                     {% endif %}
                     {% endfor %}
                     {% endfor %}
@@ -19,16 +21,19 @@
             </div>
             <div class="col-md-5 mt-3 p">
                 <label class="fs-3 text-uppercase fw-bold text-white">Nơi đến:</label>
-                <select name="arrival" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
-                    {% for r in routes_arri %}
-                    {%for airp in airports %}
-                    {% if r.airport_id == airp.id %}
-                    <option value="{{r.routes_id}}"> {{airp.name}}</option>
+                <select name="landing" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
+                        id="landingSelect" event="click">
+                    {% for airport in landing_airports %}
+                    {% for airportName in airports %}
+                    {% if airport.id == airportName.id %}
+                    <option id="selected_option1" value=" {{airport.id}} ">{{airportName.name}}</option>
+
                     {% endif %}
                     {% endfor %}
                     {% endfor %}
                 </select>
             </div>
+
             <div class="col-md-2 mt-3 p-3  ">
                 <button class="btn btn-primary mt-4 m-3 fs-4 text-uppercase fw-bold bg-success" type="submit">Tìm kiếm
                 </button>
@@ -45,40 +50,97 @@
             <div class="col-md-3">
             </div>
         </div>
-        {% if flights %}
         <div class="row align-items-center mx-3">
             <table class="table table-hover ">
                 <thead>
                 <tr>
                     <th>Mã chuyến bay</th>
-                    <th>Ngày giờ khởi hành</th>
-                    <th>Thời gian bay</th>
+                    <th>Tên chuyến bay</th>
+                    <th>Ngày giờ cất cánh</th>
+                    <th>Ngày giờ hạ cánh</th>
                     <th>Số chỗ ngồi hạng 1</th>
                     <th>Số chỗ ngồi hạng 2</th>
                 </tr>
                 </thead>
+
                 <tbody>
-
-                {% for f in flights %}
+                {% for flight in flights %}
                 <tr>
-                    <td>{{f.id}}</td>
-                    <td>{{f.departure_time}}</td>
-                    <td>{{f.flight_duration}}</td>
-                    <td>{{f.num_of_1st_seat}}</td>
-                    <td>{{f.num_of_2st_seat}}</td>
+                    <td>{{flight.id}}</td>
+                    <td>{{flight.name}}</td>
+                    <td>{{flight.take_of_time}}</td>
+                    <td>{{flight.landing_time}}</td>
+                    <td>{{flight.num_of_1st_seat}}</td>
+                    <td>{{flight.num_of_2st_seat}}</td>
                 </tr>
-
-                {% endfor%}
-
+                {% endfor %}
                 </tbody>
+
             </table>
         </div>
-        {% else %}
-        <div class="alert alert-info mt-3">Không có chuyến bay nào</div>
-        {% endif %}
+
+
     </form>
 
+
+</div>
+<div class="container bg-danger mt-3">
+    <div class="row">
+        <div class="col-md-3 col-12">
+            {% for route in routes %}
+            <div class="text-danger bg-danger">RouteId:{{route.id}}</div>
+            {% endfor%}
+            <div class="text-primart bg-danger fs-2">None Routes</div>
+
+        </div>
+    </div>
 </div>
 
 
 {% endblock %}
+<!--{% block script %}-->
+<!--<script>-->
+<!--    function updatedLandingAirport(){-->
+<!--        var takeoffSelects = document.getElementById('takeoffSelect')-->
+<!--        var landingSelects = document.getElementById('landingSelect')-->
+<!--        var selectedOption = document.getElementById('selected_option')-->
+<!--        for(let i = 0; i< landingSelects.length; i++){-->
+<!--            if(parseInt(selectedOption.value) == parseInt(landingSelects[i].value)){-->
+<!--                console.log('yes')-->
+<!--                landingSelects[i].style.display = 'none'-->
+<!--            }else{-->
+<!--                landingSelects[i].style.display = 'block'-->
+<!--            }-->
+
+
+<!--        }-->
+<!--    }-->
+<!--    function updatedTakeOffAirport(){-->
+<!--        var takeoffSelects = document.getElementById('takeoffSelect')-->
+<!--        var landingSelects = document.getElementById('landingSelect')-->
+<!--        var selectedOption = document.getElementById('selected_option1')-->
+<!--        for(let i = 0; i< takeoffSelects.length; i++){-->
+<!--            if(parseInt(selectedOption.value) == parseInt(takeoffSelects[i].value)){-->
+<!--                console.log('yes')-->
+<!--                takeoffSelects[i].style.display = 'none'-->
+<!--            }else{-->
+<!--                takeoffSelects[i].style.display = 'block'-->
+<!--            }-->
+
+<!--        }-->
+<!--    }-->
+<!--    document.addEventListener('DOMContentLoaded', function(){-->
+<!--         var selectedOption= document.getElementById('selected_option1')-->
+<!--         selectedOption.style.display = 'none'-->
+<!--    })-->
+<!--    document.getElementById('takeoffSelect').addEventListener('click',function(){-->
+<!--        updatedLandingAirport();-->
+<!--    })-->
+<!--     document.getElementById('landingSelect').addEventListener('click',function(){-->
+<!--        updatedTakeOffAirport();-->
+
+<!--    })-->
+
+
+<!--</script>-->
+<!--{% endblock %}-->

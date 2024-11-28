@@ -6,21 +6,27 @@ from app import app
 
 @app.route('/', methods = ['GET','POST'])
 def index():
-    # lấy danh sách các tuyến bay có role theo yêu cầu
-    routes_depart = dao.load_routesdetails('DEPARTURE')
-    routes_arri = dao.load_routesdetails('ARRIVAL')
-    # lấy danh sách sân bay
-    airports = dao.load_airport()
-    # kiểm tra một sân bay có nhiều tuyến bay
+
+
+    # lấy danh sách id sân bay đi
+    airports = dao.load_airport_id('takeoffairport')
+    # lấy danh sách id sân bay đến
+    airports2 = dao.load_airport_id()
+    # lấy danh sách id sân bay
+    airportsID = dao.load_airport()
+    # lấy danh sách tuyến bay
 
     # lấy giá trị value của thẻ option từ thuộc tính name của thẻ select
-    depart_airport = request.form.get('departure')
-    arrival_airport = request.form.get('arrival')
-    # lấy danh sách chuyến bay có nơi đi, nơi đến theo yêu cầu
-    flights = dao.find_flight(departure=depart_airport,arrival=arrival_airport)
+    takeoff_airport = request.form.get('take_off')
+    landing_airport = request.form.get('landing')
 
-    return render_template('index.html',routes_depart = routes_depart,routes_arri = routes_arri,airports = airports
-    ,depart_airport = depart_airport  ,flights = flights,list = list)
+    # lấy danh sách chuyến bay có nơi đi, nơi đến theo yêu cầu
+    routes = dao.load_specific_routes(takeoffId = takeoff_airport, landingairportId=landing_airport)
+    flights = dao.load_flights()
+
+
+    return render_template('index.html' ,take_off_airports = airports,landing_airports = airports2 ,airports = airportsID,routes = routes,flights = flights)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

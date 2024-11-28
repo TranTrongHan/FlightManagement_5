@@ -70,8 +70,9 @@ class Plane(db.Model):
 class Airport(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50),nullable=False,unique=True)
-    routes = relationship("RouteDetails",backref="Airport")
-
+    take_off_airport = relationship("Route", foreign_keys="Route.take_off_airport_id",backref="takeoff_airport")
+    landing_airport = relationship("Route", foreign_keys="Route.landing_airport_id",backref="landing_airport_ref")
+    flights = relationship("MidAirport",backref="Airport")
     def __str__(self):
         return self.name
 
@@ -80,48 +81,40 @@ class Route(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50),nullable=False)
     flights = relationship("Flight",backref="Route",lazy=True)
-    airports = relationship("RouteDetails",backref="Route")
+    take_off_airport_id = Column(Integer,ForeignKey(Airport.id),nullable=False)
+    landing_airport_id  = Column(Integer,ForeignKey(Airport.id),nullable=False)
+
+
     def __str__(self):
         return self.name
-
 #####################################
-class RouteDetails(db.Model):
+class Flight(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    airport_role = Column(Enum(AirportRole),nullable=False)
+    name = Column(String(50),nullable=False)
+    take_of_time = Column(DateTime,nullable=True)
+    landing_time = Column(DateTime, nullable=True)
+    num_of_1st_seat = Column(Integer,nullable=False)
+    num_of_2st_seat = Column(Integer,nullable=False)
+    mid_airports = relationship("MidAirport",backref="Flight")
+    customers = relationship("Ticket",backref="Flight")
+    plane_id = Column(Integer,ForeignKey(Plane.id),nullable=False)
+    route_id = Column(Integer,ForeignKey(Route.id),nullable=False)
+    flight_schedule_id = relationship("FlightSchedule",uselist=False)
+    def __str__(self):
+        return self.name
+#####################################
+class MidAirport(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
     stop_time = Column(Float(),nullable=False)
     note = Column(String(255),nullable=True)
-    airport_id = Column(Integer, ForeignKey(Airport.id),nullable=False,primary_key=True)
-    routes_id = Column(Integer, ForeignKey(Route.id),nullable=False,primary_key=True)
+    mid_airport_id = Column(Integer, ForeignKey(Airport.id),nullable=False,primary_key=True)
+    flight_id = Column(Integer, ForeignKey(Flight.id),nullable=False,primary_key=True)
 
 class Rule(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(200), nullable=False)
     value = Column(Float, nullable=False)
-    # num_of_airport = Column(Integer, nullable=False)
-    # minimum_duration = Column(Integer, nullable=False)
-    # num_of_intermediate_airport = Column(Integer, nullable=False)
-    # max_stoptime = Column(Float, nullable=False)
-    # min_stoptime = Column(Float, nullable=False)
-    # num_of_seats_1st_class = Column(Integer, nullable=False)
-    # num_of_seats_2st_class = Column(Integer, nullable=False)
-    # price_of_seats_1st_class = Column(Float, nullable=False)
 
-
-#####################################
-class Flight(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50),nullable=False)
-    departure_time = Column(DateTime,nullable=True)
-    flight_duration = Column(Float,nullable=True)
-    num_of_1st_seat = Column(Integer,nullable=False)
-    num_of_2st_seat = Column(Integer,nullable=False)
-    customers = relationship("Ticket",backref="Flight")
-    plane_id = Column(Integer,ForeignKey(Plane.id),nullable=False)
-    route_id = Column(Integer,ForeignKey(Route.id),nullable=False)
-    flight_schedule_id = relationship("FlightSchedule",uselist=False)
-    # flight_details_id = relationship("FlightDetails",uselist=False)
-    def __str__(self):
-        return self.name
 #####################################
 class FlightSchedule(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -148,7 +141,6 @@ class Seat(db.Model):
     def __str__(self):
         return self.name
 
-
 #####################################
 class Ticket(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -157,19 +149,6 @@ class Ticket(db.Model):
     fareclass_id = Column(Integer,ForeignKey(FareClass.id),nullable=False)
     # seat_id  = relationship("Seat",uselist=False)
     seat_id = Column(Integer,ForeignKey(Seat.id),nullable=True,unique=True)
-
-
-
-
-#####################################
-# class FlightDetails(db.Model):
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     departure_time = Column(DateTime,nullable=False)
-#     flytime  = Column(Float,nullable=False)
-#     num_of_1st_seat = Column(Integer,nullable=False)
-#     num_of_2st_seat = Column(Integer,nullable=False)
-#     flight_id = Column(Integer,ForeignKey(Flight.id),nullable=False,unique=True)
-#     flight_schedule_id =Column(Integer,ForeignKey(FlightSchedule.id),nullable=False)
 
 
 if __name__ == "__main__":
@@ -211,7 +190,7 @@ if __name__ == "__main__":
         # plane5 = Plane(name='Japan Airlines')
         # db.session.add_all([plane1, plane2, plane3, plane4, plane5])
         # db.session.commit()
-        #
+
         # airport1 = Airport(name='Nội Bài')
         # airport2 = Airport(name='Tân Sơn Nhất')
         # airport3 = Airport(name='Cần Thơ')
@@ -231,73 +210,29 @@ if __name__ == "__main__":
         # db.session.add_all([airport1, airport2, airport3, airport4, airport5, airport6, airport7, airport8, airport9 , airport10,
         #                     airport11, airport12, airport13, airport14,airport15])
         # db.session.commit()
-        #
-        # route1 = Route(name='Hà Nội - TP HCM')
-        # route2 = Route(name='Cần Thơ - TP HCM')
-        # route3= Route(name='Đà Nẵng - TP HCM')
-        # route4 = Route(name='Cà Mau - Phu Quoc')
-        # route5= Route(name='Cần Thơ - Hà Nội')
-        # route6 = Route(name='Phú Quốc - Thọ Xuân')
-        # route7 = Route(name='Điện Biên Phủ - Thọ Xuân')
-        # route8 = Route(name='Thọ Xuân - Cần Thơ')
-        # route9 = Route(name='Hà Nội - Phú Bài')
-        # route10 = Route(name='Thọ Xuân - TP HCM')
-        # route11 = Route(name='Rạch Giá - Cần Thơ')
-        # route12 = Route(name='Buôn Ma Thuột - TP HCM')
-        # route13 = Route(name='Rạch Giá - Liên Khương')
-        # route14 = Route(name='Côn Đảo - Phú Quốc')
-        # route15 = Route(name='TP Vinh - Thọ Xuân')
-        # route16 = Route(name='Liên Khương - Cần Thơ')
+
+        # route1 = Route(name='Hà Nội - TP HCM',take_off_airport_id = "1", landing_airport_id = "2")
+        # route2 = Route(name='Cần Thơ - TP HCM',take_off_airport_id = "3", landing_airport_id = "2")
+        # route3= Route(name='Đà Nẵng - TP HCM',take_off_airport_id = "4", landing_airport_id = "2")
+        # route4 = Route(name='Cà Mau - Phu Quoc',take_off_airport_id = "5", landing_airport_id = "6")
+        # route5= Route(name='Cần Thơ - Hà Nội',take_off_airport_id = "3", landing_airport_id = "1")
+        # route6 = Route(name='Phú Quốc - Thọ Xuân',take_off_airport_id = "6", landing_airport_id = "8")
+        # route7 = Route(name='Điện Biên Phủ - Thọ Xuân',take_off_airport_id = "7", landing_airport_id = "8")
+        # route8 = Route(name='Thọ Xuân - Cần Thơ',take_off_airport_id = "8", landing_airport_id = "3")
+        # route9 = Route(name='Hà Nội - Phú Bài',take_off_airport_id = "1", landing_airport_id = "9")
+        # route10 = Route(name='Thọ Xuân - TP HCM',take_off_airport_id = "8", landing_airport_id = "2")
+        # route11 = Route(name='Rạch Giá - Cần Thơ',take_off_airport_id = "11", landing_airport_id = "3")
+        # route12 = Route(name='Buôn Ma Thuột - TP HCM',take_off_airport_id = "12", landing_airport_id = "2")
+        # route13 = Route(name='Rạch Giá - Liên Khương',take_off_airport_id = "11", landing_airport_id = "13")
+        # route14 = Route(name='Côn Đảo - Phú Quốc',take_off_airport_id = "14", landing_airport_id = "6")
+        # route15 = Route(name='TP Vinh - Thọ Xuân',take_off_airport_id = "15", landing_airport_id = "8")
+        # route16 = Route(name='Liên Khương - Cần Thơ',take_off_airport_id = "13", landing_airport_id = "3")
         # db.session.add_all([route1, route2, route3, route4, route5,
         #                     route6, route7, route8, route9,route10,
         #                     route11, route12, route13,route14,route15,
         #                     route16])
         # db.session.commit()
 
-        # route_details1 = RouteDetails(airport_role=AirportRole.DEPARTURE,stop_time="1.1", airport_id='1', routes_id='1')
-        # route_details2 = RouteDetails(airport_role=AirportRole.ARRIVAL,stop_time="1.3", airport_id='2', routes_id='1')
-        #
-        # route_details3 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.15", airport_id='7', routes_id='7')
-        # route_details4 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.2", airport_id='8', routes_id='7')
-        # route_details5 = RouteDetails(airport_role=AirportRole.INTERMEDIATE, stop_time="1.4", airport_id='2', routes_id='7')
-        #
-        # route_details6 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="0.8", airport_id='13', routes_id='16')
-        # route_details7 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="0.7", airport_id='3', routes_id='16')
-        # route_details8 = RouteDetails(airport_role=AirportRole.INTERMEDIATE, stop_time="1", airport_id='2', routes_id='16')
-        #
-        # route_details9 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.25", airport_id='3', routes_id='2')
-        # route_details10 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.25", airport_id='2', routes_id='2')
-        #
-        # route_details11 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.25", airport_id='4', routes_id='3')
-        # route_details12 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.25", airport_id='2', routes_id='3')
-        #
-        # route_details13 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.25", airport_id='3', routes_id='5')
-        # route_details14 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.25", airport_id='1', routes_id='5')
-        # #
-        # route_details15 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.25", airport_id='8', routes_id='10')
-        # route_details16 = RouteDetails(airport_role=AirportRole.INTERMEDIATE, stop_time="1.25", airport_id='6', routes_id='10')
-        # route_details17 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.25", airport_id='2', routes_id='10')
-        #
-        # route_details18 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.25", airport_id='11', routes_id='11')
-        # route_details19 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.25", airport_id='3', routes_id='11')
-        #
-        # route_details20 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.25", airport_id='12', routes_id='12')
-        # route_details21 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.25", airport_id='2', routes_id='12')
-        #
-        # route_details22 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.25", airport_id='11', routes_id='13')
-        # route_details23 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.25", airport_id='13', routes_id='13')
-        #
-        # route_details24 = RouteDetails(airport_role=AirportRole.DEPARTURE, stop_time="1.25", airport_id='14', routes_id='14')
-        # route_details25 = RouteDetails(airport_role=AirportRole.ARRIVAL, stop_time="1.25", airport_id='6', routes_id='14')
-        #
-        #
-        # db.session.add_all([route_details1,route_details2,route_details3, route_details4, route_details5,
-        #                   route_details6 ,route_details7, route_details8, route_details9,
-        #                   route_details10 ,route_details11, route_details12, route_details13,
-        #                   route_details14,route_details15 ,route_details16, route_details17,
-        #                   route_details18, route_details19 ,route_details20, route_details21,
-        #                   route_details22 ,route_details23, route_details24,route_details25])
-        # db.session.commit()
         # # num_of_airport = Column(Integer, nullable=False)
         #     # minimum_duration = Column(Integer, nullable=False)
         #     # num_of_intermediate_airport = Column(Integer, nullable=False)
@@ -310,26 +245,81 @@ if __name__ == "__main__":
         rule2 = Rule(name='num_of_2st_class_seat',value=10)
         # db.session.add_all([rule1,rule2])
         # db.session.commit()
-        flight1 = Flight(name='VN001', departure_time =datetime(2024, 5, 9, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value, plane_id='1', route_id='1')
-        flight2 = Flight(name='VN002', departure_time =datetime(2023, 5, 10, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='2', route_id='1')
-        flight3 = Flight(name='VN003', departure_time =datetime(2023, 6, 3, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='3', route_id='1')
-        flight4 = Flight(name='VN004', departure_time =datetime(2023, 7, 5, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='4', route_id='2')
-        flight5 = Flight(name='VN005', departure_time =datetime(2023, 8, 6, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='5', route_id='2')
-        flight6 = Flight(name='VN006', departure_time =datetime(2023, 9, 7, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='1', route_id='2')
-        flight7 = Flight(name='VN007', departure_time =datetime(2023, 10, 7, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='2', route_id='2')
-        flight8 = Flight(name='VN008', departure_time =datetime(2023, 12, 1, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='3', route_id='3')
-        flight9 = Flight(name='VN009', departure_time =datetime(2023, 11, 2, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='4', route_id='3')
-        flight10 = Flight(name='VN0010', departure_time =datetime(2024, 5, 7, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='5', route_id='3')
-        flight11 = Flight(name='VN0011', departure_time =datetime(2024, 6, 20, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='2', route_id='3')
-        flight12 = Flight(name='VN0012', departure_time =datetime(2024, 7, 21, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='3', route_id='3')
-        flight13 = Flight(name='VN0013', departure_time =datetime(2024, 8, 22, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='4', route_id='4')
-        flight14 = Flight(name='VN0014', departure_time =datetime(2024, 9, 23, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='1', route_id='4')
-        flight15 = Flight(name='VN0015', departure_time =datetime(2024, 10, 28, 11, 00, 00 ), flight_duration=6.5,num_of_1st_seat = rule1.value,num_of_2st_seat= rule2.value,plane_id='2', route_id='4')
+        # flight1 = Flight(name='VN001', take_of_time =datetime(2024, 5, 9, 11, 00, 00 ),
+        #                  landing_time =datetime(2024, 5, 9, 11, 00, 00 ),num_of_1st_seat = rule1.value,
+        #                  num_of_2st_seat= rule2.value, plane_id='1', route_id='1')
+        # flight2 = Flight(name='VN002', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='2', route_id='1')
+        # flight3 = Flight(name='VN003', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='4', route_id='1')
+        # flight4 = Flight(name='VN004', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='2', route_id='2')
+        # flight5 = Flight(name='VN005', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='1', route_id='2')
+        # flight6 = Flight(name='VN006', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='1', route_id='3')
+        # flight7 = Flight(name='VN007', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='2', route_id='4')
+        # flight8 = Flight(name='VN008', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='5', route_id='4')
+        # flight9 = Flight(name='VN009', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='3', route_id='5')
+        # flight10 = Flight(name='VN010', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='3', route_id='6')
+        # flight11 = Flight(name='VN011', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='1', route_id='7')
+        # flight12 = Flight(name='VN012', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='2', route_id='7')
+        # flight13 = Flight(name='VN013', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='4', route_id='8')
+        # flight14 = Flight(name='VN014', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                  num_of_2st_seat=rule2.value, plane_id='4', route_id='9')
+        # flight15 = Flight(name='VN015', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                   landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                   num_of_2st_seat=rule2.value, plane_id='3', route_id='9')
+        # flight16 = Flight(name='VN016', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                   landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                   num_of_2st_seat=rule2.value, plane_id='2', route_id='9')
+        # flight17 = Flight(name='VN017', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                   landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                   num_of_2st_seat=rule2.value, plane_id='1', route_id='10')
+        # flight18 = Flight(name='VN018', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                   landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                   num_of_2st_seat=rule2.value, plane_id='4', route_id='10')
+        # flight19 = Flight(name='VN019', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                   landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                   num_of_2st_seat=rule2.value, plane_id='3', route_id='11')
+        # flight20 = Flight(name='VN020', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
+        #                   landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        #                   num_of_2st_seat=rule2.value, plane_id='4', route_id='12')
+        #
+        # db.session.add_all([flight1,flight2, flight3, flight4, flight5,
+        #                     flight6, flight7, flight8, flight9, flight10,
+        #                     flight11,flight12,flight13,flight14,flight15,
+        #                     flight16,flight17,flight18,flight19,flight20])
+        # db.session.commit()
 
-        db.session.add_all([flight1,flight2, flight3, flight4, flight5,
-                            flight6, flight7, flight8, flight9, flight10,
-                            flight11,flight12,flight13,flight14,flight15])
-        db.session.commit()
+        rule3 = Rule(name='thời gian dừng tối thiểu',value = '20')
+        # db.session.add(rule3)
+        # db.session.commit()
+
+        # mid_airport1 = MidAirport(stop_time = rule3.value,note= 'Dừng x giờ',mid_airport_id = '3', flight_id = '20')
+        # mid_airport2 = MidAirport(stop_time=rule3.value,note='Dừng x giờ', mid_airport_id='2', flight_id='19')
+        # db.session.add_all([mid_airport1,mid_airport2])
+        # db.session.commit()
 
         # flight_schedule1=  FlightSchedule(staff_id = '1' ,flight_id = '2')
         # flight_schedule2 = FlightSchedule(staff_id='1', flight_id='3')
@@ -339,13 +329,13 @@ if __name__ == "__main__":
         # db.session.add_all([flight_schedule1,flight_schedule2,flight_schedule3,flight_schedule4,flight_schedule5])
         # db.session.commit()
         #
-        # rule3 = Rule(name='1st_seat_price',value=1500000)
-        # rule4 = Rule(name='2st_seat_price',value=1000000)
-        # db.session.add_all([rule3,rule4])
+        # rule4 = Rule(name='1st_seat_price',value=1500000)
+        # rule5 = Rule(name='2st_seat_price',value=1000000)
+        # db.session.add_all([rule4,rule5])
         # db.session.commit()
 
-        # fareclass1 = FareClass(name='Ghế Hạng 1',price=rule3.value)
-        # fareclass2 = FareClass(name='Ghế Hạng 2',price=rule4.value)
+        # fareclass1 = FareClass(name='Ghế Hạng 1',price=rule4.value)
+        # fareclass2 = FareClass(name='Ghế Hạng 2',price=rule5.value)
         # db.session.add_all([fareclass1,fareclass2])
         # db.session.commit()
         #
