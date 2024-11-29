@@ -25,7 +25,7 @@ class User(db.Model):
     address = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False, unique=True)
     avatar = Column(String(100), default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg')
-    user_role = Column(Enum(UserRoleEnum), default=UserRoleEnum.CUSTOMER)
+    user_role = Column(Enum(UserRoleEnum),nullable=False)
     joined_date = Column(DateTime, default=datetime.now())
     staff_id = relationship("Staff",uselist=False)
     admin_id = relationship("Admin", uselist=False)
@@ -37,6 +37,8 @@ class User(db.Model):
 class Customer(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
+    username = Column(String(100), nullable=False, unique=True)
+    password = Column(String(255), nullable=False)
     flights = relationship("Ticket",backref="Customer")
 
 #####################################
@@ -159,28 +161,26 @@ if __name__ == "__main__":
         # user1 = User(last_name='Nguyen', first_name='An', phone='0123456789', address='123 Street A', email='an.nguyen@example.com',user_role=UserRoleEnum.ADMIN)
         # user2 = User(last_name='Tran', first_name='Binh', phone='0123456790', address='456 Street B', email='binh.tran@example.com', user_role=UserRoleEnum.ADMIN)
         # user3 = User(last_name='Le', first_name='Cuc', phone='0123456791', address='789 Street C', email='cuc.le@example.com', user_role=UserRoleEnum.STAFF)
-        # user4 = User(last_name='Pham', first_name='Duong', phone='0123456792', address='101 Street D', email='duong.pham@example.com')
-        # user5 = User(last_name='Nguyen', first_name='Minh', phone='0123456793', address='202 Street W', email='minh.nguyen@example.com')
-        # user6 = User(last_name='Hoang', first_name='Tu', phone='0123456723', address='202 Street B', email='tu.hoang@example.com')
-        # user7 = User(last_name='Hoang', first_name='Loc', phone='0123456543', address='202 Street C', email='loc.hoang@example.com')
+        # user4 = User(last_name='Pham', first_name='Duong', phone='0123456792', address='101 Street D', email='duong.pham@example.com',user_role=UserRoleEnum.STAFF)
+        # user5 = User(last_name='Nguyen', first_name='Minh', phone='0123456793', address='202 Street W', email='minh.nguyen@example.com',user_role=UserRoleEnum.CUSTOMER)
+        # user6 = User(last_name='Hoang', first_name='Tu', phone='0123456723', address='202 Street B', email='tu.hoang@example.com',user_role=UserRoleEnum.CUSTOMER)
         #
-        # db.session.add_all([user1,user2,user3,user4,user5,user6,user7])
+        # db.session.add_all([user1,user2,user3,user4,user5,user6])
         # db.session.commit()
-        #
+
         # admin1 = Admin(user_id='1',username='admin1',password=str(hashlib.md5('admin1'.encode('utf-8')).hexdigest()))
         # admin2 = Admin(user_id='2', username='admin2', password=str(hashlib.md5('admin2'.encode('utf-8')).hexdigest()))
         # db.session.add_all([admin1,admin2])
         # db.session.commit()
         #
         # staff1 = Staff(user_id='3',username='staff1',password=str(hashlib.md5('staff1'.encode('utf-8')).hexdigest()))
+        # staff2 = Staff(user_id='4',username='staff2',password=str(hashlib.md5('staff2'.encode('utf-8')).hexdigest()))
         # db.session.add_all([staff1])
         # db.session.commit()
         #
-        # customer1 = Customer(user_id='4')
-        # customer2 = Customer(user_id='5')
-        # customer3 = Customer(user_id='6')
-        # customer4 = Customer(user_id='7')
-        # db.session.add_all([customer1,customer2,customer3,customer4])
+        # customer1 = Customer(user_id='5',username='customer1',password=str(hashlib.md5('customer1'.encode('utf-8')).hexdigest()))
+        # customer2 = Customer(user_id='6', username='customer2',password=str(hashlib.md5('customer2'.encode('utf-8')).hexdigest()))
+        # db.session.add_all([customer1,customer2])
         # db.session.commit()
         #
         # plane1 = Plane(name='VietNam Airlines')
@@ -329,8 +329,8 @@ if __name__ == "__main__":
         # db.session.add_all([flight_schedule1,flight_schedule2,flight_schedule3,flight_schedule4,flight_schedule5])
         # db.session.commit()
         #
-        # rule4 = Rule(name='1st_seat_price',value=1500000)
-        # rule5 = Rule(name='2st_seat_price',value=1000000)
+        rule4 = Rule(name='1st_seat_price',value=1500000)
+        rule5 = Rule(name='2st_seat_price',value=1000000)
         # db.session.add_all([rule4,rule5])
         # db.session.commit()
 
@@ -382,39 +382,23 @@ if __name__ == "__main__":
         #
         # ticket1 = Ticket(customer_id='1',flight_id='1',fareclass_id='1',seat_id='1')
         # ticket2 = Ticket(customer_id='2',flight_id='2',fareclass_id='2',seat_id='2')
-        # ticket3 = Ticket(customer_id='3',flight_id='3',fareclass_id='1',seat_id='3')
-        # ticket4 = Ticket(customer_id='4',flight_id='4',fareclass_id='2',seat_id='4')
+        # ticket3 = Ticket(customer_id='2',flight_id='3',fareclass_id='1',seat_id='3')
+        # ticket4 = Ticket(customer_id='1',flight_id='4',fareclass_id='2',seat_id='4')
         # ticket5 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='5')
         # ticket6 = Ticket(customer_id='2',flight_id='1',fareclass_id='2',seat_id='6')
-        # ticket7 = Ticket(customer_id='3',flight_id='2',fareclass_id='1',seat_id='7')
-        # ticket8 = Ticket(customer_id='4',flight_id='3',fareclass_id='1',seat_id='8')
+        # ticket7 = Ticket(customer_id='2',flight_id='2',fareclass_id='1',seat_id='7')
+        # ticket8 = Ticket(customer_id='1',flight_id='3',fareclass_id='1',seat_id='8')
         # ticket9 = Ticket(customer_id='1',flight_id='4',fareclass_id='2',seat_id='9')
         # ticket10 = Ticket(customer_id='2',flight_id='5',fareclass_id='2',seat_id='10')
-        # ticket11 = Ticket(customer_id='3',flight_id='1',fareclass_id='1',seat_id='11')
-        # ticket12 = Ticket(customer_id='4',flight_id='2',fareclass_id='1',seat_id='12')
+        # ticket11 = Ticket(customer_id='2',flight_id='1',fareclass_id='1',seat_id='11')
+        # ticket12 = Ticket(customer_id='2',flight_id='2',fareclass_id='1',seat_id='12')
         # ticket13 = Ticket(customer_id='1',flight_id='3',fareclass_id='1',seat_id='13')
         # ticket14 = Ticket(customer_id='2',flight_id='4',fareclass_id='2',seat_id='14')
-        # ticket15 = Ticket(customer_id='3',flight_id='5',fareclass_id='1',seat_id='15')
-        # ticket16 = Ticket(customer_id='4',flight_id='1',fareclass_id='1',)
-        # ticket17 = Ticket(customer_id='1',flight_id='2',fareclass_id='2',)
-        # ticket18 = Ticket(customer_id='2',flight_id='3',fareclass_id='1',)
-        # ticket19 = Ticket(customer_id='3',flight_id='4',fareclass_id='1',)
-        # ticket20 = Ticket(customer_id='4',flight_id='5',fareclass_id='2',)
-        # ticket21 = Ticket(customer_id='1',flight_id='1',fareclass_id='2',)
-        # ticket22 = Ticket(customer_id='2',flight_id='2',fareclass_id='1',)
-        # ticket23 = Ticket(customer_id='3',flight_id='3',fareclass_id='2',)
-        # ticket24 = Ticket(customer_id='4',flight_id='4',fareclass_id='2',)
-        # ticket25= Ticket(customer_id='1',flight_id='5',fareclass_id='1',)
-        # ticket26 = Ticket(customer_id='2',flight_id='1',fareclass_id='2',)
-        # ticket27= Ticket(customer_id='3',flight_id='2',fareclass_id='1',)
-        # ticket28= Ticket(customer_id='4',flight_id='3',fareclass_id='2',)
-        # ticket29 = Ticket(customer_id='1',flight_id='4',fareclass_id='1',)
-        # ticket30= Ticket(customer_id='2',flight_id='5',fareclass_id='1',)
+        # ticket15 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='15')
+        #
         # db.session.add_all([ticket1,ticket2,ticket3,ticket4,ticket5,
         #                     ticket6,ticket7,ticket8,ticket9,ticket10,
-        #                     ticket11,ticket12,ticket13,ticket14,ticket15,
-        #                     ticket16,ticket17,ticket18,ticket19,ticket20,
-        #                     ticket21,ticket22,ticket23,ticket24,ticket25,
-        #                     ticket26,ticket27,ticket28,ticket29,ticket30])
+        #                     ticket11,ticket12,ticket13,ticket14,ticket15])
+        #
         # db.session.commit()
 

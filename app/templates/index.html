@@ -3,17 +3,15 @@
 {% block content %}
 
 <div class="container mt-3 bg-primary rounded">
-    <form method="post">
+    <form action="/" method="post">
         <div class="row">
-
             <div class="col-md-5 mt-3">
                 <label class="fs-3 text-uppercase fw-bold text-white">Nơi đi:</label>
-                <select name="take_off" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
-                        id="takeoffSelect" event="click">
+                <select name="takeoff" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" id="takeoffSelect" event="click">
                     {% for airport in take_off_airports %}
                     {% for airportName in airports %}
                     {% if airport.id == airportName.id %}
-                    <option id="selected_option" value="{{airport.id}}">{{airportName.name}}</option>
+                    <option id="selected_option" value="{{ airport.id }}">{{airportName.name}}</option>
                     {% endif %}
                     {% endfor %}
                     {% endfor %}
@@ -33,7 +31,6 @@
                     {% endfor %}
                 </select>
             </div>
-
             <div class="col-md-2 mt-3 p-3  ">
                 <button class="btn btn-primary mt-4 m-3 fs-4 text-uppercase fw-bold bg-success" type="submit">Tìm kiếm
                 </button>
@@ -64,7 +61,9 @@
                 </thead>
 
                 <tbody>
+                {% for route in routes %}
                 {% for flight in flights %}
+                {% if route.id == flight.route_id %}
                 <tr>
                     <td>{{flight.id}}</td>
                     <td>{{flight.name}}</td>
@@ -73,6 +72,8 @@
                     <td>{{flight.num_of_1st_seat}}</td>
                     <td>{{flight.num_of_2st_seat}}</td>
                 </tr>
+                {% endif %}
+                {% endfor %}
                 {% endfor %}
                 </tbody>
 
@@ -84,20 +85,11 @@
 
 
 </div>
-<div class="container bg-danger mt-3">
-    <div class="row">
-        <div class="col-md-3 col-12">
-            {% for route in routes %}
-            <div class="text-danger bg-danger">RouteId:{{route.id}}</div>
-            {% endfor%}
-            <div class="text-primart bg-danger fs-2">None Routes</div>
 
-        </div>
-    </div>
-</div>
 
 
 {% endblock %}
+
 <!--{% block script %}-->
 <!--<script>-->
 <!--    function updatedLandingAirport(){-->

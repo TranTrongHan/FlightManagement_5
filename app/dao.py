@@ -4,8 +4,8 @@ def load_route():
     return Route.query.all()
 
 def load_specific_routes(takeoffId = None, landingairportId=None):
-    if takeoffId or landingairportId:
-        return Route.query.filter(Route.take_off_airport_id == takeoffId)
+    if takeoffId and landingairportId:
+        return Route.query.filter(Route.take_off_airport_id == takeoffId, Route.landing_airport_id == landingairportId)
 
 def load_airport_id(airportrole =None):
     if(airportrole):
