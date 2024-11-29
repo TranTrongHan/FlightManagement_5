@@ -29,5 +29,14 @@ def index():
     return render_template('index.html', take_off_airports=airports, landing_airports=airports2, airports=airportsID,
                            routes=routes, flights=flights)
 
+@app.route('/login', methods = ['get','post'])
+def login_process():
+
+    if request.method.__eq__('POST'):
+        username = request.form.get('username')
+        password = request.form.get('password')
+    return render_template('login.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)

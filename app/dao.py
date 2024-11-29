@@ -1,5 +1,5 @@
-from app.models import Flight, Route, Airport
-
+from app.models import Flight, Route, Airport,Customer,User,Admin
+import hashlib
 def load_route():
     return Route.query.all()
 
@@ -19,3 +19,13 @@ def load_airport():
 
 def load_flights():
     return Flight.query.all()
+
+def auth_user_customer(username,password,role):
+    if (User.user_role == 'Admin'):
+        pass
+    if (User.user_role == 'Staff'):
+        pass
+
+
+    return Customer.query.filter(Customer.username.__eq__(username),
+                                 Customer.password.__eq__(password)).first()

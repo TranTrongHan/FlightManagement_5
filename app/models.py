@@ -27,6 +27,8 @@ class User(db.Model):
     avatar = Column(String(100), default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg')
     user_role = Column(Enum(UserRoleEnum),nullable=False)
     joined_date = Column(DateTime, default=datetime.now())
+    username = Column(String(100), nullable=False, unique=True)
+    password = Column(String(255), nullable=False)
     staff_id = relationship("Staff",uselist=False)
     admin_id = relationship("Admin", uselist=False)
     customer_id = relationship("Customer", uselist=False)
@@ -37,16 +39,12 @@ class User(db.Model):
 class Customer(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
-    username = Column(String(100), nullable=False, unique=True)
-    password = Column(String(255), nullable=False)
     flights = relationship("Ticket",backref="Customer")
 
 #####################################
 class Staff(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer,ForeignKey(User.id),nullable=False,unique=True)
-    username = Column(String(100),nullable=False,unique=True)
-    password = Column(String(255),nullable=False)
     flight_schedules = relationship("FlightSchedule",backref="Staff",lazy=True)
 
     # user = relationship("User",uselist=False)
@@ -55,9 +53,6 @@ class Staff(db.Model):
 class Admin(db.Model):
     id = Column(Integer,primary_key=True,autoincrement=True)
     user_id = Column(Integer,ForeignKey(User.id),nullable=False,unique=True)
-    username = Column(String(100), nullable=False, unique=True)
-    password = Column(String(255), nullable=False)
-
 
 #####################################
 class Plane(db.Model):
@@ -158,31 +153,31 @@ if __name__ == "__main__":
         # db.drop_all()
         # db.create_all()
         #
-        # user1 = User(last_name='Nguyen', first_name='An', phone='0123456789', address='123 Street A', email='an.nguyen@example.com',user_role=UserRoleEnum.ADMIN)
-        # user2 = User(last_name='Tran', first_name='Binh', phone='0123456790', address='456 Street B', email='binh.tran@example.com', user_role=UserRoleEnum.ADMIN)
-        # user3 = User(last_name='Le', first_name='Cuc', phone='0123456791', address='789 Street C', email='cuc.le@example.com', user_role=UserRoleEnum.STAFF)
-        # user4 = User(last_name='Pham', first_name='Duong', phone='0123456792', address='101 Street D', email='duong.pham@example.com',user_role=UserRoleEnum.STAFF)
-        # user5 = User(last_name='Nguyen', first_name='Minh', phone='0123456793', address='202 Street W', email='minh.nguyen@example.com',user_role=UserRoleEnum.CUSTOMER)
-        # user6 = User(last_name='Hoang', first_name='Tu', phone='0123456723', address='202 Street B', email='tu.hoang@example.com',user_role=UserRoleEnum.CUSTOMER)
+        # user1 = User(last_name='Nguyen', first_name='An', phone='0123456789', address='123 Street A', email='an.nguyen@example.com',user_role=UserRoleEnum.ADMIN,username='admin1',password=str(hashlib.md5('admin1'.encode('utf-8')).hexdigest()))
+        # user2 = User(last_name='Tran', first_name='Binh', phone='0123456790', address='456 Street B', email='binh.tran@example.com', user_role=UserRoleEnum.ADMIN, username='admin2', password=str(hashlib.md5('admin2'.encode('utf-8')).hexdigest()))
+        # user3 = User(last_name='Le', first_name='Cuc', phone='0123456791', address='789 Street C', email='cuc.le@example.com', user_role=UserRoleEnum.STAFF,username='staff1',password=str(hashlib.md5('staff1'.encode('utf-8')).hexdigest()))
+        # user4 = User(last_name='Pham', first_name='Duong', phone='0123456792', address='101 Street D', email='duong.pham@example.com',user_role=UserRoleEnum.STAFF,username='staff2',password=str(hashlib.md5('staff2'.encode('utf-8')).hexdigest()))
+        # user5 = User(last_name='Nguyen', first_name='Minh', phone='0123456793', address='202 Street W', email='minh.nguyen@example.com',user_role=UserRoleEnum.CUSTOMER,username='customer1',password=str(hashlib.md5('customer1'.encode('utf-8')).hexdigest()))
+        # user6 = User(last_name='Hoang', first_name='Tu', phone='0123456723', address='202 Street B', email='tu.hoang@example.com',user_role=UserRoleEnum.CUSTOMER, username='customer2',password=str(hashlib.md5('customer2'.encode('utf-8')).hexdigest()))
         #
         # db.session.add_all([user1,user2,user3,user4,user5,user6])
         # db.session.commit()
-
-        # admin1 = Admin(user_id='1',username='admin1',password=str(hashlib.md5('admin1'.encode('utf-8')).hexdigest()))
-        # admin2 = Admin(user_id='2', username='admin2', password=str(hashlib.md5('admin2'.encode('utf-8')).hexdigest()))
+        #
+        # admin1 = Admin(user_id='1')
+        # admin2 = Admin(user_id='2')
         # db.session.add_all([admin1,admin2])
         # db.session.commit()
-        #
-        # staff1 = Staff(user_id='3',username='staff1',password=str(hashlib.md5('staff1'.encode('utf-8')).hexdigest()))
-        # staff2 = Staff(user_id='4',username='staff2',password=str(hashlib.md5('staff2'.encode('utf-8')).hexdigest()))
+
+        # staff1 = Staff(user_id='3')
+        # staff2 = Staff(user_id='4')
         # db.session.add_all([staff1])
         # db.session.commit()
-        #
-        # customer1 = Customer(user_id='5',username='customer1',password=str(hashlib.md5('customer1'.encode('utf-8')).hexdigest()))
-        # customer2 = Customer(user_id='6', username='customer2',password=str(hashlib.md5('customer2'.encode('utf-8')).hexdigest()))
+
+        # customer1 = Customer(user_id='5')
+        # customer2 = Customer(user_id='6')
         # db.session.add_all([customer1,customer2])
         # db.session.commit()
-        #
+
         # plane1 = Plane(name='VietNam Airlines')
         # plane2 = Plane(name='Vietjet Air')
         # plane3 = Plane(name='Jetstar Pacific')
@@ -328,7 +323,7 @@ if __name__ == "__main__":
         # flight_schedule5 = FlightSchedule(staff_id='1', flight_id='6')
         # db.session.add_all([flight_schedule1,flight_schedule2,flight_schedule3,flight_schedule4,flight_schedule5])
         # db.session.commit()
-        #
+
         rule4 = Rule(name='1st_seat_price',value=1500000)
         rule5 = Rule(name='2st_seat_price',value=1000000)
         # db.session.add_all([rule4,rule5])
@@ -379,7 +374,7 @@ if __name__ == "__main__":
         #                     seat21,seat22,seat23,seat24,seat25,
         #                     seat26,seat27,seat28,seat29,seat30])
         # db.session.commit()
-        #
+
         # ticket1 = Ticket(customer_id='1',flight_id='1',fareclass_id='1',seat_id='1')
         # ticket2 = Ticket(customer_id='2',flight_id='2',fareclass_id='2',seat_id='2')
         # ticket3 = Ticket(customer_id='2',flight_id='3',fareclass_id='1',seat_id='3')
