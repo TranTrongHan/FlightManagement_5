@@ -1,4 +1,6 @@
-from app.models import Flight, Route, Airport,Customer,User,Admin
+from datetime import datetime
+from app import db
+from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum
 import hashlib
 def load_route():
     return Route.query.all()
@@ -20,12 +22,43 @@ def load_airport():
 def load_flights():
     return Flight.query.all()
 
-def auth_user_customer(username,password,role):
-    if (User.user_role == 'Admin'):
-        pass
-    if (User.user_role == 'Staff'):
-        pass
+def auth_user(username,password):
+
+    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
 
 
-    return Customer.query.filter(Customer.username.__eq__(username),
-                                 Customer.password.__eq__(password)).first()
+    return User.query.filter(User.username.__eq__(username.strip()),
+                                 User.password.__eq__(password)).first()
+def add_user(last_name,first_name, phone, address,email ,avatar ,username,password ):
+    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    last_name = last_name.strip()
+    first_name = first_name.strip()
+    phone = phone.strip()
+    address = address.strip()
+    email = email.strip()
+    username = username.strip()
+    password = password.strip()
+    u = User(last_name = last_name,first_name = first_name,phone = phone,address = address , email=email,
+             avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg',
+             user_role = UserRoleEnum.CUSTOMER,joined_date =datetime.now(),
+             username = username,password = password)
+    db.session.add(u)
+    db.session.commit()
+def check_user_existence(last_name=None, first_name=None,phone = None, email=None):
+    if email:
+        existing_user_email = User.query.filter_by(email=email.strip()).first()
+        if existing_user_email:
+            return False
+    if phone:
+        existing_phone = User.query.filter_by(phone = phone.strip()).first()
+        if existing_phone:
+            return False
+    if last_name and first_name:
+        existing_user_name = User.query.filter_by(last_name=last_name.strip(), first_name=first_name.strip()).first()
+        if existing_user_name:
+            return False
+    return True
+def existence_check(attribute ,value):
+    return User.query.filter(getattr(User, attribute).__eq__(value)).first()
+def get_user_by_id(id):
+    return User.query.get(id)

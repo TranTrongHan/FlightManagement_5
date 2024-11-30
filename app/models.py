@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 from enum import Enum as RoleEnum
 import  hashlib
 from datetime import datetime, date, time
+from flask_login import UserMixin
 
 class UserRoleEnum(RoleEnum):
     CUSTOMER = 1
@@ -17,7 +18,7 @@ class AirportRole(RoleEnum):
     ARRIVAL = 2
     INTERMEDIATE = 3
 #####################################
-class User(db.Model):
+class User(db.Model,UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     last_name = Column(String(50), nullable=False)
     first_name = Column(String(50), nullable=False)

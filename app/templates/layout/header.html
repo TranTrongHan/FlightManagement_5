@@ -1,23 +1,41 @@
 <nav class="navbar navbar-expand-sm bg-light navbar-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/">
-      <img src="/static/images/logo.png" alt="Avatar Logo" width="100px" height="80px" class="rounded-pill">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="collapsibleNavbar">
-      <ul class="navbar-nav">
-        <li class="nav-item ">
-          <a class="nav-link text-primary text-uppercase font-weight-bold" href="/">Trang chủ</a>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link text-primary text-uppercase font-weight-bold " href="/login">Đăng nhập</a>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link text-primary text-uppercase font-weight-bold" href="#">Đăng ký</a>
-        </li>
-      </ul>
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/static/images/logo.png" alt="Avatar Logo" width="100px" height="80px" class="rounded-pill">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item ">
+                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/">Trang chủ</a>
+                </li>
+
+                {% if current_user.is_authenticated %}
+                <li class="nav-item ">
+                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/">Đặt vé</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/">
+                        <img src="{{current_user.avatar }}" width="25" class="rounded-circle">
+                        <span class="fw-bolder t text-capitalize">Chào, {{ current_user.username }}</span>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/logout">Đăng xuất</a>
+                </li>
+
+                {% else %}
+                <li class="nav-item ">
+                    <a class="nav-link text-primary text-uppercase font-weight-bold " href="/login">Đăng nhập</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/register">Đăng ký</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </div>
     </div>
-  </div>
 </nav>
