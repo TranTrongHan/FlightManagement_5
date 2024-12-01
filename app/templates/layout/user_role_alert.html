@@ -1,0 +1,34 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="modal" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Lỗi đăng nhập</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                Người dùng không hợp lệ
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><a class="text-decoration-none text-light" href="/login">Đóng</a>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    // Tự động mở modal khi trang được nạp
+    window.onload = function() {
+        var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+        myModal.show();
+    };
+</script>
+{% endblock %}

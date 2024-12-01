@@ -1,0 +1,56 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<h1 class="text-center text-succes mt-1 "> XỬ LÍ ĐẶT VÉ </h1>
+<div class="container-fluid mt-3 bg-secondary rounded w-auto p-3">
+    <div class="row">
+        <div class="col-md-6 mt-3">
+            <label class="fs-3 text-uppercase text-info">Nơi đi:</label>
+            {% for route in route %}
+            {% for airport in airports %}
+            {% if route.take_off_airport_id == airport.id %}
+            <span class="rounded-pill bg-primary text-white fs-3 p-2">{{airport.name }}</span>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+
+        </div>
+        <div class="col-md-6 mt-3">
+            <label class="fs-3 text-uppercase text-info">Nơi đến:</label>
+            {% for route in route %}
+            {% for airport in airports %}
+            {% if route.landing_airport_id == airport.id %}
+            <span class="rounded-pill bg-primary text-white fs-3 p-2">{{airport.name }}</span>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mt-3">
+            <label class="fs-3 text-uppercase text-info">Ngày đi:</label>
+            <span class="rounded-pill bg-primary text-white fs-3 p-2">Name</span>
+        </div>
+        <div class="col-md-6 mt-3">
+            <label class="fs-3 text-uppercase text-info">Ngày về:</label>
+            <span class="rounded-pill bg-primary text-white fs-3 p-2">Name</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mt-3 col-12 ">
+            <label class="fs-3 text-uppercase text-info">Chuyến bay:</label>
+            <span class="rounded-pill bg-primary text-white fs-3 p-2">{{flight.name}}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mt-3 ">
+            <label class="fs-3 text-uppercase text-info">Thời gian cất cánh:</label>
+            <span class="rounded-pill bg-primary text-white fs-3 p-2">{{flight.take_of_time}}</span>
+        </div>
+        <div class="col-md-6 mt-3 ">
+            <label class="fs-3 text-uppercase text-info">Thời gian hạ cánh:</label>
+            <span class="rounded-pill bg-primary text-white fs-3 p-2">{{flight.landing_time}}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

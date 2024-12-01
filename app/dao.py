@@ -2,12 +2,17 @@ from datetime import datetime
 from app import db
 from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum
 import hashlib
-def load_route():
-    return Route.query.all()
+def load_route(route_id = None):
+    query = Route.query
+    if route_id:
+        query = query.filter(Route.id  == route_id)
+    return query.all()
 
 def load_specific_routes(takeoffId = None, landingairportId=None):
     if takeoffId and landingairportId:
-        return Route.query.filter(Route.take_off_airport_id == takeoffId, Route.landing_airport_id == landingairportId)
+        return Route.query.filter(Route.take_off_airport_id == takeoffId,
+                                  Route.landing_airport_id == landingairportId)
+
 
 def load_airport_id(airportrole =None):
     if(airportrole):
@@ -19,16 +24,26 @@ def load_airport_id(airportrole =None):
 def load_airport():
     return Airport.query.all()
 
-def load_flights():
-    return Flight.query.all()
+def load_flights(flight_id=None):
+    query = Flight.query
+    if flight_id:
+        query = query.filter(Flight.id == flight_id)
+    return query.all()
 
 def auth_user(username,password):
 
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
 
-
     return User.query.filter(User.username.__eq__(username.strip()),
                                  User.password.__eq__(password)).first()
+def check_staff_role(username , password,role):
+    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    u =  User.query.filter(User.username.__eq__(username.strip()),
+                                 User.password.__eq__(password)).first()
+    if u.__getattribute__('user_role') == role:
+        return True
+    return False
+
 def add_user(last_name,first_name, phone, address,email ,avatar ,username,password ):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     last_name = last_name.strip()
@@ -58,7 +73,12 @@ def check_user_existence(last_name=None, first_name=None,phone = None, email=Non
         if existing_user_name:
             return False
     return True
+
 def existence_check(attribute ,value):
     return User.query.filter(getattr(User, attribute).__eq__(value)).first()
+
 def get_user_by_id(id):
     return User.query.get(id)
+
+def get_flight_by_id(id):
+    return Flight.query.get(id)

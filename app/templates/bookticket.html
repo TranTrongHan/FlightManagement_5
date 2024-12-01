@@ -1,31 +1,32 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-
-<div class="container mt-3 bg-primary rounded">
-    <form action="/" method="post">
+{% if current_user.is_authenticated %}
+<h1 class="text-center text-succes mt-1 "> ĐẶT VÉ  </h1>
+<div class="container mt-3 bg-success rounded">
+  <form action="/bookticket" method="post">
         <div class="row">
-            <div class="col-md-5 mt-3 ">
-                <label for="takeoff" class="fs-3 text-uppercase fw-bold text-white">Nơi đi:</label>
-                <select name="takeoff" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
+            <div class="col-md-5 mt-3">
+                <label for="takeoff1" class="fs-3 text-uppercase fw-bold text-white">Nơi đi:</label>
+                <select name="takeoff1" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
                         event="click">
                     {% for airport in take_off_airports %}
                     {% for airportName in airports %}
                     {% if airport.id == airportName.id %}
-                    <option id="takeoff" value="{{ airport.id }}">{{airportName.name}}</option>
+                    <option id="takeoff1" value="{{ airport.id }}">{{airportName.name}}</option>
                     {% endif %}
                     {% endfor %}
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-5 mt-3 p  ">
-                <label for="landing" class="fs-3 text-uppercase fw-bold text-white">Nơi đến:</label>
-                <select name="landing" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
+            <div class="col-md-5 mt-3 p">
+                <label for="landing1" class="fs-3 text-uppercase fw-bold text-white">Nơi đến:</label>
+                <select name="landing1" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
                         event="click">
                     {% for airport in landing_airports %}
                     {% for airportName in airports %}
                     {% if airport.id == airportName.id %}
-                    <option id="landing" value=" {{airport.id}} ">{{airportName.name}}</option>
+                    <option id="landing1" value=" {{airport.id}} ">{{airportName.name}}</option>
                     {% endif %}
                     {% endfor %}
                     {% endfor %}
@@ -72,11 +73,9 @@
                     <td>{{flight.num_of_1st_seat}}</td>
                     <td>{{flight.num_of_2st_seat}}</td>
                     <td>
-                        <form action="/bookticket" , method="post">
-                            <button class="btn btn-primary  text-uppercase fw-bold bg-success"
-                                    type="submit">Đặt vé
-                            </button>
-                        </form>
+                       <a href="/bookticket_process?route={{ route.id }}&flight={{flight.id}}" class="text-decoration-none">
+                           Đặt vé
+                       </a>
                     </td>
                 </tr>
                 {% endif %}
@@ -88,9 +87,22 @@
         </div>
 
     </form>
-
-
 </div>
+{% else %}
+<h1 class="text-center text-danger mt-1"> Vui lòng đăng nhập trước khi thực hiện đặt vé </h1>
+<form action="/login" method="post">
+    <div class="form-floating mb-3 mt-3">
+        <input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập" name="username">
+        <label for="username">Tên đăng nhập</label>
+    </div>
 
+    <div class="form-floating mt-3 mb-3">
+        <input type="password" class="form-control" id="password" placeholder="Enter password" name="password">
+        <label for="password">Mật khẩu</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Đăng nhập</button>
+</form>
+
+{% endif %}
 
 {% endblock %}

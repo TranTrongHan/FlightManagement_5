@@ -1,3 +1,4 @@
+
 <nav class="navbar navbar-expand-sm bg-light navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
@@ -11,10 +12,11 @@
                 <li class="nav-item ">
                     <a class="nav-link text-primary text-uppercase font-weight-bold" href="/">Trang chủ</a>
                 </li>
-
-                {% if current_user.is_authenticated %}
                 <li class="nav-item ">
-                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/bookticket">Đặt vé</a>
+                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/create_flight_schedule">Lập lịch chuyến bay</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/sell_tickets">Bán vé</a>
                 </li>
                 <li class="nav-item ">
                     <a class="nav-link text-primary text-uppercase font-weight-bold" href="/">
@@ -25,15 +27,6 @@
                 <li class="nav-item ">
                     <a class="nav-link text-primary text-uppercase font-weight-bold" href="/logout">Đăng xuất</a>
                 </li>
-
-                {% else %}
-                <li class="nav-item ">
-                    <a class="nav-link text-primary text-uppercase font-weight-bold " href="/login">Đăng nhập</a>
-                </li>
-                <li class="nav-item ">
-                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/register">Đăng ký</a>
-                </li>
-                {% endif %}
 
             </ul>
         </div>

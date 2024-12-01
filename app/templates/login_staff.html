@@ -1,22 +1,17 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-<h1 class="text-center text-danger mt-1">ĐĂNG NHẬP NGƯỜI DÙNG</h1>
-<form action="/login" method="post">
+<h1 class="text-center text-danger mt-1">ĐĂNG NHẬP NHÂN VIÊN</h1>
+<form action="/login_staff" method="post">
     <div class="form-floating mb-3 mt-3">
         <input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập" name="username">
         <label for="username">Tên đăng nhập</label>
     </div>
+
     <div class="form-floating mt-3 mb-3">
         <input type="password" class="form-control" id="password" placeholder="Enter password" name="password">
         <label for="password">Mật khẩu</label>
     </div>
     <button type="submit" class="btn btn-primary">Đăng nhập</button>
-
 </form>
-<div class="row">
-    <div class="col-sm-2 p-2 mt-3 ms-2 rounded bg-success ">
-        <a href="/login_staff" class="text-decoration-none text-white fw-bold">Đăng nhập nhân viên</a>
-    </div>
-</div>
 {% endblock %}
