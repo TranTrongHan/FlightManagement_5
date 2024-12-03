@@ -1,7 +1,8 @@
 from datetime import datetime
 from app import db
-from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum
+from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum, FareClass, Plane, Seat, Ticket
 import hashlib
+import random
 def load_route(route_id = None):
     query = Route.query
     if route_id:
@@ -29,14 +30,15 @@ def load_flights(flight_id=None):
     if flight_id:
         query = query.filter(Flight.id == flight_id)
     return query.all()
-
+def load_fareclass():
+    return FareClass.query.all()
 def auth_user(username,password):
 
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
 
     return User.query.filter(User.username.__eq__(username.strip()),
                                  User.password.__eq__(password)).first()
-def check_staff_role(username , password,role):
+def check_role(username , password,role):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     u =  User.query.filter(User.username.__eq__(username.strip()),
                                  User.password.__eq__(password)).first()
@@ -82,3 +84,20 @@ def get_user_by_id(id):
 
 def get_flight_by_id(id):
     return Flight.query.get(id)
+
+
+def load_empty_seat(planeid):
+    return Seat.query.filter(Seat.plane_id == planeid,Seat.status==0).all()
+
+
+def get_ticket_by_seat(seatid):
+    return Ticket.query.get(Ticket.seat_id == seatid).first()
+
+def get_seat_by_id(seatid):
+    return Seat.query.get(seatid)
+
+def load_plane():
+    return Plane.query.all()
+
+def get_plane_by_id(planeid):
+    return Plane.query.get(planeid)

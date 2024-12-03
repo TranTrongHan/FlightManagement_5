@@ -2,9 +2,9 @@
 
 {% block content %}
 {% if current_user.is_authenticated %}
-<h1 class="text-center text-succes mt-1 "> ĐẶT VÉ  </h1>
+<h1 class="text-center text-succes mt-1 "> ĐẶT VÉ </h1>
 <div class="container mt-3 bg-success rounded">
-  <form action="/bookticket" method="post">
+    <form action="/bookticket" method="post">
         <div class="row">
             <div class="col-md-5 mt-3">
                 <label for="takeoff1" class="fs-3 text-uppercase fw-bold text-white">Nơi đi:</label>
@@ -13,7 +13,9 @@
                     {% for airport in take_off_airports %}
                     {% for airportName in airports %}
                     {% if airport.id == airportName.id %}
-                    <option id="takeoff1" value="{{ airport.id }}">{{airportName.name}}</option>
+                    <option id="takeoff1" value="{{ airport.id }}">
+                        {{airportName.name}}
+                    </option>
                     {% endif %}
                     {% endfor %}
                     {% endfor %}
@@ -53,6 +55,7 @@
                 <thead>
                 <tr>
                     <th>Mã chuyến bay</th>
+                    <th>Tên máy bay</th>
                     <th>Tên chuyến bay</th>
                     <th>Ngày giờ cất cánh</th>
                     <th>Ngày giờ hạ cánh</th>
@@ -67,15 +70,23 @@
                 {% if route.id == flight.route_id %}
                 <tr>
                     <td>{{flight.id}}</td>
+                    {% for plane in planes %}
+                    {% if flight.plane_id == plane.id %}
+                    <td>{{plane.name}}</td>
+                    {% endif %}
+                    {% endfor %}
+
+
                     <td>{{flight.name}}</td>
                     <td>{{flight.take_of_time}}</td>
                     <td>{{flight.landing_time}}</td>
                     <td>{{flight.num_of_1st_seat}}</td>
                     <td>{{flight.num_of_2st_seat}}</td>
                     <td>
-                       <a href="/bookticket_process?route={{ route.id }}&flight={{flight.id}}" class="text-decoration-none">
-                           Đặt vé
-                       </a>
+                        <a href="/bookticket_process?route={{ route.id }}&&flight={{flight.id}}&user={{current_user.id}}&takeoff_time={{flight.take_of_time}}&landing_time={{flight.landing_time}}&plane={{flight.plane_id}}"
+                           class="text-decoration-none">
+                            Đặt vé
+                        </a>
                     </td>
                 </tr>
                 {% endif %}
@@ -105,4 +116,5 @@
 
 {% endif %}
 
+<script src="{{url_for('static',filename='js/ticket.js')}}"></script>
 {% endblock %}

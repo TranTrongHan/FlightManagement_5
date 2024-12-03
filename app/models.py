@@ -242,19 +242,19 @@ if __name__ == "__main__":
         # db.session.add_all([rule1,rule2])
         # db.session.commit()
         # flight1 = Flight(name='VN001', take_of_time =datetime(2024, 5, 9, 11, 00, 00 ),
-        #                  landing_time =datetime(2024, 5, 9, 11, 00, 00 ),num_of_1st_seat = rule1.value,
+        #                  landing_time =datetime(2024, 5, 12, 12, 00, 00 ),num_of_1st_seat = rule1.value,
         #                  num_of_2st_seat= rule2.value, plane_id='1', route_id='1')
-        # flight2 = Flight(name='VN002', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
-        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        # flight2 = Flight(name='VN002', take_of_time=datetime(2024, 6, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 6, 10, 11, 00, 00), num_of_1st_seat=rule1.value,
         #                  num_of_2st_seat=rule2.value, plane_id='2', route_id='1')
-        # flight3 = Flight(name='VN003', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
-        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        # flight3 = Flight(name='VN003', take_of_time=datetime(2024, 10, 9, 11, 00, 00),
+        #                  landing_time=datetime(2024, 10, 13, 11, 00, 00), num_of_1st_seat=rule1.value,
         #                  num_of_2st_seat=rule2.value, plane_id='4', route_id='1')
-        # flight4 = Flight(name='VN004', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
-        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        # flight4 = Flight(name='VN004', take_of_time=datetime(2024,8, 1, 11, 00, 00),
+        #                  landing_time=datetime(2024, 8, 4, 11, 00, 00), num_of_1st_seat=rule1.value,
         #                  num_of_2st_seat=rule2.value, plane_id='2', route_id='2')
-        # flight5 = Flight(name='VN005', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
-        #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
+        # flight5 = Flight(name='VN005', take_of_time=datetime(2024, 10, 12, 11, 00, 00),
+        #                  landing_time=datetime(2024, 10, 13, 11, 00, 00), num_of_1st_seat=rule1.value,
         #                  num_of_2st_seat=rule2.value, plane_id='1', route_id='2')
         # flight6 = Flight(name='VN006', take_of_time=datetime(2024, 5, 9, 11, 00, 00),
         #                  landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
@@ -312,8 +312,8 @@ if __name__ == "__main__":
         # db.session.add(rule3)
         # db.session.commit()
 
-        # mid_airport1 = MidAirport(stop_time = rule3.value,note= 'Dừng x giờ',mid_airport_id = '3', flight_id = '20')
-        # mid_airport2 = MidAirport(stop_time=rule3.value,note='Dừng x giờ', mid_airport_id='2', flight_id='19')
+        # mid_airport1 = MidAirport(stop_time = rule3.value,note= 'Dừng x giờ',mid_airport_id = '5', flight_id = '1')
+        # mid_airport2 = MidAirport(stop_time=rule3.value,note='Dừng x giờ', mid_airport_id='6', flight_id='2')
         # db.session.add_all([mid_airport1,mid_airport2])
         # db.session.commit()
 
@@ -338,36 +338,36 @@ if __name__ == "__main__":
         # TRUE = BOOKED, FALSE = EMPTY
         # BOOKED SEAT
         # seat1 = Seat(name='Seat001',status=True,plane_id='1')
-        # seat2 = Seat(name='Seat002',status=True,plane_id='1')
-        # seat3 = Seat(name='Seat003',status=True,plane_id='1')
+        # seat2 = Seat(name='Seat002',status=True,plane_id='2')
+        # seat3 = Seat(name='Seat003',status=True,plane_id='3')
         # seat4 = Seat(name='Seat004',status=True,plane_id='1')
-        # seat5 = Seat(name='Seat005',status=True,plane_id='1')
-        # seat6 = Seat(name='Seat006',status=True,plane_id='1')
+        # seat5 = Seat(name='Seat005',status=True,plane_id='2')
+        # seat6 = Seat(name='Seat006',status=True,plane_id='3')
         # seat7 = Seat(name='Seat007',status=True,plane_id='1')
-        # seat8 = Seat(name='Seat008',status=True,plane_id='1')
-        # seat9 = Seat(name='Seat008',status=True,plane_id='1')
+        # seat8 = Seat(name='Seat008',status=True,plane_id='2')
+        # seat9 = Seat(name='Seat008',status=True,plane_id='3')
         # seat10 = Seat(name='Seat010',status=True,plane_id='1')
-        # seat11 = Seat(name='Seat011',status=True,plane_id='1')
-        # seat12 = Seat(name='Seat012',status=True,plane_id='1')
+        # seat11 = Seat(name='Seat011',status=True,plane_id='2')
+        # seat12 = Seat(name='Seat012',status=True,plane_id='3')
         # seat13 = Seat(name='Seat013',status=True,plane_id='1')
-        # seat14 = Seat(name='Seat014',status=True,plane_id='1')
-        # seat15= Seat(name='Seat0015',status=True,plane_id='1')
+        # seat14 = Seat(name='Seat014',status=True,plane_id='2')
+        # seat15= Seat(name='Seat015',status=True,plane_id='3')
         # #EMPTY SEAT
         # seat16 = Seat(name='Seat016', status=False, plane_id='1')
-        # seat17 = Seat(name='Seat017', status=False, plane_id='1')
-        # seat18 = Seat(name='Seat018', status=False, plane_id='1')
+        # seat17 = Seat(name='Seat017', status=False, plane_id='2')
+        # seat18 = Seat(name='Seat018', status=False, plane_id='3')
         # seat19 = Seat(name='Seat019', status=False, plane_id='1')
-        # seat20 = Seat(name='Seat020', status=False, plane_id='1')
-        # seat21 = Seat(name='Seat021', status=False, plane_id='1')
+        # seat20 = Seat(name='Seat020', status=False, plane_id='2')
+        # seat21 = Seat(name='Seat021', status=False, plane_id='3')
         # seat22 = Seat(name='Seat022', status=False, plane_id='1')
-        # seat23 = Seat(name='Seat023', status=False, plane_id='1')
-        # seat24 = Seat(name='Seat024', status=False, plane_id='1')
+        # seat23 = Seat(name='Seat023', status=False, plane_id='2')
+        # seat24 = Seat(name='Seat024', status=False, plane_id='3')
         # seat25 = Seat(name='Seat025', status=False, plane_id='1')
-        # seat26 = Seat(name='Seat026', status=False, plane_id='1')
-        # seat27 = Seat(name='Seat027', status=False, plane_id='1')
+        # seat26 = Seat(name='Seat026', status=False, plane_id='2')
+        # seat27 = Seat(name='Seat027', status=False, plane_id='3')
         # seat28 = Seat(name='Seat028', status=False, plane_id='1')
-        # seat29 = Seat(name='Seat029', status=False, plane_id='1')
-        # seat30 = Seat(name='Seat030', status=False, plane_id='1')
+        # seat29 = Seat(name='Seat029', status=False, plane_id='2')
+        # seat30 = Seat(name='Seat030', status=False, plane_id='3')
         # db.session.add_all([seat1,seat2,seat3,seat4,seat5,
         #                     seat6,seat7,seat8,seat9,seat10,
         #                     seat11,seat12,seat13,seat14,seat15,
@@ -387,14 +387,27 @@ if __name__ == "__main__":
         # ticket9 = Ticket(customer_id='1',flight_id='4',fareclass_id='2',seat_id='9')
         # ticket10 = Ticket(customer_id='2',flight_id='5',fareclass_id='2',seat_id='10')
         # ticket11 = Ticket(customer_id='2',flight_id='1',fareclass_id='1',seat_id='11')
-        # ticket12 = Ticket(customer_id='2',flight_id='2',fareclass_id='1',seat_id='12')
+        # ticket12 = Ticket(customer_id='2',flight_id='2',fareclass_id='2',seat_id='12')
         # ticket13 = Ticket(customer_id='1',flight_id='3',fareclass_id='1',seat_id='13')
         # ticket14 = Ticket(customer_id='2',flight_id='4',fareclass_id='2',seat_id='14')
-        # ticket15 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='15')
+        # ticket15 = Ticket(customer_id='1',flight_id='5',fareclass_id='1',seat_id='15')
+        # ticket16 = Ticket(customer_id='1',flight_id='5',fareclass_id='1',seat_id='16')
+        # ticket17 = Ticket(customer_id='2',flight_id='5',fareclass_id='2',seat_id='17')
+        # ticket18 = Ticket(customer_id='1',flight_id='5',fareclass_id='1',seat_id='18')
+        # ticket19 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='19')
+        # ticket20 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='20')
+        # ticket21 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='21')
+        # ticket22 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='22')
+        # ticket23 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='23')
+        # ticket24 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='24')
+        # ticket25 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='25')
+        # ticket26 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='26')
         #
         # db.session.add_all([ticket1,ticket2,ticket3,ticket4,ticket5,
         #                     ticket6,ticket7,ticket8,ticket9,ticket10,
-        #                     ticket11,ticket12,ticket13,ticket14,ticket15])
+        #                     ticket11,ticket12,ticket13,ticket14,ticket15,
+        #                     ticket16,ticket17,ticket18,ticket19,ticket20,
+        #                     ticket21,ticket22,ticket23,ticket24,ticket25,ticket26])
         #
         # db.session.commit()
 
