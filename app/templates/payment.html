@@ -1,0 +1,64 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<h1 class="alert alert-info">PAYMENT</h1>
+<div class="row">
+    <div class="col-5 card">
+        <div class="card-header text-center">Thông tin vé</div>
+        <div class="card-body">
+            {% if seats %}
+            {% for seat in seats %}
+            <div>
+                <p>Mã ghế ngồi : <span>{{seat.id}}</span></p>
+            </div>
+            <div>
+                <p>Mã chuyến bay : <span>{{session.get("ticket_info").get("flightid").get("id")}}</span></p>
+            </div>
+            <div>
+                <p>Khách hàng : <span>{{cus_name}}</span></p>
+            </div>
+            <div>
+                <p>Hạng vé : <span>{{fareclass_name}}</span></p>
+            </div>
+            <div>
+                <p>Giá vé : <span>{{"{:,.0f}".format(price)}} VNĐ</span></p>
+            </div>
+            <div>
+                <p>Mã máy bay: <span>{{session.get("ticket_info").get("planeid")}}</span></p>
+            </div>
+            <div>
+                <p>Tên máy bay: <span>{{plane_name}}</span></p>
+            </div>
+            <hr>
+            {% endfor %}
+            <div class="alert alert-info">
+                <h3>Số lượng vé: <span id="quantity">{{quantity}}</span></h3>
+                <h3>Tổng tiền: <span> </span> <span id="totalPrice" class="text-success">{{"{:,.0f}".format(quantity*price)}} VNĐ</span>
+                </h3>
+            </div>
+            <div class="row">
+                <div class="col-3 mt-3">
+                    <input type="button" value="Thanh toan" class="btn btn-danger" onclick="pay()">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">KHÔNG CÓ VÉ</div>
+    {% endif %}
+    <div class="col-5 card ms-3 ">
+        <div class="card-header text-center">Phương thức thanh toán</div>
+        <div class="card-body">
+            <a class="col-5" href="#">
+                <figure class="figure Momo-payment">
+                    <img src="https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/momonew-1664036377132.png"
+                         class="figure-img img-fluid rounded" alt=MoMo">
+                    <figcaption class="figure-caption text-center">Momo</figcaption>
+                </figure>
+            </a>
+        </div>
+    </div>
+</div>
+<script src="{{url_for('static',filename='js/bookticket.js')}}"></script>
+
+{% endblock %}

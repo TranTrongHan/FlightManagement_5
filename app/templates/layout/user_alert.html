@@ -7,7 +7,8 @@
             <!-- Modal Header -->
             <div class="modal-header">
                 <h4 class="modal-title">Lỗi đăng nhập</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                 <a class="text-decoration-none text-light btn-close" href="/login"></a>
             </div>
 
             <!-- Modal body -->
@@ -30,5 +31,15 @@
         var myModal = new bootstrap.Modal(document.getElementById('myModal'));
         myModal.show();
     };
+    function redirectToPage() {
+        // Chuyển hướng đến trang mới
+        window.location.href = '/login';  // Thay đổi thành URL thực tế
+    }
+
+    // Đợi DOM tải xong
+    document.addEventListener('DOMContentLoaded', function() {
+        // Thêm sự kiện nhấp chuột cho toàn bộ tài liệu
+        document.body.addEventListener('click', redirectToPage);
+    });
 </script>
 {% endblock %}

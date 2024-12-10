@@ -25,19 +25,27 @@ def load_airport_id(airportrole =None):
 def load_airport():
     return Airport.query.all()
 
-def load_flights(flight_id=None):
+def load_flights(flight_id=None,depart_time = None,return_time=None):
     query = Flight.query
     if flight_id:
         query = query.filter(Flight.id == flight_id)
+    if depart_time and return_time:
+        depart_time = datetime.strptime(depart_time, '%Y-%m-%d')
+        return_time = datetime.strptime(return_time, '%Y-%m-%d')
+        query = query.filter(Flight.take_of_time >= depart_time,Flight.landing_time<=return_time)
     return query.all()
 def load_fareclass():
     return FareClass.query.all()
-def auth_user(username,password):
-
+def load_plane():
+    return Plane.query.all()
+def load_empty_seat_by_plane(planeid):
+    return Seat.query.filter(Seat.plane_id == planeid,Seat.status==0)
+def auth_user(username,password,role=None):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-
-    return User.query.filter(User.username.__eq__(username.strip()),
-                                 User.password.__eq__(password)).first()
+    u = User.query.filter(User.username.__eq__(username),User.password.__eq__(password))
+    if role:
+        u = u.filter(User.user_role.__eq__(role))
+    return u.first()
 def check_role(username , password,role):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     u =  User.query.filter(User.username.__eq__(username.strip()),
@@ -84,20 +92,28 @@ def get_user_by_id(id):
 
 def get_flight_by_id(id):
     return Flight.query.get(id)
+def get_plane_by_id(id):
+    return Plane.query.get(id)
+def get_ticket_by_seat(id):
+    return Ticket.query.filter(Ticket.seat_id==id).first()
+def count_seat(planeid):
+    return Seat.query.filter(Seat.plane_id == planeid,Seat.status==0).count()
+def get_fareclass_by_name(name):
+    return FareClass.query.get(name)
+def get_fareclass_by_id(id):
+    return FareClass.query.get(id)
+def get_last_seat():
+    seat = Seat.query.order_by(Seat.id.desc()).first()
+
+def get_name_by_id(model, id):
+    instance = model.query.filter(model.id == id).first()  # Lấy đối tượng theo id
+    if instance:
+        return instance.name  # Trả về tên nếu tìm thấy
+    return None  # Trả về None nếu không tìm thấy
+def get_price(id):
+    fareclass = FareClass.query.filter(FareClass.id==id).first()
+    if fareclass:
+        return fareclass.price
+    return '0'
 
 
-def load_empty_seat(planeid):
-    return Seat.query.filter(Seat.plane_id == planeid,Seat.status==0).all()
-
-
-def get_ticket_by_seat(seatid):
-    return Ticket.query.get(Ticket.seat_id == seatid).first()
-
-def get_seat_by_id(seatid):
-    return Seat.query.get(seatid)
-
-def load_plane():
-    return Plane.query.all()
-
-def get_plane_by_id(planeid):
-    return Plane.query.get(planeid)

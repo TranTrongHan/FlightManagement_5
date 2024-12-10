@@ -1,13 +1,10 @@
-from idlelib.rpc import request_queue
 import re
-from flask import render_template, request, redirect,jsonify,session
-from sqlalchemy.sql.functions import random
-from sqlalchemy.sql.operators import is_distinct_from
-import dao,utils
+from flask import render_template, request, redirect, jsonify, session
+from sqlalchemy.sql.functions import current_user
+import dao, utils
 from app import app, login
-from flask_login import login_user, logout_user
-import  random
-from app.models import UserRoleEnum
+from flask_login import login_user, logout_user, login_required
+from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User
 
 
 @app.route('/', methods=['get', 'post'])
@@ -40,7 +37,7 @@ def login_process():
 
         u = dao.auth_user(username=username, password=password)
         if u:
-            role_check = dao.check_role(username=username, password=password, role=UserRoleEnum.CUSTOMER  )
+            role_check = dao.check_role(username=username, password=password, role=UserRoleEnum.CUSTOMER)
             if role_check:
                 login_user(u)
                 return redirect('/')
@@ -51,13 +48,14 @@ def login_process():
 
     return render_template('login.html')
 
+
 @app.route('/login_staff', methods=['get', 'post'])
 def login_staff():
     if request.method.__eq__('POST'):
         username = request.form.get('username')
         password = request.form.get('password')
         u = dao.auth_user(username=username, password=password)
-        if u :
+        if u:
             role_check = dao.check_role(username=username, password=password, role=UserRoleEnum.STAFF)
             if role_check:
                 login_user(u)
@@ -69,16 +67,36 @@ def login_staff():
 
     return render_template('login_staff.html')
 
+
+@app.route('/login_admin', methods=['post'])
+def login_admin():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    u = dao.auth_user(username=username, password=password, role=UserRoleEnum.ADMIN)
+    if u:
+        login_user(u)
+    elif not u:
+        return redirect('/user_alert')
+
+
+    return redirect('/admin')
+
+
 @app.route('/user_alert')
 def user_alert():
     return render_template('layout/user_alert.html')
+
+
 @app.route('/role_alert')
 def role_alert():
     return render_template('layout/user_role_alert.html')
 
+
 @app.route('/staffpage')
 def staff_page():
     return render_template('staffpage.html')
+
+
 @app.route('/logout')
 def log_out_process():
     logout_user()
@@ -132,6 +150,7 @@ def register_process():
 
 
 @app.route('/bookticket', methods=['GET', 'POST'])
+@login_required
 def bookticket():
     # lấy danh sách id sân bay đi
     airports = dao.load_airport_id('takeoffairport')
@@ -139,101 +158,128 @@ def bookticket():
     airports2 = dao.load_airport_id()
     # lấy danh sách id sân bay
     airportsID = dao.load_airport()
+    fareclass = dao.load_fareclass()
 
     if request.method.__eq__('POST'):
         takeoff_airport1 = request.form.get('takeoff1')
         landing_airport1 = request.form.get('landing1')
+        departure_time = request.form.get('departureTime')
+        return_time = request.form.get('returnTime')
+
         # lấy danh sách chuyến bay có nơi đi, nơi đến theo yêu cầu
         routes = dao.load_specific_routes(takeoffId=takeoff_airport1, landingairportId=landing_airport1)
-        flights = dao.load_flights()
-        # lấy route id bằng query paremeters
-        route_id = request.args.get('route')
-        # lấy route bằng routeid
-        route = dao.load_route(route_id=route_id)
 
-        ## generate 1 seat chưa được đặt (status = 0), ở đây 1 seat đã được gán cho 1 ticket, chỉ cần tìm seat chưa được đặt của chuyến bay đó thì sẽ có 1 vé
-        # lấy danh sách máy bay
-        planes = dao.load_plane()
+        if utils.check_valid_date(depart_time=departure_time, return_time=return_time):
+            flights = dao.load_flights(depart_time=departure_time, return_time=return_time)
+            planes = dao.load_plane()
+            return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
+                                   airports=airportsID, routes=routes, flights=flights, planes=planes,
+                                   fareclass=fareclass)
+        else:
+            return redirect('/invalid_date')
 
-        ## lấy danh sách ghế trống của máy bay đó
+    return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
+                           airports=airportsID, fareclass=fareclass)
 
-        ## lấy ngẫu nhiên 1 ghế trống
-        # random_seat = dao.get_seat_by_id(random.randint(1, len(seats)))
-        return render_template('bookticket.html',take_off_airports=airports, landing_airports=airports2,
-                           airports=airportsID,routes=routes,flights=flights,planes=planes)
 
-    return render_template('bookticket.html',take_off_airports=airports, landing_airports=airports2,
-                           airports=airportsID)
+@app.route('/invalid_date')
+def invalid_date_form():
+    return render_template('layout/invalid_date.html')
+
 
 @app.route('/bookticket_process', methods=['GET', 'POST'])
+@login_required
 def bookticket_process():
     flight_id = request.args.get('flight')
-    flight = dao.get_flight_by_id(id=flight_id)
-
-
+    plane_id = request.args.get('plane')
     route_id = request.args.get('route')
+    takeoff_time = request.args.get('takeoff_time')
+
+    flight = dao.get_flight_by_id(id=flight_id)
     route = dao.load_route(route_id)
+    plane = dao.get_plane_by_id(id=plane_id)
+
     airports = dao.load_airport()
     fareclass = dao.load_fareclass()
 
-    plane_id = request.args.get('plane')
-    plane = dao.get_plane_by_id(planeid =plane_id)
-
-    # generate seat,ticket trong đây
     return render_template('bookticket_process.html',
-                           route = route,airports = airports,flight = flight,plane = plane,fareclass = fareclass)
+                           route=route, airports=airports, flight=flight, fareclass=fareclass, plane=plane)
+
+
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
 
-@app.route('/api/payment', methods =['POST'])
-def payment():
-    """
-    {
-        "1": {
-            "id": "1"
-            "customer":"customer1"
-            "flight":"VN001"
-            "route": "HaNoi-TPHCM"
-            "seat": "seat01"
-            "fareclass": "PhoThong"
-            "quantity" : "1"
-            "price" :"130000"
-        }
-    """
-    ticket = session.get('ticket')
-    if not ticket:
-        ticket={}
 
-    id = str(request.json.get('id'))
-    customer = request.json.get('customer')
-    flight = request.json.get('flight')
-    route = request.json.get('route')
-    takeoff_airport = request.json.get('takeoff_airport')
-    landing_airport = request.json.get('landing_airport')
-    takeoff_time = request.json.get('takeoff_time')
-    landing_time = request.json.get('landing_time')
-    seat = request.json.get('seat')
-    fareclass = request.json.get('fareclass')
-    quantity = request.json.get('quantity')
-    unitprice = request.json.get('price')
+@app.route('/payment', methods=['GET', 'POST'])
+def payment_comfirm_page():
+    flight_id = request.form.get('flightid')
+    customer_id = request.form.get('customerid')
+    fareclass_id = request.form.get('fareclassid')
+    quantity = int(request.form.get('ticket-quantity'))
+    plane_id = request.form.get('plane')
 
-    ticket[id]={
-        "id": id,
-        "customer":customer,
-        "flight":flight,
-        "route":route,
-        "takeoff_airport":takeoff_airport,
-        "landing_airport":landing_airport,
-        "takeoff_time":takeoff_time,
-        "landing_time":landing_time,
-        "seat":seat,
-        "fareclass":fareclass,
-        "quantity":quantity,
-        "unitprice":unitprice
+    fareclass_price = dao.get_price(id=fareclass_id)
+    fareclass_name = dao.get_name_by_id(model=FareClass, id=fareclass_id)
+    customer_name = dao.get_name_by_id(User, id=customer_id)
+    plane_name = dao.get_name_by_id(Plane, id=plane_id)
+
+    flight = Flight(id=flight_id)
+    customer = Customer(user_id=customer_id)
+    fareclass = FareClass(id=fareclass_id)
+
+    ticket_info = {
+        "flightid": flight.to_dict(),
+        "customerid": customer.to_dict(),
+        "fareclassid": fareclass.to_dict(),
+        "quantity": quantity,
+        "planeid": plane_id
     }
-    session['ticket'] = ticket
+    session['ticket_info'] = ticket_info
+    seats = utils.get_seat_by_quantity(quantity=quantity, planeid=plane_id)
+    if seats:
+        return render_template('payment.html', seats=seats, quantity=quantity, price=fareclass_price,
+                               cus_name=customer_name,
+                               fareclass_name=fareclass_name, plane_name=plane_name)
 
-    return jsonify(utils.view_ticket(ticket))
+    return render_template('payment.html')
+
+
+@app.route('/api/payment', methods=['POST'])
+@login_required
+def payment():
+    try:
+        utils.add_ticket(session.get('ticket_info'))
+        del session['ticket_info']
+    except:
+        return jsonify({'code': 400, 'redirect_url': '/bookticket'})
+
+    return jsonify({'code': 200, 'redirect_url': '/bookticket'})
+
+
+@app.route('/api/create_ticket_info', methods=['POST'])
+def create_ticket():
+    flight_id = ''
+    customer_id = ''
+    fareclass_id = ''
+    quantity = ''
+    plane_id = ''
+
+    # import pdb
+    # pdb.set_trace()
+    ticket_info = {
+        "flightid": flight_id,
+        "customerid": customer_id,
+        "fareclassid": fareclass_id,
+        "quantity": quantity,
+        "planeid": plane_id
+    }
+    session['ticket_info'] = ticket_info
+
+    return jsonify()
+
+
 if __name__ == '__main__':
+    from app import admin
+
     app.run(debug=True)

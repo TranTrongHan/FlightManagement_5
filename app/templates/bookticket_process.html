@@ -2,99 +2,206 @@
 
 {% block content %}
 <h1 class="text-center text-succes mt-1 "> XỬ LÍ ĐẶT VÉ </h1>
-<div class="container p-3 mt-3 bg-light d-grid gap-3  px-4">
-    <div class="row row-cols-3  ">
-        <div class="row"></div>
-        <div class="row row-cols-2 ">
-            <div class="col p-0 fw-bold fs-2 d-flex align-items-center  ">
-                <label>Chuyến bay:</label>
+<div class="container p-3 mt-3 bg-light ">
+    <form action="/payment" method="post" class="  d-grid gap-3 px-4">
+        <div class="row row-cols-3 ">
+            <div class="row"></div>
+            <div class="row row-cols-2 ">
+                <div class="col p-0 fw-bold fs-2 d-flex align-items-center  ">
+                    <label>Chuyến bay:</label>
+                    <input id="planeid" type="hidden" name="plane" value="{{ plane.id }}">
+
+                </div>
+                <div class="col p-0 bg-grey  fw-normal">
+                    <input id="flightName" class="form-control w-auto form-control-lg" type="text"
+                           value="{{flight.name}}" name="flightname"
+                           aria-label="readonly input example" readonly>
+                    <input id="flightid" type="hidden" name="flightid" value="{{ flight.id }}">
+
+                </div>
             </div>
-            <div class="col p-0 bg-grey  fw-normal">
-                <input class="form-control w-auto form-control-lg" type="text" value="{{flight.name}}"
-                       aria-label="readonly input example" readonly>
-            </div>
+            <div class="row"></div>
         </div>
-        <div class="row"></div>
-    </div>
-    <div class="row row-cols-2  ">
-        <div class="row row-cols-2">
-            <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
-                <label>Nơi đi:</label>
-            </div>
-            <div class="col-md p-0 bg-grey fw-normal ms-3">
-                {% for route in route %}
-                {% for airport in airports %}
-                {% if route.take_off_airport_id == airport.id %}
-                <input class="form-control w-auto form-control-lg" type="text" value="{{airport.name }}"
-                       aria-label="readonly input example" readonly>
-                {% endif %}
-                {% endfor %}
-                {% endfor %}
-            </div>
-        </div>
-        <div class="row row-cols-2">
-            <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
-                <label>Nơi đến:</label>
-            </div>
-            <div class="col-md p-0 bg-grey  fw-normal ms-3">
-                {% for route in route %}
-                {% for airport in airports %}
-                {% if route.landing_airport_id == airport.id %}
-                <input class="form-control w-auto form-control-lg" type="text" value="{{airport.name }}"
-                       aria-label="readonly input example" readonly>
-                {% endif %}
-                {% endfor %}
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-    <div class="row row-cols-2 ">
-        <div class="row row-cols-2">
-            <div class="col p-0 fw-bold fs-2 d-flex align-items-center">
-                <label>Thời gian cất cánh:</label>
-            </div>
-            <div class="col-md p-0 fw-normal ">
-                <input class="form-control w-auto form-control-lg" type="text" value="{{flight.take_of_time}}"
-                       aria-label="readonly input example" readonly>
-            </div>
-        </div>
-        <div class="row row-cols-2">
-            <div class="col-form-label p-0 fw-bold fs-2 d-flex align-items-center ">
-                <label>Thời gian hạ cánh:</label>
-            </div>
-            <div class="col-md p-0 bg-grey p-0  fw-normal">
-                <input class="form-control w-auto form-control-lg" type="text" value="{{flight.landing_time}}"
-                       aria-label="readonly input example" readonly>
-            </div>
-        </div>
-    </div>
-    <div class="row row-cols-2">
-        <div class="row row-cols-2 ">
-            <div class="col-4  p-0 fw-bold fs-2 d-flex align-items-center">
-                Số lượng vé:
-            </div>
-            <div class="col ">
-                <input class="form-control w-auto form-control-lg" type="number" id="ticket-quantity"
-                       name="ticket-quantity" min="1" value="1" required>
-            </div>
-        </div>
-        <div class="row row-cols-2 ">
-            <div class="col-4  p-0 fw-bold d-flex align-items-center fs-2 w-auto">
-                Hạng vé:
-            </div>
-            <div class="col ">
-                <select class="form-select w-auto form-select-lg ms-2" aria-label="Default select example">
-                    {% for fareclass in fareclass %}
-                    <option {% if loop.index == 1 %}selected{% endif %} value="{{fareclass.price}}">{{fareclass.name}}</option>
+        <div class="row row-cols-2  ">
+            <div class="row row-cols-2">
+                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
+                    <label>Nơi đi:</label>
+                </div>
+                <div class="col-md p-0 bg-grey fw-normal ms-3">
+                    {% for route in route %}
+                    {% for airport in airports %}
+                    {% if route.take_off_airport_id == airport.id %}
+                    <input class="form-control w-auto form-control-lg" type="text" value="{{airport.name }}"
+                           aria-label="readonly input example" readonly>
+                    {% endif %}
                     {% endfor %}
-                </select>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="row row-cols-2">
+                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
+                    <label>Nơi đến:</label>
+                </div>
+                <div class="col-md p-0 bg-grey  fw-normal ms-3">
+                    {% for route in route %}
+                    {% for airport in airports %}
+                    {% if route.landing_airport_id == airport.id %}
+                    <input class="form-control w-auto form-control-lg" type="text" value="{{airport.name }}"
+                           aria-label="readonly input example" readonly>
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
+        <div class="row row-cols-2 ">
+            <div class="row row-cols-2">
+                <div class="col p-0 fw-bold fs-2 d-flex align-items-center">
+                    <label>Thời gian cất cánh:</label>
+                </div>
+                <div class="col-md p-0 fw-normal ">
+                    <input class="form-control w-auto form-control-lg" type="text" value="{{flight.take_of_time}}"
+                           aria-label="readonly input example" readonly>
+                </div>
+            </div>
+            <div class="row row-cols-2">
+                <div class="col-form-label p-0 fw-bold fs-2 d-flex align-items-center ">
+                    <label>Thời gian hạ cánh:</label>
+                </div>
+                <div class="col-md p-0 bg-grey p-0  fw-normal">
+                    <input class="form-control w-auto form-control-lg" type="text" value="{{flight.landing_time}}"
+                           aria-label="readonly input example" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-2">
+            <div class="row row-cols-2 ">
+                <div class="col-4  p-0 fw-bold fs-2 d-flex align-items-center">
+                    Số lượng vé:
+                </div>
+                <div class="col ">
+                    <input class="form-control w-auto form-control-lg" type="number" id="ticket-quantity"
+                           name="ticket-quantity" min="1" value="1" required>
+                </div>
+            </div>
+            <div class="row row-cols-2 ">
+                <div class="col-4  p-0 fw-bold d-flex align-items-center fs-2 w-auto">
+                    Hạng vé:
+                </div>
+                <div class="col ">
+                    <select id="fareClassSelect" class="form-select w-auto form-select-lg ms-2"
+                            aria-label="Default select example" name="fareclassid">
+                        {% for fareclass in fareclass %}
+                        <option data-price="{{ fareclass.price }}" {% if loop.index== 1 %}selected{% endif %}
+                                id="fareclassid" value="{{fareclass.id}}">{{fareclass.name}}
+                        </option>
+                        {% endfor %}
+                         <input type="hidden" name="fareclassname" value="{{ fareclass.name }}">
+                    </select>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row row-cols-2">
+            <div class="row row-cols-2">
+                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
+                    <label>Tên khách hàng:</label>
+                </div>
+                <div class="col-md p-0 bg-grey  fw-normal ms-3">
+                    <input class="form-control w-auto form-control-lg" type="text"
+                           value="{{current_user.name}} "
+                           name="fullname" aria-label="readonly input example" id="customerInfo" readonly>
+                    <input id="customerid" type="hidden" name="customerid" value="{{ current_user.id}}">
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-2">
+            <div class="row row-cols-2">
+                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
+                    <label>Email:</label>
+                </div>
+                <div class="col-md p-0 bg-grey  fw-normal ms-3">
+                    <input class="form-control w-auto form-control-lg" type="text" value="{{current_user.email}}"
+                           name="email" aria-label="readonly input example" readonly>
+                </div>
+            </div>
+            <div class="row row-cols-2">
+                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
+                    <label>Số điện thoại:</label>
+                </div>
+                <div class="col-md p-0 bg-grey  fw-normal ms-3">
+                    <input class="form-control w-auto form-control-lg" type="text"
+                           value="{{current_user.phone}}"
+                           aria-label="readonly input example" readonly>
+                </div>
+            </div>
+        </div>
+        <hr class=" border-3 border-top-3 border-grey">
+
+        <div class="row">
+            <div class="col-3 ms-3">
+                <input type="submit" value="Tiến hành thanh toán" data-mdb-ripple-init
+                       class="btn btn-primary btn-block btn-lg"/>
+            </div>
+<!--            <div class="col-5 ms-3">-->
+<!--                <input type="button" value="Lưu vé" data-mdb-ripple-init-->
+<!--                       class="btn btn-success btn-block btn-lg" onclick="handlePayment()"/>-->
+<!--            </div>-->
+        </div>
+    </form>
 
 
 </div>
+<script src="{{url_for('static',filename='js/bookticket.js')}}"></script>
+<!--<script>-->
+<!--    // Lắng nghe sự kiện thay đổi trên input-->
+<!--    document.getElementById('ticket-quantity').addEventListener('input', function() {-->
+<!--        // Lấy giá trị mới từ input-->
+<!--        const quantity = this.value;-->
+<!--        // Cập nhật giá trị vào span hiển thị-->
+<!--        document.getElementById('quantity').textContent = quantity;-->
+<!--    });-->
 
+<!--    // Hàm định dạng số với dấu phân cách-->
+<!--   function formatCurrency(value) {-->
+<!--       return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ';-->
+<!--   }-->
+
+<!--   // Lắng nghe sự kiện thay đổi trên dropdown-->
+<!--   document.getElementById('fareClassSelect').addEventListener('change', function() {-->
+<!--       // Lấy tên hạng vé và giá từ option được chọn-->
+<!--       const selectedOption = this.options[this.selectedIndex];-->
+<!--       const fareClassName = selectedOption.text;-->
+<!--       const fareClassPrice = selectedOption.getAttribute('data-price');-->
+<!--       const quantity = parseFloat(document.getElementById('quantity').textContent)-->
+<!--       const total = quantity * fareClassPrice-->
+
+<!--   // Cập nhật tên hạng vé và đơn giá,tổng tiền-->
+<!--      document.getElementById('fareClassName').textContent = fareClassName;-->
+<!--      document.getElementById('fareClassPrice').textContent = formatCurrency(fareClassPrice);-->
+<!--      document.getElementById('totalPrice').textContent = formatCurrency(total)-->
+
+
+<!--   });-->
+<!--   // Gọi hàm để hiển thị giá khởi đầu-->
+<!--    document.getElementById('fareClassPrice').textContent = document.getElementById('fareClassSelect').getAttribute('data-price');-->
+<!--</script>-->
+<script>
+    function handlePayment(){
+        var customer_id = document.getElementById('customerid').value;
+        var flight_id = document.getElementById('flightid').value;
+        var fareclass_id = document.getElementById('fareclassid').value;
+        var quantity = document.getElementById('quantity').innerText;
+        var plane_id = document.getElementById('planeid').value;
+
+        console.log('customer',customer_id);
+        console.log('flight',flight_id);
+        console.log('fareclass',fareclass_id);
+        console.log('quantity',quantity);
+        console.log('plane',plane_id);
+
+        view_ticket_info(flight_id,customer_id,fareclass_id,quantity,plane_id)
+    }
 </script>
-
 {% endblock %}

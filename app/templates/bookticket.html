@@ -3,17 +3,17 @@
 {% block content %}
 {% if current_user.is_authenticated %}
 <h1 class="text-center text-succes mt-1 "> ĐẶT VÉ </h1>
-<div class="container mt-3 bg-success rounded">
+<div class="container mt-3 bg-secondary rounded">
     <form action="/bookticket" method="post">
         <div class="row">
             <div class="col-md-5 mt-3">
-                <label for="takeoff1" class="fs-3 text-uppercase fw-bold text-white">Nơi đi:</label>
+                <label for="takeoff1" class="fs-3 text-uppercase fw-bold ">Nơi đi:</label>
                 <select name="takeoff1" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
                         event="click">
                     {% for airport in take_off_airports %}
                     {% for airportName in airports %}
                     {% if airport.id == airportName.id %}
-                    <option id="takeoff1" value="{{ airport.id }}">
+                    <option id="takeoff1" value="{{airportName.id}}" >
                         {{airportName.name}}
                     </option>
                     {% endif %}
@@ -21,8 +21,8 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-5 mt-3 p">
-                <label for="landing1" class="fs-3 text-uppercase fw-bold text-white">Nơi đến:</label>
+            <div class="col-md-5 mt-3 ">
+                <label for="landing1" class="fs-3 text-uppercase fw-bold ">Nơi đến:</label>
                 <select name="landing1" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
                         event="click">
                     {% for airport in landing_airports %}
@@ -35,32 +35,46 @@
                 </select>
             </div>
             <div class="col-md-2 mt-3 p-3  ">
-                <button class="btn btn-primary mt-4 m-3 fs-4 text-uppercase fw-bold bg-success" type="submit">Tìm kiếm
+                <button class="btn btn-primary mt-4 m-3 fs-4 text-uppercase fw-bold bg-primary" type="submit " onclick="saveSelection()">Tìm kiếm
                 </button>
+            </div>
+            <div class="row">
+                <div class="col-md-5">
+                    <label for="departureTime" class="fs-3 text-uppercase fw-bold ">Thời gian đi:</label>
+                    <input id="departureTime" class="form-control form-control-lg" type="date"  name="departureTime">
+
+                </div>
+                <div class="col-md-5">
+                    <label for="returnTime" class="fs-3 text-uppercase fw-bold ">Thời gian về:</label>
+                    <input id="returnTime" class="form-control form-control-lg" type="date"  name="returnTime">
+                </div>
+
             </div>
 
         </div>
-        <div class="row align-items-center ">
+        <hr class=" border-3 border-top-3 border-light">
+        {% if flights %}
+        <div class="row mt-3">
             <div class="col-md-3">
             </div>
-            <div class="col-md-6 fs-3 text-center text-white">
+            <div class="col-md-6 fs-3 text-center  ">
                 DANH SÁCH CHUYẾN BAY
             </div>
             <div class="col-md-3">
             </div>
         </div>
-        <div class="row align-items-center mx-3">
-
+        <div class="row mx-1">
             <table class="table table-hover ">
                 <thead>
                 <tr>
+                    <th>Tuyến bay</th>
                     <th>Mã chuyến bay</th>
-                    <th>Tên máy bay</th>
                     <th>Tên chuyến bay</th>
+                    <th>Tên máy bay</th>
                     <th>Ngày giờ cất cánh</th>
                     <th>Ngày giờ hạ cánh</th>
                     <th>Số chỗ ngồi hạng 1</th>
-                    <th>Số chỗ ngồi hạng 2</th>
+                    <th>Số chỗ ngồi hạng 2 </th>
                     <th></th>
                 </tr>
                 </thead>
@@ -69,21 +83,20 @@
                 {% for flight in flights %}
                 {% if route.id == flight.route_id %}
                 <tr>
-                    <td>{{flight.id}}</td>
+                    <td data-route-name="{{route.name}}">{{route.name}}</td>
+                    <td data-flight-id="{{ flight.id }}">{{flight.id}}</td>
+                    <td data-flight-name="{{ flight.name }}">{{flight.name}}</td>
                     {% for plane in planes %}
                     {% if flight.plane_id == plane.id %}
-                    <td>{{plane.name}}</td>
+                    <td data-plane-name="{{plane.name}}">{{plane.name}} </td>
                     {% endif %}
                     {% endfor %}
-
-
-                    <td>{{flight.name}}</td>
-                    <td>{{flight.take_of_time}}</td>
-                    <td>{{flight.landing_time}}</td>
+                    <td data-takeoff-time="{{ flight.take_of_time }}">{{flight.take_of_time}}</td>
+                    <td data-landing-time="{{ flight.landing_time }}">{{flight.landing_time}}</td>
                     <td>{{flight.num_of_1st_seat}}</td>
                     <td>{{flight.num_of_2st_seat}}</td>
                     <td>
-                        <a href="/bookticket_process?route={{ route.id }}&&flight={{flight.id}}&user={{current_user.id}}&takeoff_time={{flight.take_of_time}}&landing_time={{flight.landing_time}}&plane={{flight.plane_id}}"
+                        <a href="/bookticket_process?route={{ route.id }}&flight={{flight.id}}&flight_name={{flight.name}}&user={{current_user.id}}&takeoff_time={{flight.take_of_time}}&landing_time={{flight.landing_time}}&plane={{flight.plane_id}}"
                            class="text-decoration-none">
                             Đặt vé
                         </a>
@@ -93,10 +106,11 @@
                 {% endfor %}
                 {% endfor %}
                 </tbody>
-
             </table>
         </div>
-
+        {% else %}
+        <h1 class="text-center fw-bold p-3">Không có chuyến bay cần tìm.Vui lòng chọn ngày khác </h1>
+        {% endif %}
     </form>
 </div>
 {% else %}
@@ -116,5 +130,58 @@
 
 {% endif %}
 
-<script src="{{url_for('static',filename='js/ticket.js')}}"></script>
+<!--<script src="{{url_for('static',filename='js/bookticket.js')}}"></script>-->
+<!--<script>-->
+<!--    function getTicketInfo(button){-->
+<!--        var row = button.closest('tr');-->
+<!--        var takeoff = document.getElementById('takeoff1').value;-->
+<!--        var landing = document.getElementById('landing1').value;-->
+<!--        var departureTime = document.getElementById('departureTime').value;-->
+<!--        var returnTime = document.getElementById('returnTime').value;-->
+<!--        var ticketQuantity = document.getElementById('ticket-quantity').value;-->
+<!--        var fareClass = document.getElementById('fare-class').value;-->
+
+<!--        var routeName = row.querySelector('[data-route-name]').getAttribute('data-route-name');-->
+<!--        var flightId = row.querySelector('[data-flight-id]').getAttribute('data-flight-id');-->
+<!--        var flightName = row.querySelector('[data-flight-name]').getAttribute('data-flight-name');-->
+<!--        var planeName = row.querySelector('[data-plane-name]').getAttribute('data-plane-name');-->
+<!--        var takeoffTime = row.querySelector('[data-takeoff-time]').getAttribute('data-takeoff-time');-->
+<!--        var landingTime = row.querySelector('[data-landing-time]').getAttribute('data-landing-time');-->
+<!--        // Lấy giá trị fareclass.name và fareclass.price-->
+<!--        var fareClassSelect = document.getElementById('fare-class');-->
+<!--        var fareClassName = fareClassSelect.value; // Giá trị của fareclass.name-->
+<!--        var fareClassPrice = fareClassSelect.options[fareClassSelect.selectedIndex].getAttribute('data-price'); // Giá trị của fareclass.price-->
+
+<!--        bookTicket()-->
+
+
+<!--    }-->
+
+<!--</script>-->
+<script>
+     function saveSelection() {
+        // Lưu giá trị của các trường vào localStorage
+        localStorage.setItem('takeoff', document.querySelector('select[name="takeoff1"]').value);
+        localStorage.setItem('landing', document.querySelector('select[name="landing1"]').value);
+        localStorage.setItem('departureTime', document.getElementById('departureTime').value);
+        localStorage.setItem('returnTime', document.getElementById('returnTime').value);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tải lại giá trị từ localStorage
+        if (localStorage.getItem('takeoff')) {
+            document.querySelector('select[name="takeoff1"]').value = localStorage.getItem('takeoff');
+        }
+        if (localStorage.getItem('landing')) {
+            document.querySelector('select[name="landing1"]').value = localStorage.getItem('landing');
+        }
+        if (localStorage.getItem('departureTime')) {
+            document.getElementById('departureTime').value = localStorage.getItem('departureTime');
+        }
+        if (localStorage.getItem('returnTime')) {
+            document.getElementById('returnTime').value = localStorage.getItem('returnTime');
+        }
+
+    });
+</script>
 {% endblock %}
