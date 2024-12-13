@@ -1,0 +1,57 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+{% if tickets %}
+<div class="row  p-3 mt-3">
+    <table class="table">
+        <tr>
+            <th>Mã vé</th>
+            <th>Hạng vé</th>
+            <th>Tuyến bay</th>
+            <th>Chuyến bay</th>
+            <th>Chỗ ngồi</th>
+            <th>Ngày đặt vé</th>
+        </tr>
+        {% for ticket in tickets %}
+        <tr>
+            <td>{{ticket.id}}</td>
+            {% for fareclass in fareclass %}
+            {% if ticket.fareclass_id == fareclass.id %}
+            <td> {{fareclass.name}}</td>
+            {% endif %}
+            {% endfor %}
+
+            {% for route in routes %}
+            {% for flight in flights %}
+            {% if ticket.flight_id == flight.id and flight.route_id == route.id%}
+            <td> {{route.name}}</td>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+
+            {% for flight in flights %}
+            {% if ticket.flight_id == flight.id %}
+            <td> {{flight.name}}</td>
+            {% endif %}
+            {% endfor %}
+
+            {% for seat in seats %}
+            {% if ticket.seat_id == seat.id %}
+            <td> {{seat.name}}</td>
+            {% endif %}
+            {% endfor %}
+            <td>{{ticket.created_date}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% else %}
+<h1 class="text-danger text-center">BẠN CHƯA TỪNG ĐẶT VÉ </h1>
+{% endif %}
+{% else %}
+<h1 class="text-danger text-center">BẠN CHƯA ĐĂNG NHẬP</h1>
+{% endif %}
+
+{% endblock %}

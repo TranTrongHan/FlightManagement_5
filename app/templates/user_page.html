@@ -1,0 +1,63 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+
+<div class="container container-fluid mt-3">
+    {% if current_user.is_authenticated %}
+    <div class="row">
+        <div class="col-md-4 col-12 ">
+            <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                <img class="rounded-circle mt-5" width="150px"
+                     src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+                <span class="font-weight-bold">{{current_user.name}}</span>
+                <span class="text-black-50">{{current_user.email}}</span>
+            </div>
+        </div>
+        <div class="col-md-6 col-12 border  border-2 p-3">
+            <div class="pb-3">
+                <h4 class="text-center fs-3">Chỉnh sửa thông tin</h4>
+            </div>
+            <form action="/myinfo" method="post">
+                <div class="row">
+                    <div class="col-md"><label class="labels">Họ và tên: </label>
+                        <input type="text" class="form-control" placeholder="" value="{{current_user.name}}" name="fullname">
+                         <input type="hidden" class="form-control" placeholder="" value="{{current_user.id}}" name="userid">
+                    </div>
+                    <div class="col-md-12"><label class="labels">Số điện thoại: </label><input type="number"
+                                                                                               class="form-control"
+                                                                                               placeholder=""
+                                                                                               value="" name="phone"></div>
+
+                    <div class="col-md-12"><label class="labels"> Địa chỉ: </label><input type=""
+                                                                                          class="form-control"
+                                                                                          placeholder=""
+                                                                                          value="" name="address"></div>
+                    <div class="col-md-12"><label class="labels"> Email: </label><input type="email"
+                                                                                        class="form-control"
+                                                                                        placeholder=""
+                                                                                        value="" name="email"></div>
+                    <div class="col-md-12"><label class="labels">Avatar</label><input type="file"
+                                                                                      class="form-control"
+                                                                                      placeholder=""
+                                                                                      value="" name="avatar"></div>
+                    <div class="col-md-12"><label class="labels">Mật khẩu</label><input type="password" class="form-control"
+                                                                                        placeholder=""
+                                                                                        value="" name="passwd"></div>
+                    <div class="col-md-12"><label class="labels">Xác nhận mật khẩu</label><input type="password"
+                                                                                                 class="form-control"
+                                                                                                 placeholder=""
+                                                                                                 value="" name="passwd2"></div>
+                </div>
+
+                <div class="mt-5 text-center">
+                    <button class="btn btn-primary profile-button" type="submit">Lưu thông tin</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center text-info mt-3"><h1 >BẠN CHƯA ĐĂNG NHẬP</h1></div>
+    {% endif %}
+</div>
+
+{% endblock %}

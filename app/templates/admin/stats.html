@@ -3,54 +3,135 @@
 {% block body %}
 <h1 class="text-center text-danger">THỐNG KÊ BÁO CÁO</h1>
 <div class="row">
-    <div class="col-md-5 col-12"></div>
-    <div class="col-md-7 col-12">
-        <div class="row">
-            <div class="col-md-5">
-                <table class="table">
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </table>
+    <div class="col-md-6 col-12">
+        <table class="table">
+            <tr>
+                <th>Ma tuyen bay</th>
+                <th>Ten tuyen bay</th>
+                <th>Doanh thu</th>
+            </tr>
+            {% for s in stats %}
+            <tr>
+                <td>{{ s[0] }}</td>
+                <td>{{ s[1] }}</td>
+                <td>
+                    {% if s[2] %}
+                    {{ "{:,.1f}".format(s[2]) }} VNĐ
+                    {% else %}
+                    0 VNĐ
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-6 col-12">
+        <form action="">
+            <div class="form-group">
+                <input type="text" class="form-control" name="kw" placeholder="Nhập từ khóa....">
             </div>
-            <div class="col-md-7">
-                <canvas id="myChart"></canvas>
+            <div class="form-group">
+                <input type="date" class="form-control" name="from_date" placeholder="Nhập từ khóa....">
             </div>
-        </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-        <script>
-            const ctx = document.getElementById('myChart');
-
-            new Chart(ctx, {
-              type: 'bar',
-              data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                  label: '# of Votes',
-                  data: [12, 19, 3, 5, 2, 3],
-                  borderWidth: 1
-                }]
-              },
-              options: {
-                scales: {
-                  y: {
-                    beginAtZero: true
-                  }
-                }
-              }
-            });
-        </script>
-
-
+            <div class="form-group">
+                <input type="date" class="form-control" name="to_date" placeholder="Nhập từ khóa....">
+            </div>
+            <input type="submit" value="Thống kê" class="btn btn-info">
+        </form>
+        <canvas id="myChart"></canvas>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-6 col-12">
+        <table class="table">
+            <tr>
+                <th>Tháng</th>
+                <th>Doanh thu</th>
+            </tr>
+
+            {% for s in months_stats %}
+            <tr>
+                <td>{{s[0]}}</td>
+                <td>{{ "{:,.1f}".format(s[1]) }} VNĐ</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+    <div class="col-md-6 col-12">
+        <form>
+            <div class="form-group">
+                <input type="number" min="2000" name="year" class="form-control" placeholder="Nhập năm...">
+                <input type="submit" value="Thống kê" class="btn btn-primary">
+            </div>
+        </form>
+        <canvas id="productMonthChartId"></canvas>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = [], labels2=[]
+    let data = [], data2=[]
+    let colors = [], colors2=[]
+    let borderColors = [], borderColors2=[]
+    let r,g,b;
+
+    {% for s in stats %}
+    {% if s[2] %}
+    labels.push('{{ s[1] }}')
+    data.push('{{ s[2] }}')
+
+    r = parseInt(Math.random() * 255 )
+    g = parseInt(Math.random() * 255 )
+    b = parseInt(Math.random() * 255 )
+
+    colors.push(`rgba( ${r}, ${g}, ${b}, 0.2)`)
+    borderColors.push(`rgba( ${r}, ${g}, ${b}, 1)`)
+    {% endif %}
+    {% endfor %}
+
+    {% for s in months_stats %}
+    labels2.push({{ s[0] }})
+    data2.push('{{ s[1] }}')
+
+    r = parseInt(Math.random() * 255 )
+    g = parseInt(Math.random() * 255 )
+    b = parseInt(Math.random() * 255 )
+
+    colors2.push(`rgba( ${r}, ${g}, ${b}, 0.2)`)
+    borderColors2.push(`rgba( ${r}, ${g}, ${b}, 1)`)
+    {% endfor %}
+
+    window.onload = function(){
+        let contx = document.getElementById('myChart').getContext('2d');
+        let contx2 = document.getElementById('productMonthChartId').getContext('2d');
+        loadChart(contx,labels,data,'bar',colors,borderColors)
+        loadChart(contx2,labels2,data2,'line',colors2,borderColors2)
+    }
+
+    function loadChart(ctx,labels,data,type,color,borderColors){
+       const myChart = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Thong ke tuyen bay',
+            data: data,
+            backgroundColor:colors,
+            borderColor: borderColors,
+            borderWidth:1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+</script>
+
 {% endblock %}

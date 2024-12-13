@@ -78,7 +78,6 @@ def login_admin():
     elif not u:
         return redirect('/user_alert')
 
-
     return redirect('/admin')
 
 
@@ -108,8 +107,7 @@ def register_process():
     regex_username = '^[a-zA-Z0-9]+$'
     error_message = {}
     if request.method.__eq__('POST'):
-        lastname = request.form.get('lastname')
-        firstname = request.form.get('firstname')
+        name = request.form.get('name')
         phone = request.form.get('phone')
         address = request.form.get('address')
         email = request.form.get('email')
@@ -142,13 +140,57 @@ def register_process():
                                    error_message=error_message,
                                    phone=phone, email=email, username=username)
         else:
-            dao.add_user(last_name=lastname, first_name=firstname, phone=phone, address=address,
+            dao.add_user(name=name, phone=phone, address=address,
                          email=email, avatar=avatar, username=username, password=password)
             return redirect('/login')
 
     return render_template('register.html')
 
 
+@app.route('/myinfo', methods = ['GET', 'POST'])
+def my_info():
+
+
+    if request.method.__eq__('POST'):
+        error_message = {}
+        user_id = request.form.get('userid')
+        name = request.form.get('fullname')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+        email = request.form.get('email')
+        avatar = request.form.get('avatar')
+        passwd = request.form.get('passwd')
+        passwd2 = request.form.get('passwd2')
+        if len(phone) < 7 or len(phone) > 15:
+            error_message['err_phone'] = 'Phone number must be between 7-15 digits.'
+        elif dao.existence_check('phone', phone):
+            error_message['err_phone'] = 'Số điện thoại đã được sử dụng.'
+        if '@' not in email:
+            error_message['err_email'] = 'Email is invalid.'
+        elif dao.existence_check('email', email):
+            error_message['err_email'] = 'Email is đã được sử dụng.'
+
+        if not passwd.__eq__(passwd2):
+            error_message['err_password'] = 'Mật khẩu xác nhận và mật khẩu không khớp'
+
+        if error_message:
+            return render_template('user_page.html',
+                                   error_message=error_message,
+                                   phone=phone, email=email)
+        else:
+            dao.edit_user(name=name, phone=phone, address=address, email=email, passwd=passwd,user_id= user_id)
+            return redirect('/myinfo')
+
+    return render_template('user_page.html')
+@app.route('/my_booked_tickets')
+def my_tickets():
+    user_id = request.args.get('user_id')
+    tickets = dao.load_tickets(userid=user_id)
+    seats = dao.load_seats()
+    flights = dao.load_flights()
+    routes  = dao.load_route()
+    fareclass = dao.load_fareclass()
+    return render_template('bookedtickets.html',tickets = tickets,seats=seats,flights=flights,routes=routes,fareclass=fareclass)
 @app.route('/bookticket', methods=['GET', 'POST'])
 @login_required
 def bookticket():
@@ -193,17 +235,28 @@ def bookticket_process():
     flight_id = request.args.get('flight')
     plane_id = request.args.get('plane')
     route_id = request.args.get('route')
-    takeoff_time = request.args.get('takeoff_time')
 
+    # lấy thời gian của chuyến bay đang đặt vé
+    takeoff_time = request.args.get('takeoff_time')
+    landing_time = request.args.get('landing_time')
     flight = dao.get_flight_by_id(id=flight_id)
-    route = dao.load_route(route_id)
+    route = dao.load_route(route_id=route_id)
     plane = dao.get_plane_by_id(id=plane_id)
 
     airports = dao.load_airport()
     fareclass = dao.load_fareclass()
 
+    check_used_to_bookticket = utils.check_used_to_bookticket(flightid=flight_id)
+    has_ticket = utils.check_unvalid_ticket(takeofftime=takeoff_time,landingtime=landing_time,flightid=flight_id)
+
     return render_template('bookticket_process.html',
-                           route=route, airports=airports, flight=flight, fareclass=fareclass, plane=plane)
+                               route=route, airports=airports, flight=flight, fareclass=fareclass, plane=plane)
+
+
+
+@app.route('/bookticket_error')
+def error_alert():
+    return render_template('layout/bookticket_error_alert.html')
 
 
 @login.user_loader
@@ -233,16 +286,23 @@ def payment_comfirm_page():
         "customerid": customer.to_dict(),
         "fareclassid": fareclass.to_dict(),
         "quantity": quantity,
-        "planeid": plane_id
     }
     session['ticket_info'] = ticket_info
-    seats = utils.get_seat_by_quantity(quantity=quantity, planeid=plane_id)
+    seats = utils.get_seat_by_quantity(quantity=quantity, flightid=flight_id)
     if seats:
         return render_template('payment.html', seats=seats, quantity=quantity, price=fareclass_price,
                                cus_name=customer_name,
                                fareclass_name=fareclass_name, plane_name=plane_name)
 
     return render_template('payment.html')
+
+
+@app.route('/test')
+def test():
+    selected_seats = utils.create_ticket(session.get('ticket_info'))
+    if selected_seats:
+        return render_template("/layout/test.html", selected_seats=selected_seats)
+    return render_template("/layout/test.html")
 
 
 @app.route('/api/payment', methods=['POST'])

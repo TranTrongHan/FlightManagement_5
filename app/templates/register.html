@@ -4,13 +4,11 @@
 <h1 class="text-center text-succes mt-1">ĐĂNG KÝ NGƯỜI DÙNG</h1>
 
 <form action="/register" method="post">
-    <div class="form-floating mb-3 mt-3">
-        <input type="text" class="form-control" id="lastname" placeholder="Nhập họ của bạn" name="lastname">
-        <label for="lastname">Họ</label>
-    </div>
+
     <div class="form-floating mt-3 mb-3">
-        <input type="text" class="form-control" id="firstname" placeholder="Nhập tên của bạn" name="firstname">
-        <label for="firstname">Tên</label>
+        <input type="text" class="form-control" id="firstname" placeholder="Nhập họ và tên của bạn" name="name">
+        <input type="hidden" class="form-control"  placeholder="Nhập họ và tên của bạn" name="userid" value="{{current_user.id}}">
+        <label for="firstname">Họ và tên</label>
     </div>
     <div class="form-floating mt-3 mb-3">
         <input type="text" class="form-control" id="phone" placeholder="Nhập số điện thoại" name="phone">
