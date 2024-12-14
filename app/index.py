@@ -194,7 +194,7 @@ def my_tickets():
     fareclass = dao.load_fareclass()
     return render_template('bookedtickets.html',tickets = tickets,seats=seats,flights=flights,routes=routes,fareclass=fareclass)
 @app.route('/bookticket', methods=['GET', 'POST'])
-@login_required
+
 def bookticket():
     # lấy danh sách id sân bay đi
     airports = dao.load_airport_id('takeoffairport')
@@ -288,6 +288,7 @@ def payment_comfirm_page():
         "customerid": customer.to_dict(),
         "fareclassid": fareclass.to_dict(),
         "quantity": quantity,
+        "planeid":plane_id,
         "price":fareclass_price
     }
     session['ticket_info'] = ticket_info
