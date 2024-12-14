@@ -2,92 +2,106 @@
 
 {% block content %}
 
-<div class="container mt-3 bg-primary rounded">
-    <form action="/" method="post">
-        <div class="row">
-            <div class="col-md-5 mt-3 ">
-                <label for="takeoff" class="fs-3 text-uppercase fw-bold text-white">Nơi đi:</label>
-                <select name="takeoff" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
-                        event="click">
-                    {% for airport in take_off_airports %}
-                    {% for airportName in airports %}
-                    {% if airport.id == airportName.id %}
-                    <option id="takeoff" value="{{ airport.id }}">{{airportName.name}}</option>
-                    {% endif %}
-                    {% endfor %}
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-5 mt-3 p  ">
-                <label for="landing" class="fs-3 text-uppercase fw-bold text-white">Nơi đến:</label>
-                <select name="landing" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
-                        event="click">
-                    {% for airport in landing_airports %}
-                    {% for airportName in airports %}
-                    {% if airport.id == airportName.id %}
-                    <option id="landing" value=" {{airport.id}} ">{{airportName.name}}</option>
-                    {% endif %}
-                    {% endfor %}
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-2 mt-3 p-3  ">
-                <button class="btn btn-primary mt-4 m-3 fs-4 text-uppercase fw-bold bg-success" type="submit">Tìm kiếm
-                </button>
-            </div>
-
+<div class="container mt-3  d-flex flex-column  justify-content-center">
+    <div class="row">
+        <div class="col-md-10 col-sm-12 ">
+            <img src="/static/images/trangchu.png" class="rounded" style="width:1188px;height:394px;">
         </div>
-        <div class="row align-items-center ">
-            <div class="col-md-3">
-            </div>
-            <div class="col-md-6 fs-3 text-center text-white">
-                DANH SÁCH CHUYẾN BAY
-            </div>
-            <div class="col-md-3">
-            </div>
-        </div>
-        <div class="row align-items-center mx-3">
+    </div>
+    <div class="row mt-2">
+       <div class="col-12">
+             <span class="text-capitalize fs-2 pt-3">Các chuyến bay phổ biến trong ngày</span>
+       </div>
+    </div>
+   <div class="container px-4 mt-2">
+       <div class="row ">
+           <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded  col-sm-12 ">
+               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                   <a href="/bookticket"><img src="/static/images/danang.png" style="width:300px;height:200px" class="rounded"></a>
+               </div>
+               <div class=" ms-4">
+                   <span class="fw-bold d-block">TP Hồ Chí Minh đến Đà Nẵng</span>
+                   <span class="fs-6 fw-lighter d-block">13/11/2024 - 14/11/2024</span>
+               </div>
+               <div class="d-flex flex-column align-items-end">
+                   <span class="fs-4 fw-lighter d-block ">Từ</span>
+                   <span class="fw-bold fs-3 d-block  ">666.000 VND</span>
+               </div>
+           </div>
+           <div class="col-1"></div>
+            <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12 ">
+               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                      <a href="/bookticket"><img src="/static/images/tphcm.png"  style="width:300px;height:200px" class="rounded"></a>
+               </div>
+               <div class=" ms-4">
+                   <span class="fw-bold d-block"> Hà Nội đến TP Hồ Chí Minh</span>
+                   <span class="fs-6 fw-lighter d-block">20/11/2024 - 21/11/2024</span>
+               </div>
+               <div class="d-flex flex-column align-items-end">
+                   <span class="fs-4 fw-lighter d-block ">Từ</span>
+                   <span class="fw-bold fs-3 d-block  ">979.000 VND</span>
+               </div>
+           </div>
+            <div class="col-1"></div>
+           <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12   ">
+               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                      <a href="/bookticket"><img src="/static/images/hanoi.png"  style="width:300px;height:200px" class="rounded"></a>
+               </div>
+               <div class=" ms-4">
+                   <span class="fw-bold d-block">Đà Nẵng đến Hà Nội</span>
+                   <span class="fs-6 fw-lighter d-block">08/02/2025 - 09/02/2025</span>
+               </div>
+               <div class="d-flex flex-column align-items-end">
+                   <span class="fs-4 fw-lighter d-block ">Từ</span>
+                   <span class="fw-bold fs-3 d-block  ">1.085.000 VND</span>
+               </div>
+           </div>
+       </div>
+       <div class="row ">
 
-            <table class="table table-hover ">
-                <thead>
-                <tr>
-                    <th>Mã chuyến bay</th>
-                    <th>Tên chuyến bay</th>
-                    <th>Ngày giờ cất cánh</th>
-                    <th>Ngày giờ hạ cánh</th>
-                    <th>Số chỗ ngồi hạng 1</th>
-                    <th>Số chỗ ngồi hạng 2</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for route in routes %}
-                {% for flight in flights %}
-                {% if route.id == flight.route_id %}
-                <tr>
-                    <td>{{flight.id}}</td>
-                    <td>{{flight.name}}</td>
-                    <td>{{flight.take_of_time}}</td>
-                    <td>{{flight.landing_time}}</td>
-                    <td>{{flight.num_of_1st_seat}}</td>
-                    <td>{{flight.num_of_2st_seat}}</td>
-                    <td>
-                        <form action="/bookticket" , method="post">
-                            <button class="btn btn-primary  text-uppercase fw-bold bg-success"
-                                    type="submit" onclick="viewTicket()" >Đặt vé
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                {% endfor %}
-                </tbody>
-
-            </table>
-        </div>
-
-    </form>
+           <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12  ">
+               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                     <a href="/bookticket"><img src="/static/images/Da-Lat.png"  style="width:300px;height:200px" class="rounded"></a>
+               </div>
+               <div class=" ms-4">
+                   <span class="fw-bold d-block">TP Hồ Chí Minh đến Đà Lạt</span>
+                   <span class="fs-6 fw-lighter d-block">20/01/2025 - 21/01/2025</span>
+               </div>
+               <div class="d-flex flex-column align-items-end">
+                   <span class="fs-4 fw-lighter d-block ">Từ</span>
+                   <span class="fw-bold fs-3 d-block  ">1.072.000 VND</span>
+               </div>
+           </div>
+           <div class="col-1"></div>
+            <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12 ">
+               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                     <a href="/bookticket"><img src="/static/images/hue.png"  style="width:300px;height:200px" class="rounded"></a>
+               </div>
+               <div class=" ms-4">
+                   <span class="fw-bold d-block"> TP Hồ Chí Minh đến Huế</span>
+                   <span class="fs-6 fw-lighter d-block">20/11/2024 - 21/11/2024</span>
+               </div>
+               <div class="d-flex flex-column align-items-end">
+                   <span class="fs-4 fw-lighter d-block ">Từ</span>
+                   <span class="fw-bold fs-3 d-block  ">666.000 VND</span>
+               </div>
+           </div>
+            <div class="col-1"></div>
+           <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12  ">
+               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                      <a href="/bookticket"><img src="/static/images/vungtau.png"  style="width:300px;height:200px" class="rounded"></a>
+               </div>
+               <div class=" ms-4">
+                   <span class="fw-bold d-block">TP Hồ Chí Minh đến Phú Quốc</span>
+                   <span class="fs-6 fw-lighter d-block">08/03/2025 - 09/03/2025</span>
+               </div>
+               <div class="d-flex flex-column align-items-end">
+                   <span class="fs-4 fw-lighter d-block ">Từ</span>
+                   <span class="fw-bold fs-3 d-block  ">892.000 VND</span>
+               </div>
+           </div>
+       </div>
+   </div>
 
 
 </div>
