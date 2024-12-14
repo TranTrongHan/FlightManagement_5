@@ -1,8 +1,10 @@
 import re
-from flask import render_template, request, redirect, jsonify, session
+from datetime import datetime
+
+from flask import render_template, request, redirect, jsonify, session, flash, url_for
 from sqlalchemy.sql.functions import current_user
 import dao, utils
-from app import app, login
+from app import app, login, VNPAY_CONFIG
 from flask_login import login_user, logout_user, login_required
 from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User
 
@@ -286,6 +288,7 @@ def payment_comfirm_page():
         "customerid": customer.to_dict(),
         "fareclassid": fareclass.to_dict(),
         "quantity": quantity,
+        "price":fareclass_price
     }
     session['ticket_info'] = ticket_info
     seats = utils.get_seat_by_quantity(quantity=quantity, flightid=flight_id)
@@ -296,6 +299,79 @@ def payment_comfirm_page():
 
     return render_template('payment.html')
 
+@app.route('/payment_process',methods=['GET','POST'])
+def paymentprocess():
+
+    if request.method.__eq__('POST'):
+        # Lấy thông tin thanh toán từ người dùng
+        ticket_info = session.get('ticket_info')
+        amount = ticket_info.get('quantity') * ticket_info.get('price')  # Số tiền thanh toán (VNĐ)
+        # amount *= 25000
+        flightid = ticket_info.get('flightid').get('id')
+
+        vnp = dao.vnpay()
+        # Xây dựng hàm cần thiết cho vnpay
+        vnp.requestData['vnp_Version'] = '2.1.0'
+        vnp.requestData['vnp_Command'] = 'pay'
+        vnp.requestData['vnp_TmnCode'] = VNPAY_CONFIG['vnp_TmnCode']
+        vnp.requestData['vnp_Amount'] = str(int(amount * 100))
+        vnp.requestData['vnp_CurrCode'] = 'VND'
+        vnp.requestData['vnp_TxnRef'] = flightid
+        vnp.requestData['vnp_OrderInfo'] = 'Thanhtoan'  # Nội dung thanh toán
+        vnp.requestData['vnp_OrderType'] = 'ticket'
+
+        vnp.requestData['vnp_Locale'] = 'vn'
+
+        vnp.requestData['vnp_CreateDate'] = datetime.now().strftime('%Y%m%d%H%M%S')
+        vnp.requestData['vnp_IpAddr'] = "127.0.0.1"
+        vnp.requestData['vnp_ReturnUrl'] = url_for('vnpay_return', _external=True)
+
+        vnp_payment_url = vnp.get_payment_url(VNPAY_CONFIG['vnp_Url'], VNPAY_CONFIG['vnp_HashSecret'])
+
+        return redirect(vnp_payment_url)
+@app.route('/vnpay_return')
+def vnpay_return():
+    vnp_ResponseCode = request.args.get('vnp_ResponseCode')
+    if vnp_ResponseCode == '00':
+        # list_guest = session.get('guest')
+        # room_reservation_form = session.get('room_reservation_form')
+        #
+        # username = session.get('username')
+        # customer = dao.get_customer_by_account(username)
+        #
+        # room_reservation_form = RoomReservationForm(check_in_date=room_reservation_form['check_in_date'],
+        #                                             check_out_date=room_reservation_form['check_out_date'],
+        #                                             deposit=room_reservation_form['deposit'], total_amount=room_reservation_form['total_amount'],
+        #                                             room_id=room_reservation_form['room_id'], customer_id=customer.cus_id)
+        utils.add_ticket(session.get('ticket_info'))
+        del session['ticket_info']
+
+        print('Tạo vé thành công')
+
+        # arr_guest = []
+        # if list_guest:
+        #     for guest in list_guest:
+        #         if guest['customer_type'].__eq__('Domestic'):
+        #             type = 1
+        #         else:
+        #             type = 2
+        #         guest = Guest(name=guest['name'], identification_card=guest['identification_card'], customer_type_id=type)
+        #
+        #         guest.room_reservation_form.append(room_reservation_form)
+        #
+        #         arr_guest.append(guest)
+        #         print('Add guest success')
+        # db.session.add(room_reservation_form)
+        # db.session.add_all(arr_guest)
+        # db.session.commit()
+
+        flash('Payment success', 'Payment result')
+
+
+    else:
+        flash('Payment failed', 'Payment result')
+
+    return redirect('/')
 
 @app.route('/test')
 def test():
@@ -317,26 +393,26 @@ def payment():
     return jsonify({'code': 200, 'redirect_url': '/bookticket'})
 
 
-@app.route('/api/create_ticket_info', methods=['POST'])
-def create_ticket():
-    flight_id = ''
-    customer_id = ''
-    fareclass_id = ''
-    quantity = ''
-    plane_id = ''
-
-    # import pdb
-    # pdb.set_trace()
-    ticket_info = {
-        "flightid": flight_id,
-        "customerid": customer_id,
-        "fareclassid": fareclass_id,
-        "quantity": quantity,
-        "planeid": plane_id
-    }
-    session['ticket_info'] = ticket_info
-
-    return jsonify()
+# @app.route('/api/create_ticket_info', methods=['POST'])
+# def create_ticket():
+#     flight_id = ''
+#     customer_id = ''
+#     fareclass_id = ''
+#     quantity = ''
+#     plane_id = ''
+#
+#     # import pdb
+#     # pdb.set_trace()
+#     ticket_info = {
+#         "flightid": flight_id,
+#         "customerid": customer_id,
+#         "fareclassid": fareclass_id,
+#         "quantity": quantity,
+#         "planeid": plane_id
+#     }
+#     session['ticket_info'] = ticket_info
+#
+#     return jsonify()
 
 
 if __name__ == '__main__':

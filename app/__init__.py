@@ -19,7 +19,21 @@ cloudinary.config(
     api_secret = "<your_api_secret>", # Click 'View API Keys' above to copy your API secret
     secure=True
 )
-
-
+VNPAY_CONFIG = {
+    'vnp_TmnCode': 'RC52CA8T',
+    'vnp_HashSecret': 'HA8UIHW181SUFMHZ42GN5ERAN89CA1KP',
+    'vnp_Url': 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
+    "vnp_ReturnUrl": "http://localhost:5000/vnpay_return"
+}
+# Ngân hàng
+# NCB
+# Số thẻ
+# 9704198526191432198
+# Tên chủ thẻ
+# NGUYEN VAN A
+# Ngày phát hành
+# 07/15
+# Mật khẩu OTP
+# 123456
 login = LoginManager(app)
 db = SQLAlchemy(app=app)

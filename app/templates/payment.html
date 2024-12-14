@@ -33,13 +33,16 @@
             {% endfor %}
             <div class="alert alert-info">
                 <h3>Số lượng vé: <span id="quantity">{{quantity}}</span></h3>
-                <h3>Tổng tiền: <span> </span> <span id="totalPrice" class="text-success">{{"{:,.0f}".format(quantity*price)}} VNĐ</span>
+                <h3>Tổng tiền: <span> </span> <span id="totalPrice" class="text-success" data-total="">{{"{:,.0f}".format(quantity*price)}} VNĐ</span>
                 </h3>
             </div>
             <div class="row">
-                <div class="col-3 mt-3">
-                    <input type="button" value="Thanh toan" class="btn btn-danger" onclick="pay()">
-                </div>
+                <form action="/payment_process" method="post">
+                    <div class="col-3 mt-3">
+                        <input type="submit" value="Thanh toan" class="btn btn-danger" >
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
