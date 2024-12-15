@@ -4,8 +4,7 @@
 <h1 class="text-center text-succes mt-1 "> XỬ LÍ ĐẶT VÉ </h1>
 <div class="container p-3 mt-3 bg-light ">
     <form action="/payment" method="post" class="  d-grid gap-3 px-4">
-        <div class="row row-cols-3 ">
-            <div class="row"></div>
+        <div class="row row-cols-2 ">
             <div class="row row-cols-2 ">
                 <div class="col p-0 fw-bold fs-2 d-flex align-items-center  ">
                     <label>Chuyến bay:</label>
@@ -20,7 +19,15 @@
 
                 </div>
             </div>
-            <div class="row"></div>
+            <div class="row row-cols-2">
+                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
+                    <label>Số ghế trống:</label>
+                </div>
+                <div class="col-md p-0 bg-grey fw-normal ms-3">
+                   <input class="form-control w-auto form-control-lg" type="text" value="{{availseats}}"
+                           aria-label="readonly input example" readonly>
+                </div>
+            </div>
         </div>
         <div class="row row-cols-2  ">
             <div class="row row-cols-2">
@@ -82,6 +89,7 @@
                 <div class="col ">
                     <input class="form-control w-auto form-control-lg" type="number" id="ticket-quantity"
                            name="ticket-quantity" min="1" value="1" required>
+                    <input type="hidden" name="count" value="{{ count }}">
                 </div>
             </div>
             <div class="row row-cols-2 ">
@@ -96,7 +104,7 @@
                                 id="fareclassid" value="{{fareclass.id}}">{{fareclass.name}}
                         </option>
                         {% endfor %}
-                         <input type="hidden" name="fareclassname" value="{{ fareclass.name }}">
+                        <input type="hidden" name="fareclassname" value="{{ fareclass.name }}">
                     </select>
                 </div>
             </div>
@@ -144,10 +152,10 @@
                 <input type="submit" value="Tiến hành thanh toán" data-mdb-ripple-init
                        class="btn btn-primary btn-block btn-lg"/>
             </div>
-<!--            <div class="col-5 ms-3">-->
-<!--                <input type="button" value="Lưu vé" data-mdb-ripple-init-->
-<!--                       class="btn btn-success btn-block btn-lg" onclick="handlePayment()"/>-->
-<!--            </div>-->
+            <!--            <div class="col-5 ms-3">-->
+            <!--                <input type="button" value="Lưu vé" data-mdb-ripple-init-->
+            <!--                       class="btn btn-success btn-block btn-lg" onclick="handlePayment()"/>-->
+            <!--            </div>-->
         </div>
     </form>
 

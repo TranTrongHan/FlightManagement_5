@@ -1,35 +1,18 @@
 import re
 from datetime import datetime
+from zoneinfo import available_timezones
 
 from flask import render_template, request, redirect, jsonify, session, flash, url_for
-from sqlalchemy.sql.functions import current_user
 import dao, utils
-from app import app, login, VNPAY_CONFIG
+from app import app, login, VNPAY_CONFIG,dao
 from flask_login import login_user, logout_user, login_required
 from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User
 
 
-@app.route('/', methods=['get', 'post'])
+
+@app.route('/')
 def index():
-    # lấy danh sách id sân bay đi
-    airports = dao.load_airport_id('takeoffairport')
-    # lấy danh sách id sân bay đến
-    airports2 = dao.load_airport_id()
-    # lấy danh sách id sân bay
-    airportsID = dao.load_airport()
-
-    if request.method.__eq__('POST'):
-        takeoff_airport = request.form.get('takeoff')
-        landing_airport = request.form.get('landing')
-        # lấy danh sách chuyến bay có nơi đi, nơi đến theo yêu cầu
-        routes = dao.load_specific_routes(takeoffId=takeoff_airport, landingairportId=landing_airport)
-        flights = dao.load_flights()
-        return render_template('index.html', take_off_airports=airports, landing_airports=airports2,
-                               airports=airportsID, routes=routes, flights=flights)
-
-    return render_template('index.html', take_off_airports=airports,
-                           landing_airports=airports2, airports=airportsID)
-
+    return render_template('index.html')
 
 @app.route('/login', methods=['get', 'post'])
 def login_process():
@@ -77,15 +60,13 @@ def login_admin():
     u = dao.auth_user(username=username, password=password, role=UserRoleEnum.ADMIN)
     if u:
         login_user(u)
-    elif not u:
-        return redirect('/user_alert')
-
+        return redirect('/admin')
     return redirect('/admin')
 
 
 @app.route('/user_alert')
 def user_alert():
-    return render_template('layout/user_alert.html')
+    return render_template('layout/alert/user_alert.html')
 
 
 @app.route('/role_alert')
@@ -151,8 +132,6 @@ def register_process():
 
 @app.route('/myinfo', methods = ['GET', 'POST'])
 def my_info():
-
-
     if request.method.__eq__('POST'):
         error_message = {}
         user_id = request.form.get('userid')
@@ -193,8 +172,8 @@ def my_tickets():
     routes  = dao.load_route()
     fareclass = dao.load_fareclass()
     return render_template('bookedtickets.html',tickets = tickets,seats=seats,flights=flights,routes=routes,fareclass=fareclass)
-@app.route('/bookticket', methods=['GET', 'POST'])
 
+@app.route('/bookticket', methods=['GET', 'POST'])
 def bookticket():
     # lấy danh sách id sân bay đi
     airports = dao.load_airport_id('takeoffairport')
@@ -211,13 +190,13 @@ def bookticket():
         return_time = request.form.get('returnTime')
 
         # lấy danh sách chuyến bay có nơi đi, nơi đến theo yêu cầu
-        routes = dao.load_specific_routes(takeoffId=takeoff_airport1, landingairportId=landing_airport1)
+        route = dao.load_specific_routes(takeoffId=takeoff_airport1, landingairportId=landing_airport1)
 
         if utils.check_valid_date(depart_time=departure_time, return_time=return_time):
             flights = dao.load_flights(depart_time=departure_time, return_time=return_time)
             planes = dao.load_plane()
             return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
-                                   airports=airportsID, routes=routes, flights=flights, planes=planes,
+                                   airports=airportsID, route=route, flights=flights, planes=planes,
                                    fareclass=fareclass)
         else:
             return redirect('/invalid_date')
@@ -228,7 +207,7 @@ def bookticket():
 
 @app.route('/invalid_date')
 def invalid_date_form():
-    return render_template('layout/invalid_date.html')
+    return render_template('layout/alert/invalid_date.html')
 
 
 @app.route('/bookticket_process', methods=['GET', 'POST'])
@@ -247,18 +226,16 @@ def bookticket_process():
 
     airports = dao.load_airport()
     fareclass = dao.load_fareclass()
-
-    check_used_to_bookticket = utils.check_used_to_bookticket(flightid=flight_id)
-    has_ticket = utils.check_unvalid_ticket(takeofftime=takeoff_time,landingtime=landing_time,flightid=flight_id)
+    availseats = utils.count_seat_of_flight(flightid=flight_id)
 
     return render_template('bookticket_process.html',
-                               route=route, airports=airports, flight=flight, fareclass=fareclass, plane=plane)
+                               route=route, airports=airports, flight=flight, fareclass=fareclass, plane=plane,availseats=availseats)
 
 
 
 @app.route('/bookticket_error')
 def error_alert():
-    return render_template('layout/bookticket_error_alert.html')
+    return render_template('layout/alert/bookticket_error_alert.html')
 
 
 @login.user_loader
@@ -273,7 +250,6 @@ def payment_comfirm_page():
     fareclass_id = request.form.get('fareclassid')
     quantity = int(request.form.get('ticket-quantity'))
     plane_id = request.form.get('plane')
-
     fareclass_price = dao.get_price(id=fareclass_id)
     fareclass_name = dao.get_name_by_id(model=FareClass, id=fareclass_id)
     customer_name = dao.get_name_by_id(User, id=customer_id)
@@ -284,6 +260,7 @@ def payment_comfirm_page():
     fareclass = FareClass(id=fareclass_id)
 
     ticket_info = {
+        'order_id': f"reservation-{customer_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
         "flightid": flight.to_dict(),
         "customerid": customer.to_dict(),
         "fareclassid": fareclass.to_dict(),
@@ -297,27 +274,25 @@ def payment_comfirm_page():
         return render_template('payment.html', seats=seats, quantity=quantity, price=fareclass_price,
                                cus_name=customer_name,
                                fareclass_name=fareclass_name, plane_name=plane_name)
-
-    return render_template('payment.html')
+    elif not seats:
+        return redirect('/outofseat')
+@app.route('/outofseat')
+def outofseat():
+    return render_template('layout/alert/out_of_seats_alert.html')
 
 @app.route('/payment_process',methods=['GET','POST'])
 def paymentprocess():
-
-    if request.method.__eq__('POST'):
-        # Lấy thông tin thanh toán từ người dùng
+    if request.method == 'POST':
         ticket_info = session.get('ticket_info')
-        amount = ticket_info.get('quantity') * ticket_info.get('price')  # Số tiền thanh toán (VNĐ)
-        # amount *= 25000
-        flightid = ticket_info.get('flightid').get('id')
-
+        amount = ticket_info.get('quantity') * ticket_info.get('price')
+        order_id = ticket_info.get('order_id')
         vnp = dao.vnpay()
-        # Xây dựng hàm cần thiết cho vnpay
         vnp.requestData['vnp_Version'] = '2.1.0'
         vnp.requestData['vnp_Command'] = 'pay'
         vnp.requestData['vnp_TmnCode'] = VNPAY_CONFIG['vnp_TmnCode']
         vnp.requestData['vnp_Amount'] = str(int(amount * 100))
         vnp.requestData['vnp_CurrCode'] = 'VND'
-        vnp.requestData['vnp_TxnRef'] = flightid
+        vnp.requestData['vnp_TxnRef'] = order_id
         vnp.requestData['vnp_OrderInfo'] = 'Thanhtoan'  # Nội dung thanh toán
         vnp.requestData['vnp_OrderType'] = 'ticket'
 
@@ -329,57 +304,20 @@ def paymentprocess():
 
         vnp_payment_url = vnp.get_payment_url(VNPAY_CONFIG['vnp_Url'], VNPAY_CONFIG['vnp_HashSecret'])
 
+        print(vnp_payment_url)
+
         return redirect(vnp_payment_url)
+
+
 @app.route('/vnpay_return')
 def vnpay_return():
     vnp_ResponseCode = request.args.get('vnp_ResponseCode')
     if vnp_ResponseCode == '00':
-        # list_guest = session.get('guest')
-        # room_reservation_form = session.get('room_reservation_form')
-        #
-        # username = session.get('username')
-        # customer = dao.get_customer_by_account(username)
-        #
-        # room_reservation_form = RoomReservationForm(check_in_date=room_reservation_form['check_in_date'],
-        #                                             check_out_date=room_reservation_form['check_out_date'],
-        #                                             deposit=room_reservation_form['deposit'], total_amount=room_reservation_form['total_amount'],
-        #                                             room_id=room_reservation_form['room_id'], customer_id=customer.cus_id)
+
         utils.add_ticket(session.get('ticket_info'))
         del session['ticket_info']
 
-        print('Tạo vé thành công')
-
-        # arr_guest = []
-        # if list_guest:
-        #     for guest in list_guest:
-        #         if guest['customer_type'].__eq__('Domestic'):
-        #             type = 1
-        #         else:
-        #             type = 2
-        #         guest = Guest(name=guest['name'], identification_card=guest['identification_card'], customer_type_id=type)
-        #
-        #         guest.room_reservation_form.append(room_reservation_form)
-        #
-        #         arr_guest.append(guest)
-        #         print('Add guest success')
-        # db.session.add(room_reservation_form)
-        # db.session.add_all(arr_guest)
-        # db.session.commit()
-
-        flash('Payment success', 'Payment result')
-
-
-    else:
-        flash('Payment failed', 'Payment result')
-
     return redirect('/')
-
-@app.route('/test')
-def test():
-    selected_seats = utils.create_ticket(session.get('ticket_info'))
-    if selected_seats:
-        return render_template("/layout/test.html", selected_seats=selected_seats)
-    return render_template("/layout/test.html")
 
 
 @app.route('/api/payment', methods=['POST'])
@@ -393,27 +331,6 @@ def payment():
 
     return jsonify({'code': 200, 'redirect_url': '/bookticket'})
 
-
-# @app.route('/api/create_ticket_info', methods=['POST'])
-# def create_ticket():
-#     flight_id = ''
-#     customer_id = ''
-#     fareclass_id = ''
-#     quantity = ''
-#     plane_id = ''
-#
-#     # import pdb
-#     # pdb.set_trace()
-#     ticket_info = {
-#         "flightid": flight_id,
-#         "customerid": customer_id,
-#         "fareclassid": fareclass_id,
-#         "quantity": quantity,
-#         "planeid": plane_id
-#     }
-#     session['ticket_info'] = ticket_info
-#
-#     return jsonify()
 
 
 if __name__ == '__main__':
