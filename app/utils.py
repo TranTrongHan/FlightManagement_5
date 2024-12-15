@@ -12,42 +12,14 @@ def get_seat_by_quantity(quantity,flightid):
         selected_seats = []
         for _ in range(quantity):
             seats = Seat.query.filter(Seat.status == False, Seat.flight_id == flightid).all()
-            rand_seat = choice(seats)
-            rand_seat.status = True
-            selected_seats.append(rand_seat)
-        db.session.commit()
+            if seats:
+                rand_seat = choice(seats)
+
+                selected_seats.append(rand_seat)
+            elif not seats:
+                return selected_seats
+            db.session.commit()
         return selected_seats
-    return []
-
-def create_ticket(ticket_info):
-    flight_dict = ticket_info.get('flightid')
-
-    selected_seats = get_seat_by_quantity(quantity=ticket_info['quantity'], flightid=flight_dict.get('id'))
-
-    flight_obj = Flight.from_dict(flight_dict)
-    customer_dict = ticket_info.get('customerid')
-    customer_obj = Customer.from_dict(customer_dict)
-    fareclass_dict = ticket_info.get('fareclassid')
-    fareclass_obj = FareClass.from_dict(fareclass_dict)
-
-
-    existing_customer = db.session.query(Customer).filter_by(user_id=customer_obj.user_id).first()
-    existing_flight = db.session.query(Flight).filter_by(id=flight_obj.id).first()
-    existing_fareclass = db.session.query(FareClass).filter_by(id=fareclass_obj.id).first()
-    # Sử dụng đối tượng đã tồn tại
-    customer_obj = existing_customer
-    flight_obj = existing_flight
-    fareclass_obj = existing_fareclass
-
-    tickets = []
-    for seat in selected_seats:
-        ticket = Ticket( customer=customer_obj, flight=flight_obj, fareclass=fareclass_obj,
-                        seat=seat, created_date = datetime.now())
-        db.session.add(ticket)
-        tickets.append(ticket)
-    db.session.commit()
-
-    return tickets
 
 def add_ticket(ticket_info):
     flight_dict = ticket_info.get('flightid')
@@ -79,6 +51,7 @@ def add_ticket(ticket_info):
     for seat in selected_seats:
         ticket = Ticket(customer = customer_obj,flight= flight_obj,fareclass = fareclass_obj,
                         seat = seat,created_date = datetime.now() )
+        seat.status = True
         db.session.add(ticket)
         tickets.append(ticket)
     db.session.commit()
@@ -110,7 +83,7 @@ def check_unvalid_ticket(takeofftime=None,landingtime=None,flightid=None):
             #     return True
             # elif takeofftime > booked_ticket.return_date:
             #     return True
-            depart_date = booked_ticket.depart_date
+            depart_date = booked_ticket.created_date
             departday = depart_date.day
             departmonth = depart_date.month
             return_date =booked_ticket.return_date
@@ -121,7 +94,10 @@ def check_unvalid_ticket(takeofftime=None,landingtime=None,flightid=None):
 
 
     return has_ticket
-
+def count_seat_of_flight(flightid=None):
+    if flightid:
+        avail_seats = Seat.query.filter(Seat.flight_id == flightid,Seat.status==False).count()
+        return avail_seats
 def route_stats(kw = None,from_date=None,to_date=None):
     route_stats = db.session.query(Route.id,Route.name,
                     func.sum(FareClass.price))\

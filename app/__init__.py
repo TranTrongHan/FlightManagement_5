@@ -7,7 +7,7 @@ from cloudinary.utils import cloudinary_url
 from flask_login import LoginManager
 app = Flask(__name__)
 
-app.secret_key='secret'
+app.secret_key='thisIsNOnSecret'
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/editedflight_db?charset=utf8mb4" % quote('Admin@123')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 
@@ -20,8 +20,8 @@ cloudinary.config(
     secure=True
 )
 VNPAY_CONFIG = {
-    'vnp_TmnCode': 'RC52CA8T',
-    'vnp_HashSecret': 'HA8UIHW181SUFMHZ42GN5ERAN89CA1KP',
+    'vnp_TmnCode': 'JTUTARBA',
+    'vnp_HashSecret': 'YGOTOHGJS772HDGA1KE690H64UK3SQTV',
     'vnp_Url': 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
     "vnp_ReturnUrl": "http://localhost:5000/vnpay_return"
 }

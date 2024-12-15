@@ -1,5 +1,3 @@
-
-
 from app import db, app
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, Enum, DateTime, values, false
 from sqlalchemy.orm import relationship, backref
@@ -87,7 +85,7 @@ class Plane(db.Model):
 #####################################
 class Airport(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), nullable=False, unique=True)
+    name = Column(String(100), nullable=False, unique=True)
     take_off_airport = relationship("Route", foreign_keys="Route.take_off_airport_id", backref="takeoff_airport")
     landing_airport = relationship("Route", foreign_keys="Route.landing_airport_id", backref="landing_airport_ref")
     flights = relationship("MidAirport", backref="airport", lazy=True)
@@ -112,8 +110,7 @@ class Flight(db.Model):
     name = Column(String(50), nullable=False)
     take_of_time = Column(DateTime, nullable=True)
     landing_time = Column(DateTime, nullable=True)
-    num_of_1st_seat = Column(Integer, nullable=False)
-    num_of_2st_seat = Column(Integer, nullable=False)
+    seats_quantity = Column(Integer,nullable=False)
     mid_airports = relationship("MidAirport", backref="flight", lazy=True)
     ticket = relationship("Ticket", backref="flight", lazy=True)
     plane_id = Column(Integer, ForeignKey(Plane.id), nullable=False)
@@ -201,8 +198,7 @@ if __name__ == "__main__":
         db.drop_all()
         db.create_all()
 
-        rule1 = Rule(name='num_of_1st_class_seat', value=10)
-        rule2 = Rule(name='num_of_2st_class_seat', value=10)
+        rule1 = Rule(name='Số lượng ghế ngồi',value ='5')
         rule3 = Rule(name='thời gian dừng tối thiểu', value='20')
         rule4 = Rule(name='1st_seat_price', value=1500000)
         rule5 = Rule(name='2st_seat_price', value=1000000)
@@ -251,147 +247,182 @@ if __name__ == "__main__":
         db.session.add_all([plane1, plane2, plane3, plane4, plane5])
         db.session.commit()
 
-        airport1 = Airport(name='Nội Bài')
-        airport2 = Airport(name='Tân Sơn Nhất')
-        airport3 = Airport(name='Cần Thơ')
-        airport4 = Airport(name='Đà Nẵng')
-        airport5 = Airport(name='Cà Mau')
-        airport6 = Airport(name='Phú Quốc')
-        airport7 = Airport(name='Điện Biên Phủ')
-        airport8 = Airport(name='Thọ Xuân')
-        airport9 = Airport(name='Phú Bài')
-        airport10 = Airport(name='Pleiku')
-        airport11 = Airport(name='Rạch Giá')
-        airport12 = Airport(name='Buôn Ma Thuột')
-        airport13 = Airport(name='Liên Khương')
-        airport14 = Airport(name='Côn Đảo')
-        airport15 = Airport(name='TP Vinh')
+        airport1 = Airport(name='Sân bay Nội Bài (HAN)')
+        airport2 = Airport(name='Sân bay Tân Sơn Nhất (SGN)')
+        airport3 = Airport(name='Sân bay Cam Ranh (CXR)')
+        airport4 = Airport(name='Sân bay Đà Nẵng (DAD)')
+        airport5 = Airport(name='Sân bay Phù Cát (UIH)')
+        airport6 = Airport(name='Sân bay Quốc tế Phú Quốc (PQH)')
+        airport7 = Airport(name='Sân bay Liên Khương (DLI)')
+        airport8 = Airport(name='Sân bay Cát Bi (HPH)')
+        airport9 = Airport(name='Sân bay Điện Biên Phủ (DIN)')
+        airport10 = Airport(name='Sân bay Côn Đảo (VCS) ')
+        airport11 = Airport(name='Sân bay Tuy Hòa (UIH)')
+        airport12 = Airport(name='Sân bay Rạch Giá (VKG) ')
+
 
         db.session.add_all(
             [airport1, airport2, airport3, airport4, airport5, airport6, airport7, airport8, airport9, airport10,
-             airport11, airport12, airport13, airport14, airport15])
+             airport11, airport12])
         db.session.commit()
 
-        route1 = Route(name='Hà Nội - TP HCM', take_off_airport_id="1", landing_airport_id="2")
-        route2 = Route(name='Cần Thơ - TP HCM', take_off_airport_id="3", landing_airport_id="2")
-        route3 = Route(name='Đà Nẵng - TP HCM', take_off_airport_id="4", landing_airport_id="2")
-        route4 = Route(name='Cà Mau - Phu Quoc', take_off_airport_id="5", landing_airport_id="6")
-        route5 = Route(name='Cần Thơ - Hà Nội', take_off_airport_id="3", landing_airport_id="1")
-        route6 = Route(name='Phú Quốc - Thọ Xuân', take_off_airport_id="6", landing_airport_id="8")
-        route7 = Route(name='Điện Biên Phủ - Thọ Xuân', take_off_airport_id="7", landing_airport_id="8")
-        route8 = Route(name='Thọ Xuân - Cần Thơ', take_off_airport_id="8", landing_airport_id="3")
-        route9 = Route(name='Hà Nội - Phú Bài', take_off_airport_id="1", landing_airport_id="9")
-        route10 = Route(name='Thọ Xuân - TP HCM', take_off_airport_id="8", landing_airport_id="2")
-        route11 = Route(name='Rạch Giá - Cần Thơ', take_off_airport_id="11", landing_airport_id="3")
-        route12 = Route(name='Buôn Ma Thuột - TP HCM', take_off_airport_id="12", landing_airport_id="2")
-        route13 = Route(name='Rạch Giá - Liên Khương', take_off_airport_id="11", landing_airport_id="13")
-        route14 = Route(name='Côn Đảo - Phú Quốc', take_off_airport_id="14", landing_airport_id="6")
-        route15 = Route(name='TP Vinh - Thọ Xuân', take_off_airport_id="15", landing_airport_id="8")
-        route16 = Route(name='Liên Khương - Cần Thơ', take_off_airport_id="13", landing_airport_id="3")
+        route1 = Route(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_off_airport_id="1", landing_airport_id="2")
+        route2 = Route(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_off_airport_id="1", landing_airport_id="4")
+        route3 = Route(name='Đà Nẵng(DAD) - TP HCM(SG)', take_off_airport_id="4", landing_airport_id="2")
+        route4 = Route(name='Hà Nội(HAN) - Nha Trang(CXR)', take_off_airport_id="1", landing_airport_id="4")
+        route5 = Route(name='TP HCM(SG)- Nha Trang(CXR)', take_off_airport_id="2", landing_airport_id="3")
+        route6 = Route(name='Hà Nội(HAN) - Phú Quốc(PQH)', take_off_airport_id="1", landing_airport_id="6")
+        route7 = Route(name='Hồ Chí Minh(SGN) - Phú Quốc(PQH)', take_off_airport_id="2", landing_airport_id="6")
+        route8 = Route(name='Hà Nội(HAN) - Quy Nhơn(UIH)', take_off_airport_id="1", landing_airport_id="5")
+        route9 = Route(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_off_airport_id="2", landing_airport_id="7")
+        route10 = Route(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_off_airport_id="1", landing_airport_id="8")
+        route11 = Route(name='Hà Nội(HAN) - Điện Biên Phủ(DIN)', take_off_airport_id="1", landing_airport_id="9")
+        route12 = Route(name='Hồ Chí Minh(SGN) - Côn Đảo(VCS)', take_off_airport_id="2", landing_airport_id="10")
+        route13 = Route(name='Hà Nội(HAN) - Phú Yên(UIH)', take_off_airport_id="1", landing_airport_id="11")
+        # route14 = Route(name='Hồ Chí Minh(SGN) -  Phú Yên(UIH)', take_off_airport_id="2", landing_airport_id="11")
+        # route15 = Route(name='Hà Nội (HAN) - Rạch Giá (VKG)', take_off_airport_id="1", landing_airport_id="12")
         db.session.add_all([route1, route2, route3, route4, route5,
                             route6, route7, route8, route9, route10,
-                            route11, route12, route13, route14, route15,
-                            route16])
+                            route11, route12, route13])
         db.session.commit()
 
-        db.session.add_all([rule1, rule2])
+        db.session.add_all([rule1])
         db.session.commit()
-        flight1 = Flight(name='VN001', take_of_time=datetime(2024, 12, 11, 11, 00, 00),
-                         landing_time=datetime(2024, 12, 13, 12, 00, 00), num_of_1st_seat=rule1.value,
-                         num_of_2st_seat=rule2.value, plane_id='1', route_id='1')
-        flight2 = Flight(name='VN002', take_of_time=datetime(2024, 12, 11, 7, 00, 00),
-                         landing_time=datetime(2024, 12, 14, 15, 00, 00), num_of_1st_seat=rule1.value,
-                         num_of_2st_seat=rule2.value, plane_id='2', route_id='1')
-        flight3 = Flight(name='VN003', take_of_time=datetime(2024, 12, 11, 9, 00, 00),
-                         landing_time=datetime(2024, 12, 14, 9, 00, 00), num_of_1st_seat=rule1.value,
-                         num_of_2st_seat=rule2.value, plane_id='4', route_id='1')
-        flight4 = Flight(name='VN004', take_of_time=datetime(2024, 12, 12, 10, 00, 00),
-                         landing_time=datetime(2024, 12, 13, 12, 00, 00), num_of_1st_seat=rule1.value,
-                         num_of_2st_seat=rule2.value, plane_id='2', route_id='2')
-        flight5 = Flight(name='VN005', take_of_time=datetime(2024, 12, 12, 9, 00, 00),
-                         landing_time=datetime(2024, 12, 14, 11, 00, 00), num_of_1st_seat=rule1.value,
-                         num_of_2st_seat=rule2.value, plane_id='1', route_id='2')
-        flight6 = Flight(name='VN006', take_of_time=datetime(2024, 11, 12, 8, 00, 00),
-                         landing_time=datetime(2024, 12, 15, 10, 00, 00), num_of_1st_seat=rule1.value,
-                         num_of_2st_seat=rule2.value, plane_id='1', route_id='3')
-        flight7 = Flight(name='VN007', take_of_time=datetime(2024, 12, 13, 22, 00, 00),
-                         landing_time=datetime(2024, 12, 15, 22, 00, 00), num_of_1st_seat=rule1.value,
-                         num_of_2st_seat=rule2.value, plane_id='2', route_id='3')
-        flight8 = Flight(name='VN008', take_of_time=datetime(2024, 12, 13, 23, 00, 00),
-                         landing_time=datetime(2024, 12, 15, 23, 00, 00), num_of_1st_seat=rule1.value,
-                         num_of_2st_seat=rule2.value, plane_id='5', route_id='3')
-        flight9 = Flight(name='VN009', take_of_time=datetime(2024, 12, 13, 2, 00, 00),
-                         landing_time=datetime(2024, 12, 15, 4, 00, 00), num_of_1st_seat=rule1.value,
-                         num_of_2st_seat=rule2.value, plane_id='3', route_id='3')
-        flight10 = Flight(name='VN010', take_of_time=datetime(2024, 12, 13, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 15, 23, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='3', route_id='3')
-        flight11 = Flight(name='VN011', take_of_time=datetime(2024, 12, 14, 10, 00, 00),
-                          landing_time=datetime(2024, 12, 15, 12, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='1', route_id='4')
-        flight12 = Flight(name='VN012', take_of_time=datetime(2024, 12, 14, 12, 00, 00),
-                          landing_time=datetime(2024, 12, 16, 14, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='2', route_id='5')
-        flight13 = Flight(name='VN013', take_of_time=datetime(2024, 12, 14, 14, 00, 00),
-                          landing_time=datetime(2024, 12, 17, 16, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='6')
-        flight14 = Flight(name='VN014', take_of_time=datetime(2024, 10, 9, 11, 00, 00),
-                          landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='7')
-        flight15 = Flight(name='VN015', take_of_time=datetime(2024, 10, 15, 11, 00, 00),
-                          landing_time=datetime(2024, 5, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='3', route_id='9')
-        flight16 = Flight(name='VN016', take_of_time=datetime(2024, 12, 15, 3, 00, 00),
-                          landing_time=datetime(2024, 12, 16, 5, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='2', route_id='9')
-        flight17 = Flight(name='VN017', take_of_time=datetime(2024, 12, 15, 5, 00, 00),
-                          landing_time=datetime(2024, 12, 17, 7, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='1', route_id='10')
-        flight18 = Flight(name='VN018', take_of_time=datetime(2024, 12, 15, 7, 00, 00),
-                          landing_time=datetime(2024, 12, 18, 9, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='10')
-        flight19 = Flight(name='VN019', take_of_time=datetime(2024, 12, 25, 3, 00, 00),
-                          landing_time=datetime(2024, 12, 26, 14, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='3', route_id='11')
-        flight20 = Flight(name='VN020', take_of_time=datetime(2024, 12, 25, 3, 00, 00),
-                          landing_time=datetime(2024, 12, 27, 2, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='5', route_id='12')
-        flight21 = Flight(name='VN020', take_of_time=datetime(2024, 12, 25, 4, 00, 00),
-                          landing_time=datetime(2024, 12, 28, 5, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='12')
-        flight22 = Flight(name='VN020', take_of_time=datetime(2024, 12, 26, 10, 00, 00),
-                          landing_time=datetime(2024, 12, 27, 23, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='1', route_id='12')
-        flight23 = Flight(name='VN020', take_of_time=datetime(2024, 12, 26, 9, 00, 00),
-                          landing_time=datetime(2024, 12, 29, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='2', route_id='12')
-        flight24 = Flight(name='VN020', take_of_time=datetime(2024, 12, 26, 13, 00, 00),
-                          landing_time=datetime(2024, 12, 28, 14, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='12')
-        flight25 = Flight(name='VN020', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 27, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='5', route_id='1')
-        flight26 = Flight(name='VN020', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 28, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='1')
-        flight27 = Flight(name='VN020', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 28, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='1')
-        flight28 = Flight(name='VN020', take_of_time=datetime(2024, 11, 1, 11, 00, 00),
-                          landing_time=datetime(2024, 11, 9, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='12')
-        flight29 = Flight(name='VN020', take_of_time=datetime(2024, 11, 2, 11, 00, 00),
-                          landing_time=datetime(2024, 11, 3, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='12')
-        flight30 = Flight(name='VN020', take_of_time=datetime(2024, 11, 3, 11, 00, 00),
-                          landing_time=datetime(2024, 11, 5, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='12')
-        flight31 = Flight(name='VN020', take_of_time=datetime(2024, 11, 4, 11, 00, 00),
-                          landing_time=datetime(2024, 11, 6, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='12')
-        flight32 = Flight(name='VN020', take_of_time=datetime(2024, 11, 5, 11, 00, 00),
-                          landing_time=datetime(2024, 11, 7, 11, 00, 00), num_of_1st_seat=rule1.value,
-                          num_of_2st_seat=rule2.value, plane_id='4', route_id='12')
+        #         ==============================Tuyến Hà Nội(HAN) - Hồ Chí Minh(SGN) ======================================
+        flight1 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                         landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                            seats_quantity = rule1.value, plane_id='1', route_id='1')
+        flight2 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+                         landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='2', route_id='1')
+        flight3 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 29, 23, 00, 00),
+                         landing_time=datetime(2024, 12, 1, 12, 00, 00),
+                         seats_quantity=rule1.value, plane_id='3', route_id='1')
+        flight4 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 28, 5, 00, 00),
+                         landing_time=datetime(2024, 12, 30, 10, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='4', route_id='1')
+        #         ==============================Tuyến Hà Nội(HAN) - Đà Nẵng(DAD) ======================================
+        flight5 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                         landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='1', route_id='2')
+        flight6 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+                         landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='2', route_id='2')
+        flight7 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_of_time=datetime(2024, 12, 29, 23, 00, 00),
+                         landing_time=datetime(2024, 12, 1, 12, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='3', route_id='1')
+        flight8 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_of_time=datetime(2024, 12, 28, 5, 00, 00),
+                         landing_time=datetime(2024, 12, 30, 10, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='4', route_id='2')
+
+        #         ==============================Tuyến Hà Nội(HAN) - Nha Trang(CXR) ======================================
+        flight9 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                         landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='1', route_id='4')
+        flight10 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+                         landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='2', route_id='4')
+        flight11 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_of_time=datetime(2024, 12, 29, 23, 00, 00),
+                         landing_time=datetime(2024, 12, 1, 12, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='3', route_id='4')
+        flight12 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_of_time=datetime(2024, 12, 28, 5, 00, 00),
+                         landing_time=datetime(2024, 12, 30, 10, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='4', route_id='4')
+
+        #         ==============================Tuyến Đà Nẵng(DAD) - TP HCM(SG) ======================================
+        flight13 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                         landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='1', route_id='3')
+        flight14 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+                         landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='2', route_id='3')
+        flight15 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 29, 23, 00, 00),
+                         landing_time=datetime(2024, 12, 1, 12, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='3', route_id='3')
+        flight16 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 28, 5, 00, 00),
+                         landing_time=datetime(2024, 12, 30, 10, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='4', route_id='3')
+
+        #         ==============================Tuyến TP HCM(SG)- Nha Trang(CXR) ======================================
+        flight17 = Flight(name='TP HCM(SG)- Nha Trang(CXR)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                         landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='1', route_id='5')
+        flight18 = Flight(name='TP HCM(SG)- Nha Trang(CXR)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+                         landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                         seats_quantity=rule1.value, plane_id='2', route_id='5')
+
+        #         ==============================Tuyến Hà Nội(HAN) - Phú Quốc(PQH) ======================================
+        flight19 = Flight(name='Hà Nội(HAN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='6')
+        flight20 = Flight(name='Hà Nội(HAN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+                          landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='2', route_id='6')
+
+        #         ==============================Tuyến Hồ Chí Minh(SGN) - Phú Quốc(PQH) ======================================
+        flight21 = Flight(name='Hồ Chí Minh(SGN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='7')
+        flight22 = Flight(name='Hồ Chí Minh(SGN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+                          landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='2', route_id='7')
+
+        #         ==============================Tuyến Hà Nội(HAN) - Quy Nhơn(UIH) ======================================
+        flight23 = Flight(name='Hà Nội(HAN) - Quy Nhơn(UIH)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='8')
+
+        #         ==============================Tuyến Hồ Chí Minh(SGN) - Đà Lạt(DLI) ======================================
+        flight24 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='9')
+        flight25 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+                          landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='2', route_id='9')
+
+        #         ==============================Tuyến Hà Nội(HAN) - Hải Phòng(HPH) ======================================
+        flight26 = Flight(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='10')
+        flight27 = Flight(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+                          landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='2', route_id='10')
+
+        #         ==============================Tuyến Hà Nội(HAN) - Điện Biên Phủ(DIN) ======================================
+        flight28 = Flight(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='11')
+
+        #         ==============================Tuyến Hồ Chí Minh(SGN) - Côn Đảo(VCS) ======================================
+        flight29 = Flight(name='Hồ Chí Minh(SGN) - Côn Đảo(VCS)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='12')
+
+        #         ==============================Tuyến Hà Nội(HAN) - Phú Yên(UIH) ======================================
+        flight30 = Flight(name='Hà Nội(HAN) - Phú Yên(UIH)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='13')
+
+
+        #         ==============================Các chuyến bay đã qua lịch hiện tại ======================================
+        flight31 = Flight(name='Hà Nội(HAN) - Phú Yên(UIH)', take_of_time=datetime(2024, 12, 15, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='13')
+        flight32 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 11, 15, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='9')
+        flight33 = Flight(name='Hồ Chí Minh(SGN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 10, 15, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='7')
+        flight34 = Flight(name='Hà Nội(HAN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 8, 15, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='6')
+        flight35 = Flight(name='TP HCM(SG)- Nha Trang(CXR)', take_of_time=datetime(2024, 9, 15, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='5')
+        flight36 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 10, 15, 11, 00, 00),
+                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
+                          seats_quantity=rule1.value, plane_id='1', route_id='1')
 
         db.session.add_all([flight1, flight2, flight3, flight4, flight5,
                             flight6, flight7, flight8, flight9, flight10,
@@ -399,11 +430,9 @@ if __name__ == "__main__":
                             flight16, flight17, flight18, flight19, flight20,
                             flight21, flight22, flight23, flight24, flight25,
                             flight26, flight27, flight28, flight29, flight30,
-                            flight31, flight32])
+                            flight31, flight32, flight33, flight34, flight35,flight36])
         db.session.commit()
 
-        db.session.add(rule3)
-        db.session.commit()
 
         mid_airport1 = MidAirport(stop_time=rule3.value, note='Dừng x giờ', mid_airport_id='5', flight_id='1')
         mid_airport2 = MidAirport(stop_time=rule3.value, note='Dừng x giờ', mid_airport_id='6', flight_id='2')
@@ -428,235 +457,263 @@ if __name__ == "__main__":
         db.session.commit()
 
         # TRUE = BOOKED, FALSE = EMPTY
-        # ROUTE = 1(NB_TSN), PLANE =1,2,4
-        # ROUTE = 2(CT_TSN), PLANE =2,1
         # EMPY SEAT
-        # FLIGHT1
-        f1_seat1 = Seat(name='Seat01', status=False, flight_id='1')
-        f1_seat2 = Seat(name='Seat02', status=False, flight_id='1')
-        f1_seat3 = Seat(name='Seat03', status=False, flight_id='1')
-        f1_seat4 = Seat(name='Seat04', status=False, flight_id='1')
-        f1_seat5 = Seat(name='Seat05', status=False, flight_id='1')
-        f1_seat6= Seat(name='Seat06', status=False, flight_id='1')
-        f1_seat7= Seat(name='Seat07', status=False, flight_id='1')
-        f1_seat8 = Seat(name='Seat08', status=False, flight_id='1')
-        f1_seat9 = Seat(name='Seat09', status=False, flight_id='1')
-        f1_seat10 = Seat(name='Seat10', status=False, flight_id='1')
-        # f1_seat11 = Seat(name='Seat11', status=False, flight_id='1')
-        # f1_seat12 = Seat(name='Seat12', status=False, flight_id='1')
-        # f1_seat13 = Seat(name='Seat13', status=False, flight_id='1')
-        # f1_seat14 = Seat(name='Seat14', status=False, flight_id='1')
-        # f1_seat15 = Seat(name='Seat15', status=False, flight_id='1')
-        # f1_seat16 = Seat(name='Seat16', status=False, flight_id='1')
-        # f1_seat17 = Seat(name='Seat17', status=False, flight_id='1')
-        # f1_seat18 = Seat(name='Seat18', status=False, flight_id='1')
-        # f1_seat19 = Seat(name='Seat19', status=False, flight_id='1')
-        # f1_seat20 = Seat(name='Seat20', status=False, flight_id='1')
+        seat1 = Seat(name='Seat01', status=False, flight_id='1')
+        seat2 = Seat(name='Seat02', status=False, flight_id='1')
+        seat3 = Seat(name='Seat03', status=False, flight_id='1')
+        seat4 = Seat(name='Seat04', status=False, flight_id='1')
+        seat5 = Seat(name='Seat05', status=False, flight_id='1')
 
-        # FLIGHT2
-        f2_seat1 = Seat(name='Seat01', status=False, flight_id='2')
-        f2_seat2 = Seat(name='Seat02', status=False, flight_id='2')
-        f2_seat3 = Seat(name='Seat03', status=False, flight_id='2')
-        f2_seat4 = Seat(name='Seat04', status=False, flight_id='2')
-        f2_seat5 = Seat(name='Seat05', status=False, flight_id='2')
-        f2_seat6 = Seat(name='Seat06', status=False, flight_id='2')
-        f2_seat7 = Seat(name='Seat07', status=False, flight_id='2')
-        f2_seat8 = Seat(name='Seat08', status=False, flight_id='2')
-        f2_seat9 = Seat(name='Seat09', status=False, flight_id='2')
-        f2_seat10 = Seat(name='Seat10', status=False, flight_id='2')
+        seat6 = Seat(name='Seat01', status=False, flight_id='2')
+        seat7 = Seat(name='Seat02', status=False, flight_id='2')
+        seat8 = Seat(name='Seat03', status=False, flight_id='2')
+        seat9 = Seat(name='Seat04', status=False, flight_id='2')
+        seat10 = Seat(name='Seat05', status=False, flight_id='2')
 
-        # FLIGHT3
-        f3_seat1 = Seat(name='Seat01', status=False, flight_id='3')
-        f3_seat2 = Seat(name='Seat02', status=False, flight_id='3')
-        f3_seat3 = Seat(name='Seat03', status=False, flight_id='3')
-        f3_seat4 = Seat(name='Seat04', status=False, flight_id='3')
-        f3_seat5 = Seat(name='Seat05', status=False, flight_id='3')
-        f3_seat6 = Seat(name='Seat06', status=False, flight_id='3')
-        f3_seat7 = Seat(name='Seat07', status=False, flight_id='3')
-        f3_seat8 = Seat(name='Seat08', status=False, flight_id='3')
-        f3_seat9 = Seat(name='Seat09', status=False, flight_id='3')
-        f3_seat10 = Seat(name='Seat10', status=False, flight_id='3')
-        # FLIGHT4
-        f4_seat1 = Seat(name='Seat01', status=False, flight_id='4')
-        f4_seat2 = Seat(name='Seat02', status=False, flight_id='4')
-        f4_seat3 = Seat(name='Seat03', status=False, flight_id='4')
-        f4_seat4 = Seat(name='Seat04', status=False, flight_id='4')
-        f4_seat5 = Seat(name='Seat05', status=False, flight_id='4')
-        f4_seat6 = Seat(name='Seat06', status=False, flight_id='4')
-        f4_seat7 = Seat(name='Seat07', status=False, flight_id='4')
-        f4_seat8 = Seat(name='Seat08', status=False, flight_id='4')
-        f4_seat9 = Seat(name='Seat09', status=False, flight_id='4')
-        f4_seat10 = Seat(name='Seat10', status=False, flight_id='4')
+        seat11 = Seat(name='Seat01', status=False, flight_id='3')
+        seat12 = Seat(name='Seat02', status=False, flight_id='3')
+        seat13 = Seat(name='Seat03', status=False, flight_id='3')
+        seat14 = Seat(name='Seat04', status=False, flight_id='3')
+        seat15 = Seat(name='Seat05', status=False, flight_id='3')
 
-        # FLIGHT5
-        f5_seat1 = Seat(name='Seat01', status=False, flight_id='5')
-        f5_seat2 = Seat(name='Seat02', status=False, flight_id='5')
-        f5_seat3 = Seat(name='Seat03', status=False, flight_id='5')
-        f5_seat4 = Seat(name='Seat04', status=False, flight_id='5')
-        f5_seat5 = Seat(name='Seat05', status=False, flight_id='5')
-        f5_seat6 = Seat(name='Seat06', status=False, flight_id='5')
-        f5_seat7 = Seat(name='Seat07', status=False, flight_id='5')
-        f5_seat8 = Seat(name='Seat08', status=False, flight_id='5')
-        f5_seat9 = Seat(name='Seat09', status=False, flight_id='5')
-        f5_seat10 = Seat(name='Seat10', status=False, flight_id='5')
+        seat16 = Seat(name='Seat01', status=False, flight_id='4')
+        seat17 = Seat(name='Seat02', status=False, flight_id='4')
+        seat18 = Seat(name='Seat03', status=False, flight_id='4')
+        seat19 = Seat(name='Seat04', status=False, flight_id='4')
+        seat20 = Seat(name='Seat05', status=False, flight_id='4')
 
-        # FLIGHT6
-        f6_seat1 = Seat(name='Seat01', status=False, flight_id='6')
-        f6_seat2 = Seat(name='Seat02', status=False, flight_id='6')
-        f6_seat3 = Seat(name='Seat03', status=False, flight_id='6')
-        f6_seat4 = Seat(name='Seat04', status=False, flight_id='6')
-        f6_seat5 = Seat(name='Seat05', status=False, flight_id='6')
-        f6_seat6 = Seat(name='Seat06', status=False, flight_id='6')
-        f6_seat7 = Seat(name='Seat07', status=False, flight_id='6')
-        f6_seat8 = Seat(name='Seat08', status=False, flight_id='6')
-        f6_seat9 = Seat(name='Seat09', status=False, flight_id='6')
-        f6_seat10 = Seat(name='Seat10', status=False, flight_id='6')
+        seat21 = Seat(name='Seat01', status=False, flight_id='5')
+        seat22 = Seat(name='Seat02', status=False, flight_id='5')
+        seat23 = Seat(name='Seat03', status=False, flight_id='5')
+        seat24 = Seat(name='Seat04', status=False, flight_id='5')
+        seat25 = Seat(name='Seat05', status=False, flight_id='5')
 
-        # FLIGHT7
-        f7_seat1 = Seat(name='Seat01', status=False, flight_id='7')
-        f7_seat2 = Seat(name='Seat02', status=False, flight_id='7')
-        f7_seat3 = Seat(name='Seat03', status=False, flight_id='7')
-        f7_seat4 = Seat(name='Seat04', status=False, flight_id='7')
-        f7_seat5 = Seat(name='Seat05', status=False, flight_id='7')
-        f7_seat6 = Seat(name='Seat06', status=False, flight_id='7')
-        f7_seat7 = Seat(name='Seat07', status=False, flight_id='7')
-        f7_seat8 = Seat(name='Seat08', status=False, flight_id='7')
-        f7_seat9 = Seat(name='Seat09', status=False, flight_id='7')
-        f7_seat10 = Seat(name='Seat10', status=False, flight_id='7')
-        # FLIGHT20
-        f20_seat1 = Seat(name='Seat01', status=False, flight_id='20')
-        f20_seat2 = Seat(name='Seat02', status=False, flight_id='20')
-        f20_seat3 = Seat(name='Seat03', status=False, flight_id='20')
-        f20_seat4 = Seat(name='Seat04', status=False, flight_id='20')
-        f20_seat5 = Seat(name='Seat05', status=False, flight_id='20')
-        f20_seat6 = Seat(name='Seat06', status=False, flight_id='20')
-        f20_seat7 = Seat(name='Seat07', status=False, flight_id='20')
-        f20_seat8 = Seat(name='Seat08', status=False, flight_id='20')
-        f20_seat9 = Seat(name='Seat09', status=False, flight_id='20')
-        f20_seat10 = Seat(name='Seat10', status=False, flight_id='20')
-        # FLIGHT21
-        f21_seat1 = Seat(name='Seat01', status=False, flight_id='21')
-        f21_seat2 = Seat(name='Seat02', status=False, flight_id='21')
-        f21_seat3 = Seat(name='Seat03', status=False, flight_id='21')
-        f21_seat4 = Seat(name='Seat04', status=False, flight_id='21')
-        f21_seat5 = Seat(name='Seat05', status=False, flight_id='21')
-        f21_seat6 = Seat(name='Seat06', status=False, flight_id='21')
-        f21_seat7 = Seat(name='Seat07', status=False, flight_id='21')
-        f21_seat8 = Seat(name='Seat08', status=False, flight_id='21')
-        f21_seat9 = Seat(name='Seat09', status=False, flight_id='21')
-        f21_seat10 = Seat(name='Seat10', status=False, flight_id='21')
+        seat26 = Seat(name='Seat01', status=False, flight_id='6')
+        seat27 = Seat(name='Seat02', status=False, flight_id='6')
+        seat28 = Seat(name='Seat03', status=False, flight_id='6')
+        seat29 = Seat(name='Seat04', status=False, flight_id='6')
+        seat30 = Seat(name='Seat05', status=False, flight_id='6')
 
-        # FLIGHT24
-        f24_seat1 = Seat(name='Seat01', status=False, flight_id='24')
-        f24_seat2 = Seat(name='Seat02', status=False, flight_id='24')
-        f24_seat3 = Seat(name='Seat03', status=False, flight_id='24')
-        f24_seat4 = Seat(name='Seat04', status=False, flight_id='24')
-        f24_seat5 = Seat(name='Seat05', status=False, flight_id='24')
-        f24_seat6 = Seat(name='Seat06', status=False, flight_id='24')
-        f24_seat7 = Seat(name='Seat07', status=False, flight_id='24')
-        f24_seat8 = Seat(name='Seat08', status=False, flight_id='24')
-        f24_seat9 = Seat(name='Seat09', status=False, flight_id='24')
-        f24_seat10 = Seat(name='Seat10', status=False, flight_id='24')
-        # FLIGHT25
-        f25_seat1 = Seat(name='Seat01', status=False, flight_id='25')
-        f25_seat2 = Seat(name='Seat02', status=False, flight_id='25')
-        f25_seat3 = Seat(name='Seat03', status=False, flight_id='25')
-        f25_seat4 = Seat(name='Seat04', status=False, flight_id='25')
-        f25_seat5 = Seat(name='Seat05', status=False, flight_id='25')
-        f25_seat6 = Seat(name='Seat06', status=False, flight_id='25')
-        f25_seat7 = Seat(name='Seat07', status=False, flight_id='25')
-        f25_seat8 = Seat(name='Seat08', status=False, flight_id='25')
-        f25_seat9 = Seat(name='Seat09', status=False, flight_id='25')
-        f25_seat10 = Seat(name='Seat10', status=False, flight_id='25')
-        # FLIGHT26
-        f26_seat1 = Seat(name='Seat01', status=False, flight_id='26')
-        f26_seat2 = Seat(name='Seat02', status=False, flight_id='26')
-        f26_seat3 = Seat(name='Seat03', status=False, flight_id='26')
-        f26_seat4 = Seat(name='Seat04', status=False, flight_id='26')
-        f26_seat5 = Seat(name='Seat05', status=False, flight_id='26')
-        f26_seat6 = Seat(name='Seat06', status=False, flight_id='26')
-        f26_seat7 = Seat(name='Seat07', status=False, flight_id='26')
-        f26_seat8 = Seat(name='Seat08', status=False, flight_id='26')
-        f26_seat9 = Seat(name='Seat09', status=False, flight_id='26')
-        f26_seat10 = Seat(name='Seat10', status=False, flight_id='26')
-        # FLIGHT29
-        f29_seat1 = Seat(name='Seat01', status=False, flight_id='29')
-        f29_seat2 = Seat(name='Seat02', status=False, flight_id='29')
-        f29_seat3 = Seat(name='Seat03', status=False, flight_id='29')
-        f29_seat4 = Seat(name='Seat04', status=False, flight_id='29')
-        f29_seat5 = Seat(name='Seat05', status=False, flight_id='29')
-        f29_seat6 = Seat(name='Seat06', status=False, flight_id='29')
-        f29_seat7 = Seat(name='Seat07', status=False, flight_id='29')
-        f29_seat8 = Seat(name='Seat08', status=False, flight_id='29')
-        f29_seat9 = Seat(name='Seat09', status=False, flight_id='29')
-        f29_seat10 = Seat(name='Seat10', status=False, flight_id='29')
+        seat31 = Seat(name='Seat01', status=False, flight_id='7')
+        seat32 = Seat(name='Seat02', status=False, flight_id='7')
+        seat33 = Seat(name='Seat03', status=False, flight_id='7')
+        seat34 = Seat(name='Seat04', status=False, flight_id='7')
+        seat35 = Seat(name='Seat05', status=False, flight_id='7')
 
-        db.session.add_all([f1_seat1,f1_seat2,f1_seat3, f1_seat4, f1_seat5,
-                            f1_seat6, f1_seat7, f1_seat8, f1_seat9, f1_seat10,
+        seat36 = Seat(name='Seat01', status=False, flight_id='8')
+        seat37 = Seat(name='Seat02', status=False, flight_id='8')
+        seat38 = Seat(name='Seat03', status=False, flight_id='8')
+        seat39 = Seat(name='Seat04', status=False, flight_id='8')
+        seat40 = Seat(name='Seat05', status=False, flight_id='8')
 
-                            f2_seat1, f2_seat2, f2_seat3, f2_seat4, f2_seat5,
-                            f2_seat6, f2_seat7, f2_seat8, f2_seat9, f2_seat10,
+        seat41 = Seat(name='Seat01', status=False, flight_id='9')
+        seat42 = Seat(name='Seat02', status=False, flight_id='9')
+        seat43 = Seat(name='Seat03', status=False, flight_id='9')
+        seat44 = Seat(name='Seat04', status=False, flight_id='9')
+        seat45 = Seat(name='Seat05', status=False, flight_id='9')
 
-                            f3_seat1, f3_seat2, f3_seat3, f3_seat4, f3_seat5,
-                            f3_seat6, f3_seat7, f3_seat8, f3_seat9, f3_seat10,
+        seat46 = Seat(name='Seat01', status=False, flight_id='10')
+        seat47 = Seat(name='Seat02', status=False, flight_id='10')
+        seat48 = Seat(name='Seat03', status=False, flight_id='10')
+        seat49 = Seat(name='Seat04', status=False, flight_id='10')
+        seat50 = Seat(name='Seat05', status=False, flight_id='10')
 
-                            f4_seat1, f4_seat2, f4_seat3, f4_seat4, f4_seat5,
-                            f4_seat6, f4_seat7, f4_seat8, f4_seat9, f4_seat10,
+        seat51 = Seat(name='Seat01', status=False, flight_id='11')
+        seat52 = Seat(name='Seat02', status=False, flight_id='11')
+        seat53 = Seat(name='Seat03', status=False, flight_id='11')
+        seat54 = Seat(name='Seat04', status=False, flight_id='11')
+        seat55 = Seat(name='Seat05', status=False, flight_id='11')
 
-                            f5_seat1, f5_seat2, f5_seat3, f5_seat4, f5_seat5,
-                            f5_seat6, f5_seat7, f5_seat8, f5_seat9, f5_seat10,
+        seat56 = Seat(name='Seat01', status=False, flight_id='12')
+        seat57 = Seat(name='Seat02', status=False, flight_id='12')
+        seat58 = Seat(name='Seat03', status=False, flight_id='12')
+        seat59 = Seat(name='Seat04', status=False, flight_id='12')
+        seat60 = Seat(name='Seat05', status=False, flight_id='12')
 
-                            f6_seat1, f6_seat2, f6_seat3, f6_seat4, f6_seat5,
-                            f6_seat6, f6_seat7, f6_seat8, f6_seat9, f6_seat10,
+        seat61 = Seat(name='Seat01', status=False, flight_id='13')
+        seat62 = Seat(name='Seat02', status=False, flight_id='13')
+        seat63 = Seat(name='Seat03', status=False, flight_id='13')
+        seat64 = Seat(name='Seat04', status=False, flight_id='13')
+        seat65 = Seat(name='Seat05', status=False, flight_id='13')
 
-                            f7_seat1, f7_seat2, f7_seat3, f7_seat4, f7_seat5,
-                            f7_seat6, f7_seat7, f7_seat8, f7_seat9, f7_seat10,
+        seat66 = Seat(name='Seat01', status=False, flight_id='14')
+        seat67 = Seat(name='Seat02', status=False, flight_id='14')
+        seat68 = Seat(name='Seat03', status=False, flight_id='14')
+        seat69 = Seat(name='Seat04', status=False, flight_id='14')
+        seat70 = Seat(name='Seat05', status=False, flight_id='14')
 
-                            f20_seat1, f20_seat2, f20_seat3, f20_seat4, f20_seat5,
-                            f20_seat6, f20_seat7, f20_seat8, f20_seat9, f20_seat10,
+        seat71 = Seat(name='Seat01', status=False, flight_id='15')
+        seat72 = Seat(name='Seat02', status=False, flight_id='15')
+        seat73 = Seat(name='Seat03', status=False, flight_id='15')
+        seat74 = Seat(name='Seat04', status=False, flight_id='15')
+        seat75 = Seat(name='Seat05', status=False, flight_id='15')
 
-                            f21_seat1, f21_seat2, f21_seat3, f21_seat4, f21_seat5,
-                            f21_seat6, f21_seat7, f21_seat8, f21_seat9, f21_seat10,
+        seat76 = Seat(name='Seat01', status=False, flight_id='16')
+        seat77 = Seat(name='Seat02', status=False, flight_id='16')
+        seat78 = Seat(name='Seat03', status=False, flight_id='16')
+        seat79 = Seat(name='Seat04', status=False, flight_id='16')
+        seat80 = Seat(name='Seat05', status=False, flight_id='16')
 
-                            f24_seat1, f24_seat2, f24_seat3, f24_seat4, f24_seat5,
-                            f24_seat6, f24_seat7, f24_seat8, f24_seat9, f24_seat10,
+        seat81 = Seat(name='Seat01', status=False, flight_id='17')
+        seat82 = Seat(name='Seat02', status=False, flight_id='17')
+        seat83 = Seat(name='Seat03', status=False, flight_id='17')
+        seat84 = Seat(name='Seat04', status=False, flight_id='17')
+        seat85 = Seat(name='Seat05', status=False, flight_id='17')
 
-                            f25_seat1, f25_seat2, f25_seat3, f25_seat4, f25_seat5,
-                            f25_seat6, f25_seat7, f25_seat8, f25_seat9, f25_seat10,
+        seat86 = Seat(name='Seat01', status=False, flight_id='18')
+        seat87 = Seat(name='Seat02', status=False, flight_id='18')
+        seat88 = Seat(name='Seat03', status=False, flight_id='18')
+        seat89 = Seat(name='Seat04', status=False, flight_id='18')
+        seat90 = Seat(name='Seat05', status=False, flight_id='18')
 
-                            f26_seat1, f26_seat2, f26_seat3, f26_seat4, f26_seat5,
-                            f26_seat6, f26_seat7, f26_seat8, f26_seat9, f26_seat10,
+        seat91 = Seat(name='Seat01', status=False, flight_id='19')
+        seat92 = Seat(name='Seat02', status=False, flight_id='19')
+        seat93 = Seat(name='Seat03', status=False, flight_id='19')
+        seat94 = Seat(name='Seat04', status=False, flight_id='19')
+        seat95 = Seat(name='Seat05', status=False, flight_id='19')
 
-                            f29_seat1, f29_seat2, f29_seat3, f29_seat4, f29_seat5,
-                            f29_seat6, f29_seat7, f29_seat8, f29_seat9, f29_seat10,
-                            ])
+        seat96 = Seat(name='Seat01', status=False, flight_id='20')
+        seat97 = Seat(name='Seat02', status=False, flight_id='20')
+        seat98 = Seat(name='Seat03', status=False, flight_id='20')
+        seat99 = Seat(name='Seat04', status=False, flight_id='20')
+        seat100 = Seat(name='Seat05', status=False, flight_id='20')
+
+        seat101 = Seat(name='Seat01', status=False, flight_id='21')
+        seat102 = Seat(name='Seat02', status=False, flight_id='21')
+        seat103 = Seat(name='Seat03', status=False, flight_id='21')
+        seat104 = Seat(name='Seat04', status=False, flight_id='21')
+        seat105 = Seat(name='Seat05', status=False, flight_id='21')
+
+        seat106 = Seat(name='Seat01', status=False, flight_id='22')
+        seat107 = Seat(name='Seat02', status=False, flight_id='22')
+        seat108 = Seat(name='Seat03', status=False, flight_id='22')
+        seat109 = Seat(name='Seat04', status=False, flight_id='22')
+        seat110 = Seat(name='Seat05', status=False, flight_id='22')
+
+        seat111 = Seat(name='Seat01', status=False, flight_id='23')
+        seat112 = Seat(name='Seat02', status=False, flight_id='23')
+        seat113 = Seat(name='Seat03', status=False, flight_id='23')
+        seat114 = Seat(name='Seat04', status=False, flight_id='23')
+        seat115 = Seat(name='Seat05', status=False, flight_id='23')
+
+        seat116 = Seat(name='Seat01', status=False, flight_id='24')
+        seat117 = Seat(name='Seat02', status=False, flight_id='24')
+        seat118 = Seat(name='Seat03', status=False, flight_id='24')
+        seat119 = Seat(name='Seat04', status=False, flight_id='24')
+        seat120 = Seat(name='Seat05', status=False, flight_id='24')
+
+        seat121 = Seat(name='Seat01', status=False, flight_id='25')
+        seat122 = Seat(name='Seat02', status=False, flight_id='25')
+        seat123 = Seat(name='Seat03', status=False, flight_id='25')
+        seat124 = Seat(name='Seat04', status=False, flight_id='25')
+        seat125 = Seat(name='Seat05', status=False, flight_id='25')
+
+        seat126 = Seat(name='Seat01', status=False, flight_id='26')
+        seat127 = Seat(name='Seat02', status=False, flight_id='26')
+        seat128 = Seat(name='Seat03', status=False, flight_id='26')
+        seat129 = Seat(name='Seat04', status=False, flight_id='26')
+        seat130 = Seat(name='Seat05', status=False, flight_id='26')
+
+        seat131 = Seat(name='Seat01', status=False, flight_id='27')
+        seat132 = Seat(name='Seat02', status=False, flight_id='27')
+        seat133 = Seat(name='Seat03', status=False, flight_id='27')
+        seat134 = Seat(name='Seat04', status=False, flight_id='27')
+        seat135 = Seat(name='Seat05', status=False, flight_id='27')
+
+        seat136 = Seat(name='Seat01', status=False, flight_id='28')
+        seat137 = Seat(name='Seat02', status=False, flight_id='28')
+        seat138 = Seat(name='Seat03', status=False, flight_id='28')
+        seat139 = Seat(name='Seat04', status=False, flight_id='28')
+        seat140 = Seat(name='Seat05', status=False, flight_id='28')
+
+        seat141 = Seat(name='Seat01', status=False, flight_id='29')
+        seat142 = Seat(name='Seat02', status=False, flight_id='29')
+        seat143 = Seat(name='Seat03', status=False, flight_id='29')
+        seat144 = Seat(name='Seat04', status=False, flight_id='29')
+        seat145 = Seat(name='Seat05', status=False, flight_id='29')
+
+        seat146 = Seat(name='Seat01', status=False, flight_id='30')
+        seat147 = Seat(name='Seat02', status=False, flight_id='30')
+        seat148 = Seat(name='Seat03', status=False, flight_id='30')
+        seat149 = Seat(name='Seat04', status=False, flight_id='30')
+        seat150 = Seat(name='Seat05', status=False, flight_id='30')
+
+        seat151 = Seat(name='Seat01', status=False, flight_id='31')
+        seat152 = Seat(name='Seat02', status=False, flight_id='31')
+        seat153 = Seat(name='Seat03', status=False, flight_id='31')
+        seat154 = Seat(name='Seat04', status=False, flight_id='31')
+        seat155 = Seat(name='Seat05', status=False, flight_id='31')
+
+        seat156 = Seat(name='Seat01', status=False, flight_id='32')
+        seat157 = Seat(name='Seat02', status=False, flight_id='32')
+        seat158 = Seat(name='Seat03', status=False, flight_id='32')
+        seat159 = Seat(name='Seat04', status=False, flight_id='32')
+        seat160 = Seat(name='Seat05', status=False, flight_id='32')
+
+        seat161 = Seat(name='Seat01', status=False, flight_id='33')
+        seat162 = Seat(name='Seat02', status=False, flight_id='33')
+        seat163 = Seat(name='Seat03', status=False, flight_id='33')
+        seat164 = Seat(name='Seat04', status=False, flight_id='33')
+        seat165 = Seat(name='Seat05', status=False, flight_id='33')
+
+        seat166 = Seat(name='Seat01', status=False, flight_id='34')
+        seat167 = Seat(name='Seat02', status=False, flight_id='34')
+        seat168 = Seat(name='Seat03', status=False, flight_id='34')
+        seat169 = Seat(name='Seat04', status=False, flight_id='34')
+        seat170 = Seat(name='Seat05', status=False, flight_id='34')
+
+        seat171 = Seat(name='Seat01', status=False, flight_id='35')
+        seat172 = Seat(name='Seat02', status=False, flight_id='35')
+        seat173 = Seat(name='Seat03', status=False, flight_id='35')
+        seat174 = Seat(name='Seat04', status=False, flight_id='35')
+        seat175 = Seat(name='Seat05', status=False, flight_id='35')
+
+        seat176 = Seat(name='Seat01', status=False, flight_id='36')
+        seat177 = Seat(name='Seat02', status=False, flight_id='36')
+        seat178 = Seat(name='Seat03', status=False, flight_id='36')
+        seat179 = Seat(name='Seat04', status=False, flight_id='36')
+        seat180 = Seat(name='Seat05', status=False, flight_id='36')
+
+        # Thêm tất cả các ghế vào session
+        db.session.add_all([
+            seat1, seat2, seat3, seat4, seat5,
+            seat6, seat7, seat8, seat9, seat10,
+            seat11, seat12, seat13, seat14, seat15,
+            seat16, seat17, seat18, seat19, seat20,
+            seat21, seat22, seat23, seat24, seat25,
+            seat26, seat27, seat28, seat29, seat30,
+            seat31, seat32, seat33, seat34, seat35,
+            seat36, seat37, seat38, seat39, seat40,
+            seat41, seat42, seat43, seat44, seat45,
+            seat46, seat47, seat48, seat49, seat50,
+            seat51, seat52, seat53, seat54, seat55,
+            seat56, seat57, seat58, seat59, seat60,
+            seat61, seat62, seat63, seat64, seat65,
+            seat66, seat67, seat68, seat69, seat70,
+            seat71, seat72, seat73, seat74, seat75,
+            seat76, seat77, seat78, seat79, seat80,
+            seat81, seat82, seat83, seat84, seat85,
+            seat86, seat87, seat88, seat89, seat90,
+            seat91, seat92, seat93, seat94, seat95,
+            seat96, seat97, seat98, seat99, seat100,
+            seat101, seat102, seat103, seat104, seat105,
+            seat106, seat107, seat108, seat109, seat110,
+            seat111, seat112, seat113, seat114, seat115,
+            seat116, seat117, seat118, seat119, seat120,
+            seat121, seat122, seat123, seat124, seat125,
+            seat126, seat127, seat128, seat129, seat130,
+            seat131, seat132, seat133, seat134, seat135,
+            seat136, seat137, seat138, seat139, seat140,
+            seat141, seat142, seat143, seat144, seat145,
+            seat146, seat147, seat148, seat149, seat150,
+            seat151, seat152, seat153, seat154, seat155,
+            seat156, seat157, seat158, seat159, seat160,
+            seat161, seat162, seat163, seat164, seat165,
+            seat166, seat167, seat168, seat169, seat170,
+            seat171, seat172, seat173, seat174, seat175,
+            seat176, seat177, seat178, seat179, seat180
+        ])
         db.session.commit()
-        # ticket1 = Ticket(customer_id='1',flight_id='1',fareclass_id='1',seat_id='1')
-        # ticket2 = Ticket(customer_id='2',flight_id='2',fareclass_id='2',seat_id='2')
-        # ticket3 = Ticket(customer_id='2',flight_id='3',fareclass_id='1',seat_id='3')
-        # ticket4 = Ticket(customer_id='1',flight_id='4',fareclass_id='2',seat_id='4')
-        # ticket5 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='5')
-        # ticket6 = Ticket(customer_id='2',flight_id='1',fareclass_id='2',seat_id='6')
-        # ticket7 = Ticket(customer_id='2',flight_id='2',fareclass_id='1',seat_id='7')
-        # ticket8 = Ticket(customer_id='1',flight_id='3',fareclass_id='1',seat_id='8')
-        # ticket9 = Ticket(customer_id='1',flight_id='4',fareclass_id='2',seat_id='9')
-        # ticket10 = Ticket(customer_id='2',flight_id='5',fareclass_id='2',seat_id='10')
-        # ticket11 = Ticket(customer_id='2',flight_id='1',fareclass_id='1',seat_id='11')
-        # ticket12 = Ticket(customer_id='2',flight_id='2',fareclass_id='2',seat_id='12')
-        # ticket13 = Ticket(customer_id='1',flight_id='3',fareclass_id='1',seat_id='13')
-        # ticket14 = Ticket(customer_id='2',flight_id='4',fareclass_id='2',seat_id='14')
-        # ticket15 = Ticket(customer_id='1',flight_id='5',fareclass_id='1',seat_id='15')
-        # ticket16 = Ticket(customer_id='1',flight_id='5',fareclass_id='1',seat_id='16')
-        # ticket17 = Ticket(customer_id='2',flight_id='5',fareclass_id='2',seat_id='17')
-        # ticket18 = Ticket(customer_id='1',flight_id='5',fareclass_id='1',seat_id='18')
-        # ticket19 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='19')
-        # ticket20 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='20')
-        # ticket21 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='21')
-        # ticket22 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='22')
-        # ticket23 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='23')
-        # ticket24 = Ticket(customer_id='1',flight_id='5',fareclass_id='2',seat_id='24')
-        # ticket25 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='25')
-        # ticket26 = Ticket(customer_id='2',flight_id='5',fareclass_id='1',seat_id='26')
         #
         # db.session.add_all([ticket1,ticket2,ticket3,ticket4,ticket5,
         #                     ticket6,ticket7,ticket8,ticket9,ticket10,

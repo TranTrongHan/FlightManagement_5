@@ -2,8 +2,7 @@
 
 {% block content %}
 {% if current_user.is_authenticated %}
-<h1 class="text-center text-succes mt-1 "> ĐẶT VÉ </h1>
-<div class="container mt-3 bg-secondary rounded">
+<div class="container mt-3 shadow-lg bg-body rounded ">
     <form action="/bookticket" method="post">
         <div class="row">
             <div class="col-md-5 mt-3">
@@ -35,7 +34,7 @@
                 </select>
             </div>
             <div class="col-md-2 mt-3 p-3  ">
-                <button class="btn btn-primary mt-4 m-3 fs-4 text-uppercase fw-bold bg-primary" type="submit " onclick="saveSelection()">Tìm kiếm
+                <button class="btn btn-primary mt-4 m-3 fs-4 text-uppercase fw-bold bg-success" type="submit " onclick="saveSelection()">Tìm kiếm
                 </button>
             </div>
             <div class="row">
@@ -53,7 +52,7 @@
 
         </div>
         <hr class=" border-3 border-top-3 border-light">
-        {% if flights %}
+        {% if route %}
         <div class="row mt-3">
             <div class="col-md-3">
             </div>
@@ -73,13 +72,10 @@
                     <th>Tên máy bay</th>
                     <th>Ngày giờ cất cánh</th>
                     <th>Ngày giờ hạ cánh</th>
-                    <th>Số chỗ ngồi hạng 1</th>
-                    <th>Số chỗ ngồi hạng 2 </th>
-                    <th></th>
+                    <th>Vé còn lại</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for route in routes %}
                 {% for flight in flights %}
                 {% if route.id == flight.route_id %}
                 <tr>
@@ -93,23 +89,20 @@
                     {% endfor %}
                     <td data-takeoff-time="{{ flight.take_of_time }}">{{flight.take_of_time}}</td>
                     <td data-landing-time="{{ flight.landing_time }}">{{flight.landing_time}}</td>
-                    <td>{{flight.num_of_1st_seat}}</td>
-                    <td>{{flight.num_of_2st_seat}}</td>
                     <td>
                         <a href="/bookticket_process?route={{ route.id }}&flight={{flight.id}}&flight_name={{flight.name}}&user={{current_user.id}}&takeoff_time={{flight.take_of_time}}&landing_time={{flight.landing_time}}&plane={{flight.plane_id}}"
-                           class="text-decoration-none">
+                           class="btn btn-success">
                             Đặt vé
                         </a>
                     </td>
                 </tr>
                 {% endif %}
                 {% endfor %}
-                {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <h1 class="text-center fw-bold p-3">Không có chuyến bay cần tìm.Vui lòng chọn ngày khác </h1>
+        <h1 class="text-center fw-bold p-3">Không có chuyến bay cần tìm</h1>
         {% endif %}
     </form>
 </div>
@@ -183,5 +176,12 @@
         }
 
     });
+    // Ngăn người dùng chọn thời gian đi và thời gian về của quá khứ
+     document.addEventListener('DOMContentLoaded', function() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('departureTime').setAttribute('min', today);
+        document.getElementById('returnTime').setAttribute('min', today);
+    });
 </script>
+
 {% endblock %}

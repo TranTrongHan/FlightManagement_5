@@ -10,7 +10,12 @@ admin = Admin(app=app,name='FlightManagementApp',template_mode='bootstrap4')
 
 class AuthenticatedView(ModelView):
     def is_accessible(self):
-        return current_user.is_authenticated and current_user.user_role.__eq__(UserRoleEnum.ADMIN)
+        if not current_user.is_authenticated:
+            return False
+        if current_user.user_role != UserRoleEnum.ADMIN:
+            logout_user()
+            return False
+        return True
 
 class AuthenticatedBaseView(BaseView):
     def is_accessible(self):

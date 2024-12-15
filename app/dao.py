@@ -1,7 +1,6 @@
 import hmac
 import urllib
 from datetime import datetime
-
 from app import db
 from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum, FareClass, Plane, Seat, Ticket
 import hashlib
@@ -12,11 +11,13 @@ def load_route(route_id = None):
     return query.all()
 
 def load_specific_routes(takeoffId = None, landingairportId=None):
-    if takeoffId and landingairportId:
-        return Route.query.filter(Route.take_off_airport_id == takeoffId,
-                                  Route.landing_airport_id == landingairportId)
-
-
+    route = None
+    if int(takeoffId) == int(landingairportId):
+        return route
+    elif takeoffId != landingairportId:
+        route =  Route.query.filter(Route.take_off_airport_id == takeoffId,
+                                     Route.landing_airport_id == landingairportId).first()
+        return route
 def load_airport_id(airportrole =None):
     if(airportrole):
         query = Route.query.order_by('name').filter(Route.take_off_airport_id)
@@ -24,8 +25,11 @@ def load_airport_id(airportrole =None):
         query = Route.query.order_by('name').filter(Route.landing_airport_id)
     return query.all()
 
-def load_seats():
-    return Seat.query.all()
+def load_seats(flightid=None):
+    seat = Seat.query
+    if flightid:
+        seat = seat.filter(Seat.flight_id == flightid)
+    return seat.all()
 
 def load_airport():
     return Airport.query.all()
@@ -34,15 +38,19 @@ def load_tickets(userid = None):
     if userid:
         tickets = tickets.filter(Ticket.customer_id == userid)
     return tickets.all()
-def load_flights(flight_id=None,depart_time = None,return_time=None):
-    query = Flight.query
+def load_flights(flight_id=None,depart_time=None,return_time=None,route_id=None):
     if flight_id:
-        query = query.filter(Flight.id == flight_id)
-    if depart_time and return_time:
+        query = Flight.query.filter(Flight.id == flight_id).all()
+        return query
+    if route_id:
+        flights = Flight.query.filter(Flight.route_id == route_id).all()
+        return flights()
+    if depart_time and return_time :
         depart_time = datetime.strptime(depart_time, '%Y-%m-%d')
         return_time = datetime.strptime(return_time, '%Y-%m-%d')
-        query = query.filter(Flight.take_of_time >= depart_time,Flight.landing_time<=return_time)
-    return query.all()
+        flights = Flight.query.filter(Flight.take_of_time >= depart_time,Flight.landing_time<=return_time).all()
+        return flights
+    return Flight.query.all()
 def load_fareclass():
     return FareClass.query.all()
 def load_plane():
@@ -129,8 +137,7 @@ def get_fareclass_by_name(name):
     return FareClass.query.get(name)
 def get_fareclass_by_id(id):
     return FareClass.query.get(id)
-def get_last_seat():
-    seat = Seat.query.order_by(Seat.id.desc()).first()
+
 
 def get_name_by_id(model, id):
     instance = model.query.filter(model.id == id).first()  # Lấy đối tượng theo id
@@ -145,7 +152,6 @@ def get_price(id):
 class vnpay:
     requestData = {}
     responseData = {}
-
     def get_payment_url(self, vnpay_payment_url, secret_key):
         # Dữ liệu thanh toán được sắp xếp dưới dạng danh sách các cặp khóa-giá trị theo thứ tự tăng dần của khóa.
         inputData = sorted(self.requestData.items())
@@ -193,10 +199,9 @@ class vnpay:
 
         return vnp_SecureHash == hashValue
 
-    # Tạo mã hash dựa trên thuật toán HMAC-SHA-512
+    # tạo mã hash dựa trên thuật toán HMAC-SHA-512
     @staticmethod
     def __hmacsha512(key, data):
         byteKey = key.encode('utf-8')
         byteData = data.encode('utf-8')
         return hmac.new(byteKey, byteData, hashlib.sha512).hexdigest()
-
