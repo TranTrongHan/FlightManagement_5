@@ -1,6 +1,7 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
+
 {% if current_user.is_authenticated %}
 <div class="container mt-3 shadow-lg bg-body rounded ">
     <form action="/bookticket" method="post">
@@ -91,7 +92,7 @@
                     <td data-landing-time="{{ flight.landing_time }}">{{flight.landing_time}}</td>
                     <td>
                         <a href="/bookticket_process?route={{ route.id }}&flight={{flight.id}}&flight_name={{flight.name}}&user={{current_user.id}}&takeoff_time={{flight.take_of_time}}&landing_time={{flight.landing_time}}&plane={{flight.plane_id}}"
-                           class="btn btn-success">
+                           class="btn btn-success" >
                             Đặt vé
                         </a>
                     </td>

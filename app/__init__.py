@@ -1,5 +1,7 @@
 from flask import Flask
 from urllib.parse import quote
+
+from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 import cloudinary
 import cloudinary.uploader
@@ -35,5 +37,13 @@ VNPAY_CONFIG = {
 # 07/15
 # Mật khẩu OTP
 # 123456
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # hoặc máy chủ SMTP bạn sử dụng
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'hintran6@gmail.com'  # Tài khoản email của bạn
+app.config['MAIL_PASSWORD'] = 'kfms sxce qkbe lyub'  # Mật khẩu email
+app.config['MAIL_DEFAULT_SENDER'] = 'hintran6@gmail.com'
+
+mail = Mail(app)
 login = LoginManager(app)
 db = SQLAlchemy(app=app)
