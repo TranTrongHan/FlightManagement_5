@@ -1,59 +1,60 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
+
 <h1 class="text-center text-succes mt-1 "> XỬ LÍ ĐẶT VÉ </h1>
 <div class="container p-3 mt-3 bg-light ">
     <form action="/payment" method="post" class="  d-grid gap-3 px-4">
         <div class="row row-cols-2 ">
-            <div class="row row-cols-2 ">
-                <div class="col p-0 fw-bold fs-2 d-flex align-items-center  ">
+            <div class="row ">
+                <div class="col-md-4 p-0 fw-bold fs-2 d-flex align-items-center  ">
                     <label>Chuyến bay:</label>
                     <input id="planeid" type="hidden" name="plane" value="{{ plane.id }}">
 
                 </div>
-                <div class="col p-0 bg-grey  fw-normal">
-                    <input id="flightName" class="form-control w-auto form-control-lg" type="text"
+                <div class="col-md-7 p-0 bg-grey  fw-normal">
+                    <input id="flightName" class="form-control  form-control-lg" type="text"
                            value="{{flight.name}}" name="flightname"
                            aria-label="readonly input example" readonly>
                     <input id="flightid" type="hidden" name="flightid" value="{{ flight.id }}">
 
                 </div>
             </div>
-            <div class="row row-cols-2">
-                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
+            <div class="row">
+                <div class="col-md-2 p-0 fw-bold fs-2 d-flex align-items-center w-auto">
                     <label>Số ghế trống:</label>
                 </div>
-                <div class="col-md p-0 bg-grey fw-normal ms-3">
-                   <input class="form-control w-auto form-control-lg" type="text" value="{{availseats}}"
+                <div class="col-md-5 p-0 bg-grey fw-normal ms-3">
+                   <input class="form-control w-auto form-control-lg" type="text" value="{{availseats}}" name="availseats"
                            aria-label="readonly input example" readonly>
                 </div>
             </div>
         </div>
         <div class="row row-cols-2  ">
-            <div class="row row-cols-2">
-                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
+            <div class="row ">
+                <div class="col-md-4 p-0 fw-bold fs-2 d-flex align-items-center w-auto">
                     <label>Nơi đi:</label>
                 </div>
-                <div class="col-md p-0 bg-grey fw-normal ms-3">
+                <div class="col-md-7 p-0 bg-grey fw-normal ms-3">
                     {% for route in route %}
                     {% for airport in airports %}
                     {% if route.take_off_airport_id == airport.id %}
-                    <input class="form-control w-auto form-control-lg" type="text" value="{{airport.name }}"
+                    <input class="form-control  form-control-lg" type="text" value="{{airport.name }}"
                            aria-label="readonly input example" readonly>
                     {% endif %}
                     {% endfor %}
                     {% endfor %}
                 </div>
             </div>
-            <div class="row row-cols-2">
-                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
+            <div class="row ">
+                <div class="col-md-4 p-0 fw-bold fs-2 d-flex align-items-center w-auto">
                     <label>Nơi đến:</label>
                 </div>
-                <div class="col-md p-0 bg-grey  fw-normal ms-3">
+                <div class="col-md-7 p-0 bg-grey  fw-normal ms-3">
                     {% for route in route %}
                     {% for airport in airports %}
                     {% if route.landing_airport_id == airport.id %}
-                    <input class="form-control w-auto form-control-lg" type="text" value="{{airport.name }}"
+                    <input class="form-control form-control-lg" type="text" value="{{airport.name }}"
                            aria-label="readonly input example" readonly>
                     {% endif %}
                     {% endfor %}
@@ -62,31 +63,31 @@
             </div>
         </div>
         <div class="row row-cols-2 ">
-            <div class="row row-cols-2">
-                <div class="col p-0 fw-bold fs-2 d-flex align-items-center">
+            <div class="row ">
+                <div class="col-md-6 p-0 fw-bold fs-2 d-flex align-items-center">
                     <label>Thời gian cất cánh:</label>
                 </div>
-                <div class="col-md p-0 fw-normal ">
+                <div class="col-md-6 p-0 fw-normal ">
                     <input class="form-control w-auto form-control-lg" type="text" value="{{flight.take_of_time}}"
-                           aria-label="readonly input example" readonly>
+                           aria-label="readonly input example" readonly name="takeofftime">
                 </div>
             </div>
-            <div class="row row-cols-2">
-                <div class="col-form-label p-0 fw-bold fs-2 d-flex align-items-center ">
+            <div class="row ">
+                <div class="col-md-6 form-label p-0 fw-bold fs-2 d-flex align-items-center ">
                     <label>Thời gian hạ cánh:</label>
                 </div>
-                <div class="col-md p-0 bg-grey p-0  fw-normal">
+                <div class="col-md-6 p-0 bg-grey p-0  fw-normal">
                     <input class="form-control w-auto form-control-lg" type="text" value="{{flight.landing_time}}"
-                           aria-label="readonly input example" readonly>
+                           aria-label="readonly input example" readonly name="landingtime">
                 </div>
             </div>
         </div>
         <div class="row row-cols-2">
-            <div class="row row-cols-2 ">
-                <div class="col-4  p-0 fw-bold fs-2 d-flex align-items-center">
+            <div class="row  ">
+                <div class="col-md-4  p-0 fw-bold fs-2 d-flex align-items-center">
                     Số lượng vé:
                 </div>
-                <div class="col ">
+                <div class="col-md-7 ">
                     <input class="form-control w-auto form-control-lg" type="number" id="ticket-quantity"
                            name="ticket-quantity" min="1" value="1" required>
                     <input type="hidden" name="count" value="{{ count }}">

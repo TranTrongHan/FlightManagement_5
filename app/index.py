@@ -250,6 +250,10 @@ def payment_comfirm_page():
     fareclass_id = request.form.get('fareclassid')
     quantity = int(request.form.get('ticket-quantity'))
     plane_id = request.form.get('plane')
+    avail_seats = int(request.form.get('availseats'))
+    # takeofftime = request.form.get('takeofftime')
+    # landingtime = request.form.get('landingtime')
+
     fareclass_price = dao.get_price(id=fareclass_id)
     fareclass_name = dao.get_name_by_id(model=FareClass, id=fareclass_id)
     customer_name = dao.get_name_by_id(User, id=customer_id)
@@ -258,24 +262,39 @@ def payment_comfirm_page():
     flight = Flight(id=flight_id)
     customer = Customer(user_id=customer_id)
     fareclass = FareClass(id=fareclass_id)
+    if int(avail_seats) == 0:
+        return redirect('/outofseat')
 
+    if int(quantity) > int(avail_seats):
+        return redirect('/invalid_tickets')
+
+    booked_ticket = utils.checkduplicate_ticket(flightid=flight_id,customer_id=customer_id)
+    if booked_ticket:
+        return redirect('/duplicateticket')
     ticket_info = {
-        'order_id': f"reservation-{customer_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+        'order_id': f"ticket-{customer_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
         "flightid": flight.to_dict(),
         "customerid": customer.to_dict(),
+        "customername":customer_name,
         "fareclassid": fareclass.to_dict(),
         "quantity": quantity,
         "planeid":plane_id,
         "price":fareclass_price
     }
     session['ticket_info'] = ticket_info
+    print(session.get('ticket_info').get('customername'))
     seats = utils.get_seat_by_quantity(quantity=quantity, flightid=flight_id)
-    if seats:
-        return render_template('payment.html', seats=seats, quantity=quantity, price=fareclass_price,
+
+    return render_template('payment.html', seats=seats, quantity=quantity, price=fareclass_price,
                                cus_name=customer_name,
                                fareclass_name=fareclass_name, plane_name=plane_name)
-    elif not seats:
-        return redirect('/outofseat')
+@app.route('/duplicateticket')
+def duplicateticket():
+    return render_template('layout/alert/booked_ticket.html')
+@app.route('/invalid_tickets')
+def invalidtickets():
+    return render_template('layout/alert/invalid_tickets_quantity.html')
+
 @app.route('/outofseat')
 def outofseat():
     return render_template('layout/alert/out_of_seats_alert.html')
@@ -313,23 +332,23 @@ def paymentprocess():
 def vnpay_return():
     vnp_ResponseCode = request.args.get('vnp_ResponseCode')
     if vnp_ResponseCode == '00':
-
         utils.add_ticket(session.get('ticket_info'))
+        utils.send_ticket_email(session.get('ticket_info'))
         del session['ticket_info']
 
-    return redirect('/')
+    return redirect('/successpayment')
 
+@app.route('/successpayment')
+def successpayment():
+    return render_template('layout/alert/successpayment.html')
 
-@app.route('/api/payment', methods=['POST'])
+@app.route('/api/checkavailseat', methods=['POST'])
 @login_required
-def payment():
-    try:
-        utils.add_ticket(session.get('ticket_info'))
-        del session['ticket_info']
-    except:
-        return jsonify({'code': 400, 'redirect_url': '/bookticket'})
+def checkavailseat():
+    pass
 
-    return jsonify({'code': 200, 'redirect_url': '/bookticket'})
+
+
 
 
 

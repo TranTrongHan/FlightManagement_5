@@ -6,19 +6,21 @@
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
-                <h4 class="modal-title">Lỗi đăng nhập</h4>
-
+                <h4 class="modal-title">Thông báo</h4>
                  <a class="text-decoration-none text-light btn-close" href="/login"></a>
             </div>
 
             <!-- Modal body -->
             <div class="modal-body">
-                Tên đăng nhập hoặc mật khẩu không hợp lệ.
+                Đặt vé thành công.
+                <br>
+                Xem vé đã đặt tại<a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover
+                        " href="/my_booked_tickets?/user_id={{current_user.id}}"> đây. </a>
             </div>
 
             <!-- Modal footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><a class="text-decoration-none text-light" href="/login">Đóng</a>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><a class="text-decoration-none text-light" href="/">Đóng</a>
                 </button>
             </div>
 
@@ -31,9 +33,9 @@
         var myModal = new bootstrap.Modal(document.getElementById('myModal'));
         myModal.show();
     };
-    function redirectToPage() {
+     function redirectToPage() {
         // Chuyển hướng đến trang mới
-        window.location.href = '/login';  // Thay đổi thành URL thực tế
+        window.location.href = '/';  // Thay đổi thành URL thực tế
     }
 
     // Đợi DOM tải xong

@@ -137,7 +137,8 @@ def get_fareclass_by_name(name):
     return FareClass.query.get(name)
 def get_fareclass_by_id(id):
     return FareClass.query.get(id)
-
+def get_seat_by_id(id):
+    return Seat.query.get(id)
 
 def get_name_by_id(model, id):
     instance = model.query.filter(model.id == id).first()  # Lấy đối tượng theo id

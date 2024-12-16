@@ -6,19 +6,19 @@
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
-                <h4 class="modal-title">Lỗi đăng nhập</h4>
+                <h4 class="modal-title">Lỗi đặt vé</h4>
 
-                 <a class="text-decoration-none text-light btn-close" href="/login"></a>
+                 <a class="text-decoration-none text-light btn-close" href="/bookticket"></a>
             </div>
 
             <!-- Modal body -->
             <div class="modal-body">
-                Tên đăng nhập hoặc mật khẩu không hợp lệ.
+                Số lượng vé bạn đặt không phù hợp.
             </div>
 
             <!-- Modal footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><a class="text-decoration-none text-light" href="/login">Đóng</a>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><a class="text-decoration-none text-light" href="/bookticket">Đóng</a>
                 </button>
             </div>
 
@@ -33,7 +33,7 @@
     };
     function redirectToPage() {
         // Chuyển hướng đến trang mới
-        window.location.href = '/login';  // Thay đổi thành URL thực tế
+        window.location.href = '/bookticket';  // Thay đổi thành URL thực tế
     }
 
     // Đợi DOM tải xong

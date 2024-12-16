@@ -1,31 +1,41 @@
 
 from random import choice
+from flask_mail import Message
+from flask import session
 from sqlalchemy import func
 from sqlalchemy.sql import extract
 from datetime import datetime
-from app import dao,db
+from app import dao, db, app, mail
 from app.models import Ticket, Flight, Customer, Seat, FareClass, Plane, Route
 
 
 def get_seat_by_quantity(quantity,flightid):
     if quantity:
+
         selected_seats = []
+        seatinfo = {}
         for _ in range(quantity):
             seats = Seat.query.filter(Seat.status == False, Seat.flight_id == flightid).all()
             if seats:
                 rand_seat = choice(seats)
-
+                rand_seat.status = True
+                seatinfo[int(rand_seat.id)]={
+                    "id":int(rand_seat.id),
+                    "name":str(rand_seat.name),
+                    "flightid":int(rand_seat.flight_id)
+                }
                 selected_seats.append(rand_seat)
             elif not seats:
                 return selected_seats
+            session['seats'] = seatinfo
+            return selected_seats
             db.session.commit()
-        return selected_seats
+
 
 def add_ticket(ticket_info):
     flight_dict = ticket_info.get('flightid')
 
-    selected_seats = get_seat_by_quantity(quantity=ticket_info['quantity'],flightid=flight_dict.get('id'))
-
+    selected_seats = session.get('seats')
 
     flight_obj = Flight.from_dict(flight_dict)
     customer_dict = ticket_info.get('customerid')
@@ -38,7 +48,6 @@ def add_ticket(ticket_info):
     # plane = dao.get_plane_by_id(id=ticket_info['planeid'])
 
 
-
     existing_customer = db.session.query(Customer).filter_by(user_id=customer_obj.user_id).first()
     existing_flight = db.session.query(Flight).filter_by(id = flight_obj.id).first()
     existing_fareclass = db.session.query(FareClass).filter_by(id = fareclass_obj.id).first()
@@ -48,10 +57,10 @@ def add_ticket(ticket_info):
     fareclass_obj = existing_fareclass
 
     tickets = []
-    for seat in selected_seats:
+    for seat in selected_seats.values():
+        seat_obj = dao.get_seat_by_id(id=seat['id'])
         ticket = Ticket(customer = customer_obj,flight= flight_obj,fareclass = fareclass_obj,
-                        seat = seat,created_date = datetime.now() )
-        seat.status = True
+                        seat = seat_obj,created_date = datetime.now())
         db.session.add(ticket)
         tickets.append(ticket)
     db.session.commit()
@@ -61,11 +70,16 @@ def check_valid_date(depart_time = None,return_time=None):
     if return_date <= departure_date:
         return False
     return True
-def check_used_to_bookticket(flightid=None):
-    booked_ticket = Ticket.query.filter(Ticket.flight_id == flightid)
-    if booked_ticket:
-        return True
-    return False
+def checkduplicate_ticket(flightid=None,customer_id=None):
+    flight = dao.get_flight_by_id(id = flightid)
+    booked_flight = None
+    # lấy thời gian bay vé đã đặt của khách hàng đó
+    tickets = dao.load_tickets(userid=customer_id)
+    for ticket in tickets:
+        if ticket.flight_id == flight.id:
+            booked_flight = dao.get_flight_by_id(id=ticket.flight_id)
+
+    return booked_flight
 def check_unvalid_ticket(takeofftime=None,landingtime=None,flightid=None):
     has_ticket = False
     if takeofftime and landingtime:
@@ -98,6 +112,31 @@ def count_seat_of_flight(flightid=None):
     if flightid:
         avail_seats = Seat.query.filter(Seat.flight_id == flightid,Seat.status==False).count()
         return avail_seats
+
+
+def send_ticket_email(ticket_info):
+    subject = f"Vé {ticket_info['order_id']} của bạn đã được ghi nhận."
+    msg = Message(subject, recipients=[app.config['MAIL_USERNAME']])
+
+    # Tạo nội dung email với bảng thông tin vé
+    msg.html = f"""
+    <h3>Chúc mừng bạn đã đặt vé thành công!</h3>
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <tr>
+            <th>Thông Tin</th>
+            <th>Giá Trị</th>
+        </tr>
+        <tr>
+            <td>{ticket_info.get('customername')}</td>
+            <td>{ticket_info.get('customername')}</td>
+        </tr>
+       
+    </table>
+    <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+    """
+    # Gửi email
+    mail.send(msg)
+
 def route_stats(kw = None,from_date=None,to_date=None):
     route_stats = db.session.query(Route.id,Route.name,
                     func.sum(FareClass.price))\
