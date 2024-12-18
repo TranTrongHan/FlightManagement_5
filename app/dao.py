@@ -38,7 +38,7 @@ def load_tickets(userid = None):
     if userid:
         tickets = tickets.filter(Ticket.customer_id == userid)
     return tickets.all()
-def load_flights(flight_id=None,depart_time=None,return_time=None,route_id=None):
+def load_flights(flight_id=None,depart_time=None,return_time=None,route_id=None,flight_id_of_ticket=None):
     if flight_id:
         query = Flight.query.filter(Flight.id == flight_id).all()
         return query
@@ -50,6 +50,8 @@ def load_flights(flight_id=None,depart_time=None,return_time=None,route_id=None)
         return_time = datetime.strptime(return_time, '%Y-%m-%d')
         flights = Flight.query.filter(Flight.take_of_time >= depart_time,Flight.landing_time<=return_time).all()
         return flights
+    if flight_id_of_ticket:
+        flights = Flight.query.filter(Flight.id== flight_id_of_ticket)
     return Flight.query.all()
 def load_fareclass():
     return FareClass.query.all()

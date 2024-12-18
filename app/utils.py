@@ -17,8 +17,8 @@ def get_seat_by_quantity(quantity,flightid):
             if seats:
                 rand_seat = choice(seats)
                 rand_seat.status = True
-                print(f"Chỉ số hiện tại: {index}")
-                print(f"Chỗ ngồi hiện tại: {rand_seat.name}")
+                # print(f"Chỉ số hiện tại: {index}")
+                # print(f"Chỗ ngồi hiện tại: {rand_seat.name}")
                 print(rand_seat.status)
                 selected_seats.append(rand_seat)
                 seatinfo[int(rand_seat.id)]={
@@ -72,6 +72,11 @@ def check_valid_date(depart_time = None,return_time=None):
     if return_date <= departure_date:
         return False
     return True
+def check_time(flighid = None,customerid = None):
+    cus_tickets = dao.load_tickets(userid=customerid)
+    flight = dao.get_flight_by_id(id = flighid)
+    cus_flights = []
+    pass
 def checkduplicate_ticket(flightid=None,customer_id=None):
     flight = dao.get_flight_by_id(id = flightid)
     booked_flight = None
@@ -82,34 +87,8 @@ def checkduplicate_ticket(flightid=None,customer_id=None):
             booked_flight = dao.get_flight_by_id(id=ticket.flight_id)
 
     return booked_flight
-def check_unvalid_ticket(takeofftime=None,landingtime=None,flightid=None):
-    has_ticket = False
-    if takeofftime and landingtime:
-        takeofftime = datetime.strptime(takeofftime,'%Y-%m-%d %H:%M:%S')
-        takeoffday = takeofftime.day
-        takeoffmonth = takeofftime.month
-        landingtime = datetime.strptime(landingtime, '%Y-%m-%d %H:%M:%S')
-        landingday = landingtime.day
-        landingmonth = landingtime.month
-        # lay ve da dat cua chuyen bay dang dat
-        booked_ticket = Ticket.query.filter(Ticket.flight_id == flightid).first()
-        if booked_ticket:
-            # ve dang dat da trung thoi gian di cua ve truoc do
-            # if landingtime < booked_ticket.depart_date:
-            #     return True
-            # elif takeofftime > booked_ticket.return_date:
-            #     return True
-            depart_date = booked_ticket.created_date
-            departday = depart_date.day
-            departmonth = depart_date.month
-            return_date =booked_ticket.return_date
-            returnday = return_date.day
-            returnmonth = return_date.month
-            if takeoffday > departday:
-                pass
 
 
-    return has_ticket
 def count_seat_of_flight(flightid=None):
     if flightid:
         avail_seats = Seat.query.filter(Seat.flight_id == flightid,Seat.status==False).count()
