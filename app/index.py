@@ -282,9 +282,7 @@ def payment_comfirm_page():
         "price":fareclass_price
     }
     session['ticket_info'] = ticket_info
-    print(session.get('ticket_info').get('customername'))
     seats = utils.get_seat_by_quantity(quantity=quantity, flightid=flight_id)
-
     return render_template('payment.html', seats=seats, quantity=quantity, price=fareclass_price,
                                cus_name=customer_name,
                                fareclass_name=fareclass_name, plane_name=plane_name)
