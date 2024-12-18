@@ -1,4 +1,3 @@
-
 from random import choice
 from flask_mail import Message
 from flask import session
@@ -11,25 +10,28 @@ from app.models import Ticket, Flight, Customer, Seat, FareClass, Plane, Route
 
 def get_seat_by_quantity(quantity,flightid):
     if quantity:
-
         selected_seats = []
         seatinfo = {}
-        for _ in range(quantity):
+        for index  in range(quantity):
             seats = Seat.query.filter(Seat.status == False, Seat.flight_id == flightid).all()
             if seats:
                 rand_seat = choice(seats)
                 rand_seat.status = True
+                print(f"Chỉ số hiện tại: {index}")
+                print(f"Chỗ ngồi hiện tại: {rand_seat.name}")
+                print(rand_seat.status)
+                selected_seats.append(rand_seat)
                 seatinfo[int(rand_seat.id)]={
                     "id":int(rand_seat.id),
                     "name":str(rand_seat.name),
                     "flightid":int(rand_seat.flight_id)
                 }
-                selected_seats.append(rand_seat)
+                db.session.commit()
+
             elif not seats:
                 return selected_seats
-            session['seats'] = seatinfo
-            return selected_seats
-            db.session.commit()
+        session['seats'] = seatinfo
+        return selected_seats
 
 
 def add_ticket(ticket_info):
