@@ -66,6 +66,31 @@ def add_ticket(ticket_info):
         db.session.add(ticket)
         tickets.append(ticket)
     db.session.commit()
+# hàm cho phép khách hàng chỉ được phép đặt vé trước 12h bay
+def check_flight_time(flightid = None,customerid = None):
+    # lấy giờ bay, giờ về của chuyến bay đang đặt
+    flight = dao.get_flight_by_id(id = flightid)
+    departure_date = flight.take_of_time
+    return_date = flight.landing_time
+    # lấy danh sách vé đã đặt của khách hàng để tìm mã chuyến bay trong danh sách vé
+    booked_tickets = dao.load_tickets(userid = customerid)
+    # thêm những mã chuyến bay trong danh sách vé bằng với mã chuyến bay đang đặt
+    flightid_of_booked_tickets = []
+    for ticket in booked_tickets:
+        if ticket.flight_id ==flightid:
+            flightid_of_booked_tickets.append(ticket.flight_id)
+
+    # lấy đối tượng flight của những mã chuyến bay trong danh sách
+    flight_object_list = []
+    for flightid in flightid_of_booked_tickets:
+        Flight = dao.get_flight_by_id(id = flight)
+        flight_object_list.append(Flight)
+    # kiểm tra thời gian ngày đi ngày về của những đối tượng Flight có nằm trong khoảng ngày đi ngày về của vé đang đặt
+    # nếu có thì trả về True => hiển thị thông báo không được đặt vé
+    # ngược lại trả về False => khách hàng đặt vé bình thường
+    for flight in flight_object_list:
+        pass
+
 def check_valid_date(depart_time = None,return_time=None):
     departure_date = datetime.strptime(depart_time, '%Y-%m-%d')
     return_date = datetime.strptime(return_time, '%Y-%m-%d')
@@ -82,34 +107,7 @@ def checkduplicate_ticket(flightid=None,customer_id=None):
             booked_flight = dao.get_flight_by_id(id=ticket.flight_id)
 
     return booked_flight
-def check_unvalid_ticket(takeofftime=None,landingtime=None,flightid=None):
-    has_ticket = False
-    if takeofftime and landingtime:
-        takeofftime = datetime.strptime(takeofftime,'%Y-%m-%d %H:%M:%S')
-        takeoffday = takeofftime.day
-        takeoffmonth = takeofftime.month
-        landingtime = datetime.strptime(landingtime, '%Y-%m-%d %H:%M:%S')
-        landingday = landingtime.day
-        landingmonth = landingtime.month
-        # lay ve da dat cua chuyen bay dang dat
-        booked_ticket = Ticket.query.filter(Ticket.flight_id == flightid).first()
-        if booked_ticket:
-            # ve dang dat da trung thoi gian di cua ve truoc do
-            # if landingtime < booked_ticket.depart_date:
-            #     return True
-            # elif takeofftime > booked_ticket.return_date:
-            #     return True
-            depart_date = booked_ticket.created_date
-            departday = depart_date.day
-            departmonth = depart_date.month
-            return_date =booked_ticket.return_date
-            returnday = return_date.day
-            returnmonth = return_date.month
-            if takeoffday > departday:
-                pass
 
-
-    return has_ticket
 def count_seat_of_flight(flightid=None):
     if flightid:
         avail_seats = Seat.query.filter(Seat.flight_id == flightid,Seat.status==False).count()
