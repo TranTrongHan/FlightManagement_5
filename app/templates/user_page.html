@@ -7,14 +7,14 @@
         <div class="col-md-4 col-12 ">
             <div class="d-flex flex-column align-items-center text-center p-3 py-5">
                 <img class="rounded-circle mt-5" width="150px"
-                     src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+                     src="/static/images/user.png">
                 <span class="font-weight-bold">{{current_user.name}}</span>
                 <span class="text-black-50">{{current_user.email}}</span>
             </div>
         </div>
-        <div class="col-md-6 col-12 border  border-2 p-3">
+        <div class="col-md-6 col-12 border  border-2 p-3" style="background-color: rgba(240, 248, 255, 0.9);border-radius: 20px;">
             <div class="pb-3">
-                <h4 class="text-center fs-3">Chỉnh sửa thông tin</h4>
+                <h4 class="text-center text-primary fs-3">Chỉnh sửa thông tin</h4>
             </div>
             <form action="/myinfo" method="post">
                 <div class="row">
@@ -59,5 +59,7 @@
     <div class="text-center text-info mt-3"><h1 >BẠN CHƯA ĐĂNG NHẬP</h1></div>
     {% endif %}
 </div>
+
+
 
 {% endblock %}

@@ -1,55 +1,76 @@
 {% extends 'layout/base.html'  %}
 
 {% block content %}
-<h1 class="text-center text-succes mt-1">ĐĂNG KÝ NGƯỜI DÙNG</h1>
+<div style="width: 800px; background-color: rgba(240, 248, 255, 0.9); padding: 30px; margin: 100px auto; border-radius: 10px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    <form action="/register" method="post" enctype="multipart/form-data">
+        <h2 style="color: #0078FF; margin-bottom: 20px;">ĐĂNG KÝ NGƯỜI DÙNG</h2>
 
-<form action="/register" method="post">
+        <img src="/static/images/user.png" alt="User Avatar"
+             style="width: 70px; margin-bottom: 20px;">
 
-    <div class="form-floating mt-3 mb-3">
-        <input type="text" class="form-control" id="firstname" placeholder="Nhập họ và tên của bạn" name="name">
-        <input type="hidden" class="form-control"  placeholder="Nhập họ và tên của bạn" name="userid" value="{{current_user.id}}">
-        <label for="firstname">Họ và tên</label>
-    </div>
-    <div class="form-floating mt-3 mb-3">
-        <input type="text" class="form-control" id="phone" placeholder="Nhập số điện thoại" name="phone">
-        <label for="phone">Số điện thoại</label>
-        {% if error_message and error_message.get('err_phone') %}
-        <p class="text-danger error-message">{{ error_message['err_phone'] }}</p>
-        {% endif %}
-    </div>
-    <div class="form-floating mt-3 mb-3">
-        <input type="text" class="form-control" id="address" placeholder="Nhập địa chỉ nhà" name="address">
-        <label for="address">Địa chỉ</label>
-    </div>
-    <div class="form-floating mt-3 mb-3">
-        <input type="text" class="form-control" id="email" placeholder="Nhập email" name="email">
-        <label for="email">Email</label>
-        {% if error_message and error_message.get('err_email') %}
-        <p class="text-danger error-message">{{ error_message['email'] }}</p>
-        {% endif %}
-    </div>
-    <div class="form-floating mt-3 mb-3">
-        <input type="file" accept=".pngm,.jpg" class="form-control" id="avatar" name="avatar">
-        <label for="avatar">Ảnh đại diện</label>
-    </div>
-    <div class="form-floating mt-3 mb-3">
-        <input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập" name="username">
-        <label for="username">Tên đăng nhập</label>
-        {% if error_message and error_message.get('err_username') %}
-        <p class="text-danger error-message">{{ error_message['username'] }}</p>
-        {% elif error_message and error_message.get('err_format') %}
-        {% endif %}
-    </div>
-    <div class="form-floating mt-3 mb-3">
-        <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" name="password">
-        <label for="password">Mật khẩu</label>
-    </div>
-    <div class="form-floating mt-3 mb-3">
-        <input type="password" class="form-control" id="confirm" placeholder="Nhập lại mật khẩu" name="confirm">
-        <label for="confirm">Xác nhận mật khẩu</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Đăng ký</button>
-</form>
+        <!-- Họ và tên -->
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="fullname" placeholder="Họ và tên" name="name" required>
+            <label for="fullname">Họ và tên</label>
+        </div>
+
+        <!-- Số điện thoại -->
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="phone" placeholder="Số điện thoại" name="phone">
+            <label for="phone">Số điện thoại</label>
+            {% if error_message and error_message.get('err_phone') %}
+            <p class="text-danger error-message">{{ error_message['err_phone'] }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Địa chỉ -->
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="address" placeholder="Địa chỉ" name="address">
+            <label for="address">Địa chỉ</label>
+        </div>
+
+        <!-- Email -->
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="email" placeholder="Email" name="email">
+            <label for="email">Email</label>
+            {% if error_message and error_message.get('err_email') %}
+            <p class="text-danger error-message">{{ error_message['err_email'] }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Avatar -->
+        <div class="form-floating mb-3">
+            <input type="file" accept=".png,.jpg" class="form-control" id="avatar" name="avatar">
+            <label for="avatar">Chọn ảnh đại diện</label>
+        </div>
+
+        <!-- Tên đăng nhập -->
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" name="username">
+            <label for="username">Tên đăng nhập</label>
+            {% if error_message and error_message.get('err_username') %}
+            <p class="text-danger error-message">{{ error_message['err_username'] }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Mật khẩu -->
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password" placeholder="Mật khẩu" name="password">
+            <label for="password">Mật khẩu</label>
+        </div>
+
+        <!-- Xác nhận mật khẩu -->
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="confirm" placeholder="Xác nhận mật khẩu" name="confirm">
+            <label for="confirm">Xác nhận mật khẩu</label>
+        </div>
+
+        <!-- Nút đăng ký -->
+        <button type="submit"
+                style="width: 100%; background-color: #0078FF; color: #fff; border: none; border-radius: 5px; padding: 10px; font-size: 1rem; cursor: pointer; margin-top: 15px;">Đăng ký
+        </button>
+    </form>
+</div>
 
 
 {% endblock %}
