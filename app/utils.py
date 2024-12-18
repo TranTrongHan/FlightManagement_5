@@ -78,9 +78,6 @@ def check_time(flighid = None,customerid = None):
     cus_flights = []
     pass
 
-
-def testbackup():
-    pass
 def checkduplicate_ticket(flightid=None,customer_id=None):
     flight = dao.get_flight_by_id(id = flightid)
     booked_flight = None
