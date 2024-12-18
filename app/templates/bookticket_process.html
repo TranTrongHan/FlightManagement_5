@@ -2,166 +2,155 @@
 
 {% block content %}
 
-<h1 class="text-center text-succes mt-1 "> XỬ LÍ ĐẶT VÉ </h1>
-<div class="container p-3 mt-3 bg-light ">
-    <form action="/payment" method="post" class="  d-grid gap-3 px-4">
-        <div class="row row-cols-2 ">
-            <div class="row ">
-                <div class="col-md-4 p-0 fw-bold fs-2 d-flex align-items-center  ">
-                    <label>Chuyến bay:</label>
-                    <input id="planeid" type="hidden" name="plane" value="{{ plane.id }}">
 
-                </div>
-                <div class="col-md-7 p-0 bg-grey  fw-normal">
-                    <input id="flightName" class="form-control  form-control-lg" type="text"
-                           value="{{flight.name}}" name="flightname"
-                           aria-label="readonly input example" readonly>
-                    <input id="flightid" type="hidden" name="flightid" value="{{ flight.id }}">
-
-                </div>
+<div style="width: 1000px; background-color: rgba(240, 248, 255, 0.9); padding: 30px; margin: 100px auto; border-radius: 10px;  box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    <form action="/payment" method="post" class="d-grid gap-3 px-4">
+        <h1 class="text-center text-primary mt-4 mb-4">XỬ LÍ ĐẶT VÉ</h1>
+        <!-- Chuyến bay -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label for="flightName" class="fw-bold fs-5 text-danger">Chuyến bay:</label>
             </div>
-            <div class="row">
-                <div class="col-md-2 p-0 fw-bold fs-2 d-flex align-items-center w-auto">
-                    <label>Số ghế trống:</label>
-                </div>
-                <div class="col-md-5 p-0 bg-grey fw-normal ms-3">
-                   <input class="form-control w-auto form-control-lg" type="text" value="{{availseats}}" name="availseats"
-                           aria-label="readonly input example" readonly>
-                </div>
+            <div class="col-12 col-md-8">
+                <input id="flightName" class="form-control form-control-lg" type="text" value="{{flight.name}}" name="flightname" readonly>
+                <input id="planeid" type="hidden" name="plane" value="{{ plane.id }}">
+                <input id="flightid" type="hidden" name="flightid" value="{{ flight.id }}">
             </div>
         </div>
-        <div class="row row-cols-2  ">
-            <div class="row ">
-                <div class="col-md-4 p-0 fw-bold fs-2 d-flex align-items-center w-auto">
-                    <label>Nơi đi:</label>
-                </div>
-                <div class="col-md-7 p-0 bg-grey fw-normal ms-3">
-                    {% for route in route %}
-                    {% for airport in airports %}
-                    {% if route.take_off_airport_id == airport.id %}
-                    <input class="form-control  form-control-lg" type="text" value="{{airport.name }}"
-                           aria-label="readonly input example" readonly>
-                    {% endif %}
+
+        <!-- Số ghế trống -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Số ghế trống:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{availseats}}" readonly>
+            </div>
+        </div>
+
+        <!-- Nơi đi -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Nơi đi:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                {% for route in route %}
+                {% for airport in airports %}
+                {% if route.take_off_airport_id == airport.id %}
+                <input class="form-control form-control-lg" type="text" value="{{airport.name}}" readonly>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Nơi đến -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Nơi đến:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                {% for route in route %}
+                {% for airport in airports %}
+                {% if route.landing_airport_id == airport.id %}
+                <input class="form-control form-control-lg" type="text" value="{{airport.name}}" readonly>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Thời gian cất cánh -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Thời gian cất cánh:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{flight.take_of_time}}" readonly>
+            </div>
+        </div>
+
+        <!-- Thời gian hạ cánh -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Thời gian hạ cánh:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{flight.landing_time}}" readonly>
+            </div>
+        </div>
+
+        <!-- Số lượng vé -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Số lượng vé:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="number" id="ticket-quantity" name="ticket-quantity" min="1" value="1" required>
+                <input type="hidden" name="count" value="{{ count }}">
+            </div>
+        </div>
+
+        <!-- Hạng vé -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Hạng vé:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <select id="fareClassSelect" class="form-select form-select-lg" name="fareclassid">
+                    {% for fareclass in fareclass %}
+                    <option data-price="{{ fareclass.price }}" {% if loop.index == 1 %}selected{% endif %} value="{{fareclass.id}}">{{fareclass.name}}</option>
                     {% endfor %}
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="row ">
-                <div class="col-md-4 p-0 fw-bold fs-2 d-flex align-items-center w-auto">
-                    <label>Nơi đến:</label>
-                </div>
-                <div class="col-md-7 p-0 bg-grey  fw-normal ms-3">
-                    {% for route in route %}
-                    {% for airport in airports %}
-                    {% if route.landing_airport_id == airport.id %}
-                    <input class="form-control form-control-lg" type="text" value="{{airport.name }}"
-                           aria-label="readonly input example" readonly>
-                    {% endif %}
-                    {% endfor %}
-                    {% endfor %}
-                </div>
+                </select>
             </div>
         </div>
-        <div class="row row-cols-2 ">
-            <div class="row ">
-                <div class="col-md-6 p-0 fw-bold fs-2 d-flex align-items-center">
-                    <label>Thời gian cất cánh:</label>
-                </div>
-                <div class="col-md-6 p-0 fw-normal ">
-                    <input class="form-control w-auto form-control-lg" type="text" value="{{flight.take_of_time}}"
-                           aria-label="readonly input example" readonly name="takeofftime">
-                </div>
-            </div>
-            <div class="row ">
-                <div class="col-md-6 form-label p-0 fw-bold fs-2 d-flex align-items-center ">
-                    <label>Thời gian hạ cánh:</label>
-                </div>
-                <div class="col-md-6 p-0 bg-grey p-0  fw-normal">
-                    <input class="form-control w-auto form-control-lg" type="text" value="{{flight.landing_time}}"
-                           aria-label="readonly input example" readonly name="landingtime">
-                </div>
-            </div>
-        </div>
-        <div class="row row-cols-2">
-            <div class="row  ">
-                <div class="col-md-4  p-0 fw-bold fs-2 d-flex align-items-center">
-                    Số lượng vé:
-                </div>
-                <div class="col-md-7 ">
-                    <input class="form-control w-auto form-control-lg" type="number" id="ticket-quantity"
-                           name="ticket-quantity" min="1" value="1" required>
-                    <input type="hidden" name="count" value="{{ count }}">
-                </div>
-            </div>
-            <div class="row row-cols-2 ">
-                <div class="col-4  p-0 fw-bold d-flex align-items-center fs-2 w-auto">
-                    Hạng vé:
-                </div>
-                <div class="col ">
-                    <select id="fareClassSelect" class="form-select w-auto form-select-lg ms-2"
-                            aria-label="Default select example" name="fareclassid">
-                        {% for fareclass in fareclass %}
-                        <option data-price="{{ fareclass.price }}" {% if loop.index== 1 %}selected{% endif %}
-                                id="fareclassid" value="{{fareclass.id}}">{{fareclass.name}}
-                        </option>
-                        {% endfor %}
-                        <input type="hidden" name="fareclassname" value="{{ fareclass.name }}">
-                    </select>
-                </div>
-            </div>
 
+        <!-- Tên khách hàng -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Tên khách hàng:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{current_user.name}}" name="fullname" readonly>
+                <input id="customerid" type="hidden" name="customerid" value="{{ current_user.id }}">
+            </div>
+        </div>
 
-        </div>
-        <div class="row row-cols-2">
-            <div class="row row-cols-2">
-                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
-                    <label>Tên khách hàng:</label>
-                </div>
-                <div class="col-md p-0 bg-grey  fw-normal ms-3">
-                    <input class="form-control w-auto form-control-lg" type="text"
-                           value="{{current_user.name}} "
-                           name="fullname" aria-label="readonly input example" id="customerInfo" readonly>
-                    <input id="customerid" type="hidden" name="customerid" value="{{ current_user.id}}">
-                </div>
+        <!-- Email -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Email:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{current_user.email}}" name="email" readonly>
             </div>
         </div>
-        <div class="row row-cols-2">
-            <div class="row row-cols-2">
-                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
-                    <label>Email:</label>
-                </div>
-                <div class="col-md p-0 bg-grey  fw-normal ms-3">
-                    <input class="form-control w-auto form-control-lg" type="text" value="{{current_user.email}}"
-                           name="email" aria-label="readonly input example" readonly>
-                </div>
-            </div>
-            <div class="row row-cols-2">
-                <div class="col p-0 fw-bold fs-2 d-flex align-items-center w-auto">
-                    <label>Số điện thoại:</label>
-                </div>
-                <div class="col-md p-0 bg-grey  fw-normal ms-3">
-                    <input class="form-control w-auto form-control-lg" type="text"
-                           value="{{current_user.phone}}"
-                           aria-label="readonly input example" readonly>
-                </div>
-            </div>
-        </div>
-        <hr class=" border-3 border-top-3 border-grey">
 
+        <!-- Số điện thoại -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Số điện thoại:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{current_user.phone}}" readonly>
+            </div>
+        </div>
+
+        <!-- Thanh toán -->
+        <hr class="border-3 border-top-3 border-light">
         <div class="row">
-            <div class="col-3 ms-3">
-                <input type="submit" value="Tiến hành thanh toán" data-mdb-ripple-init
-                       class="btn btn-primary btn-block btn-lg"/>
+            <div class="col-12 d-flex justify-content-center">
+                <input type="submit" value="Tiến hành thanh toán" class="btn" style="background-color: #0078FF; color: white; font-size: 1.25rem; padding: 12px 24px; border: none; border-radius: 5px;"/>
             </div>
-            <!--            <div class="col-5 ms-3">-->
+                        <!--            <div class="col-5 ms-3">-->
             <!--                <input type="button" value="Lưu vé" data-mdb-ripple-init-->
             <!--                       class="btn btn-success btn-block btn-lg" onclick="handlePayment()"/>-->
             <!--            </div>-->
         </div>
     </form>
-
-
 </div>
+
+
 <script src="{{url_for('static',filename='js/bookticket.js')}}"></script>
 <!--<script>-->
 <!--    // Lắng nghe sự kiện thay đổi trên input-->

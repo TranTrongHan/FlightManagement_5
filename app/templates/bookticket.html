@@ -3,124 +3,136 @@
 {% block content %}
 
 {% if current_user.is_authenticated %}
-<div class="container mt-3 shadow-lg bg-body rounded ">
+<div style="width: 1300px; background-color: rgba(240, 248, 255, 0.9); padding: 10px; margin: 50px auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
     <form action="/bookticket" method="post">
+        <h2 style="color: #0078FF; margin-bottom: 20px;text-align: center;">TÌM KIẾM CHUYẾN BAY</h2>
+
         <div class="row">
-            <div class="col-md-5 mt-3">
-                <label for="takeoff1" class="fs-3 text-uppercase fw-bold ">Nơi đi:</label>
-                <select name="takeoff1" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
-                        event="click">
+            <!-- Nơi đi -->
+            <div class="col-md-5 mb-3">
+                <label for="takeoff1" class="fs-4 text-danger fw-bold">Nơi đi:</label>
+                <select name="takeoff1" class="form-select form-select-lg" id="takeoff1">
                     {% for airport in take_off_airports %}
                     {% for airportName in airports %}
                     {% if airport.id == airportName.id %}
-                    <option id="takeoff1" value="{{airportName.id}}" >
-                        {{airportName.name}}
-                    </option>
+                    <option value="{{airportName.id}}">{{airportName.name}}</option>
                     {% endif %}
                     {% endfor %}
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-5 mt-3 ">
-                <label for="landing1" class="fs-3 text-uppercase fw-bold ">Nơi đến:</label>
-                <select name="landing1" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
-                        event="click">
+
+            <!-- Nơi đến -->
+            <div class="col-md-5 mb-3">
+                <label for="landing1" class="fs-4 text-danger fw-bold">Nơi đến:</label>
+                <select name="landing1" class="form-select form-select-lg" id="landing1">
                     {% for airport in landing_airports %}
                     {% for airportName in airports %}
                     {% if airport.id == airportName.id %}
-                    <option id="landing1" value=" {{airport.id}} ">{{airportName.name}}</option>
+                    <option value="{{airport.id}}">{{airportName.name}}</option>
                     {% endif %}
                     {% endfor %}
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-2 mt-3 p-3  ">
-                <button class="btn btn-primary mt-4 m-3 fs-4 text-uppercase fw-bold bg-success" type="submit " onclick="saveSelection()">Tìm kiếm
-                </button>
+
+            <!-- Button Tìm kiếm -->
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                <button class="btn btn-s btn-primary w-100 fw-bold" type="submit" onclick="saveSelection()">Tìm kiếm</button>
             </div>
-            <div class="row">
-                <div class="col-md-5">
-                    <label for="departureTime" class="fs-3 text-uppercase fw-bold ">Thời gian đi:</label>
-                    <input id="departureTime" class="form-control form-control-lg" type="date"  name="departureTime">
-
-                </div>
-                <div class="col-md-5">
-                    <label for="returnTime" class="fs-3 text-uppercase fw-bold ">Thời gian về:</label>
-                    <input id="returnTime" class="form-control form-control-lg" type="date"  name="returnTime">
-                </div>
-
-            </div>
-
         </div>
-        <hr class=" border-3 border-top-3 border-light">
-        {% if route %}
+
         <div class="row mt-3">
-            <div class="col-md-3">
+            <!-- Thời gian đi -->
+            <div class="col-md-5 mb-3">
+                <label for="departureTime" class="fs-4 text-danger fw-bold">Thời gian đi:</label>
+                <input id="departureTime" class="form-control form-control-lg" type="date" name="departureTime">
             </div>
-            <div class="col-md-6 fs-3 text-center  ">
-                DANH SÁCH CHUYẾN BAY
-            </div>
-            <div class="col-md-3">
+
+            <!-- Thời gian về -->
+            <div class="col-md-5 mb-3">
+                <label for="returnTime" class="fs-4 text-danger fw-bold">Thời gian về:</label>
+                <input id="returnTime" class="form-control form-control-lg" type="date" name="returnTime">
             </div>
         </div>
-        <div class="row mx-1">
-            <table class="table table-hover ">
-                <thead>
-                <tr>
-                    <th>Tuyến bay</th>
-                    <th>Mã chuyến bay</th>
-                    <th>Tên chuyến bay</th>
-                    <th>Tên máy bay</th>
-                    <th>Ngày giờ cất cánh</th>
-                    <th>Ngày giờ hạ cánh</th>
-                    <th>Vé còn lại</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for flight in flights %}
-                {% if route.id == flight.route_id %}
-                <tr>
-                    <td data-route-name="{{route.name}}">{{route.name}}</td>
-                    <td data-flight-id="{{ flight.id }}">{{flight.id}}</td>
-                    <td data-flight-name="{{ flight.name }}">{{flight.name}}</td>
-                    {% for plane in planes %}
-                    {% if flight.plane_id == plane.id %}
-                    <td data-plane-name="{{plane.name}}">{{plane.name}} </td>
-                    {% endif %}
-                    {% endfor %}
-                    <td data-takeoff-time="{{ flight.take_of_time }}">{{flight.take_of_time}}</td>
-                    <td data-landing-time="{{ flight.landing_time }}">{{flight.landing_time}}</td>
-                    <td>
-                        <a href="/bookticket_process?route={{ route.id }}&flight={{flight.id}}&flight_name={{flight.name}}&user={{current_user.id}}&takeoff_time={{flight.take_of_time}}&landing_time={{flight.landing_time}}&plane={{flight.plane_id}}"
-                           class="btn btn-success" >
-                            Đặt vé
-                        </a>
-                    </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
+
+        <hr class="my-4">
+
+        {% if route %}
+        <div class="row">
+            <div class="col-12 text-center">
+                <h3 class="text-center text-primary fw-bold">Danh sách chuyến bay</h3>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <table class="table table-hover table-bordered">
+                    <thead class="table-primary">
+                        <tr class="text-center">
+                            <th>Tuyến bay</th>
+                            <th>Mã chuyến bay</th>
+                            <th>Tên chuyến bay</th>
+                            <th>Tên máy bay</th>
+                            <th>Ngày giờ cất cánh</th>
+                            <th>Ngày giờ hạ cánh</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight in flights %}
+                        {% if route.id == flight.route_id %}
+                        <tr class="text-center">
+                            <td>{{route.name}}</td>
+                            <td>{{flight.id}}</td>
+                            <td>{{flight.name}}</td>
+                            {% for plane in planes %}
+                            {% if flight.plane_id == plane.id %}
+                            <td>{{plane.name}}</td>
+                            {% endif %}
+                            {% endfor %}
+                            <td>{{flight.take_of_time}}</td>
+                            <td>{{flight.landing_time}}</td>
+                            <td>
+                                <a href="/bookticket_process?route={{ route.id }}&flight={{flight.id}}&flight_name={{flight.name}}&user={{current_user.id}}&takeoff_time={{flight.take_of_time}}&landing_time={{flight.landing_time}}&plane={{flight.plane_id}}"
+                                   class="btn btn-primary btn-sm fw-bold">Đặt vé</a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% else %}
-        <h1 class="text-center fw-bold p-3">Không có chuyến bay cần tìm</h1>
+        <h3 class="text-center text-danger fw-bold">Không có chuyến bay cần tìm</h3>
         {% endif %}
     </form>
 </div>
+
 {% else %}
 <h1 class="text-center text-danger mt-1"> Vui lòng đăng nhập trước khi thực hiện đặt vé </h1>
-<form action="/login" method="post">
-    <div class="form-floating mb-3 mt-3">
-        <input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập" name="username">
-        <label for="username">Tên đăng nhập</label>
-    </div>
+<div style="width: 550px; background-color: rgba(240, 248, 255, 0.9); padding: 30px; margin: 100px auto; border-radius: 10px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    <form action="/login" method="post">
+        <h2 style="color: #0078FF; margin-bottom: 20px;">ĐĂNG NHẬP</h2>
 
-    <div class="form-floating mt-3 mb-3">
-        <input type="password" class="form-control" id="password" placeholder="Enter password" name="password">
-        <label for="password">Mật khẩu</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Đăng nhập</button>
-</form>
+        <img src="/static/images/user.png" alt="User Icon"
+             style="width: 70px; margin-bottom: 20px;">
+
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" name="username" required>
+            <label for="username">Tên đăng nhập</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password" placeholder="Mật khẩu" name="password" required>
+            <label for="password">Mật khẩu</label>
+        </div>
+
+        <button type="submit"
+                style="width: 100%; background-color: #0078FF; color: #fff; border: none; border-radius: 5px; padding: 10px; font-size: 1rem; cursor: pointer; margin-top: 15px;">Đăng nhập
+        </button>
+    </form>
 
 {% endif %}
 
