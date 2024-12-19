@@ -1,14 +1,15 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import available_timezones
 
 from flask import render_template, request, redirect, jsonify, session, flash, url_for
 import dao, utils
 from app import app, login, VNPAY_CONFIG,dao
 from flask_login import login_user, logout_user, login_required
-from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User
+from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User, MidAirport, FlightSchedule, Route, \
+    Airport, Staff
 from app.utils import check_pending_flighttime
-
+from dao import db
 
 @app.route('/')
 def index():
@@ -46,6 +47,10 @@ def login_staff():
             role_check = dao.check_role(username=username, password=password, role=UserRoleEnum.STAFF)
             if role_check:
                 login_user(u)
+                # Lưu staff_id vào session
+                staff = db.session.query(Staff).filter(Staff.user_id == u.id).first()
+                if staff:
+                    session['staff_id'] = staff.id  # Lưu staff_id vào session
                 return redirect('/staffpage')
             elif not role_check:
                 flash(message="Người dùng không hợp lệ.", category="Thông báo")
@@ -334,6 +339,123 @@ def checkavailseat():
     pass
 
 
+@app.route('/create_flight_schedule', methods=['GET', 'POST'])
+def create_flight_schedule():
+    err_msg = ""
+
+    # Lấy danh sách tuyến bay từ cơ sở dữ liệu
+    if request.method == 'POST':
+        # Nhận dữ liệu từ form
+        staff_id = session.get('staff_id')
+        name = request.form.get('name')
+        existing_flight = Flight.query.filter_by(name=name).first()
+
+        if existing_flight:
+            flash('Tên chuyến bay đã tồn tại trong cơ sở dữ liệu', 'error')
+            return redirect(url_for('create_flight_schedule'))
+        route_id = request.form['route']
+        plane_id = request.form['plane']
+        take_of_time = request.form['take_of_time']  # Thời gian cất cánh (datetime)
+        flight_duration = float(request.form['flight_duration'])  # Thời gian bay (giờ)
+        num_of_1st_seat = request.form['num_of_1st_seat']
+        num_of_2st_seat = request.form['num_of_2st_seat']
+
+        # Nhận thông tin sân bay trung gian, thời gian dừng và ghi chú
+        transit_airport_1 = request.form.get('transit_airport_1')
+        stopover_time_1 = request.form.get('stopover_time_1')
+        note_transit_1 = request.form.get('note_transit_1')
+
+        transit_airport_2 = request.form.get('transit_airport_2')
+        stopover_time_2 = request.form.get('stopover_time_2')
+        note_transit_2 = request.form.get('note_transit_2')
+        take_off_airport = request.form.get('take_off_airport')
+        landing_airport = request.form.get('landing_airport')
+        try:
+            # Chuyển đổi thời gian cất cánh từ chuỗi thành đối tượng datetime
+            take_of_time = datetime.fromisoformat(take_of_time)
+
+            # Tính toán thời gian hạ cánh
+            landing_time = take_of_time + timedelta(hours=flight_duration)
+
+            # Tạo đối tượng Flight và lưu vào cơ sở dữ liệu
+            new_flight = Flight(
+                name=name,
+                take_of_time=take_of_time,
+                landing_time=landing_time,
+                route_id=route_id,
+                plane_id = plane_id,
+                first_seat_quantity = num_of_1st_seat,
+                second_seat_quantity = num_of_2st_seat
+            )
+
+            db.session.add(new_flight)
+            db.session.commit()
+
+            # Thêm sân bay trung gian 1 vào bảng MidAirport nếu có
+            if transit_airport_1 and stopover_time_1:
+                mid_airport_1 = MidAirport(
+                    stop_time=stopover_time_1,
+                    note=note_transit_1,
+                    flight_id=new_flight.id,
+                    mid_airport_id=transit_airport_1
+                )
+                db.session.add(mid_airport_1)
+
+            # Thêm sân bay trung gian 2 vào bảng MidAirport nếu có
+            if transit_airport_2 and stopover_time_2:
+                mid_airport_2 = MidAirport(
+                    stop_time=stopover_time_2,
+                    note=note_transit_2,
+                    flight_id=new_flight.id,
+                    mid_airport_id=transit_airport_2
+                )
+                db.session.add(mid_airport_2)
+
+            # Lưu tất cả thay đổi vào cơ sở dữ liệu
+            db.session.commit()
+
+
+            # Tạo đối tượng FlightSchedule
+            new_flight_schedule = FlightSchedule(
+                staff_id=staff_id,
+                flight_id=new_flight.id
+            )
+
+            db.session.add(new_flight_schedule)
+            db.session.commit()
+
+            flash('Lưu chuyến bay thành công', 'success')
+        except Exception as e:
+            db.session.rollback()  # Nếu có lỗi, rollback lại các thay đổi
+            flash(f'Đã có lỗi xảy ra: {str(e)}', 'error')  # Hiển thị thông báo lỗi
+    routes = Route.query.all()
+    planes = Plane.query.all()
+    airports = Airport.query.all()
+
+
+    return render_template('create_flight_schedule.html', routes = routes, planes = planes, airports = airports)
+
+
+@app.route('/get-airports-by-route/<int:route_id>', methods=['GET'])
+def get_airports_by_route(route_id):
+    route = Route.query.get(route_id)
+    if not route:
+        return jsonify({"error": "Route not found"}), 404
+
+    # Lấy thông tin sân bay đi và sân bay đến từ ID trong Route
+    take_off_airport = Airport.query.get(route.take_off_airport_id)
+    landing_airport = Airport.query.get(route.landing_airport_id)
+
+    return jsonify({
+        "take_off_airport": {
+            "id": take_off_airport.id,
+            "name": take_off_airport.name
+        },
+        "landing_airport": {
+            "id": landing_airport.id,
+            "name": landing_airport.name
+        }
+    })
 
 
 
