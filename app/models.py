@@ -293,7 +293,7 @@ if __name__ == "__main__":
                          landing_time=datetime(2024, 12, 27, 23, 00, 00), 
                             seats_quantity = rule1.value, plane_id='1', route_id='1')
         flight2 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
-                         landing_time=datetime(2024, 12, 18, 11, 00, 00), 
+                         landing_time=datetime(2024, 12, 27 , 11, 00, 00),
                          seats_quantity=rule1.value, plane_id='2', route_id='1')
         flight3 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 29, 23, 00, 00),
                          landing_time=datetime(2024, 12, 1, 12, 00, 00),

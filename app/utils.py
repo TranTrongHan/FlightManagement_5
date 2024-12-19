@@ -72,12 +72,14 @@ def check_valid_date(depart_time = None,return_time=None):
     if return_date <= departure_date:
         return False
     return True
-def check_time(flighid = None,customerid = None):
+def check_pending_flighttime(flightid=None,customerid = None):
     cus_tickets = dao.load_tickets(userid=customerid)
-    flight = dao.get_flight_by_id(id = flighid)
-    cus_flights = []
-    pass
-
+    pending_flight = dao.get_flight_by_id(id= flightid)
+    for cus_ticket in cus_tickets:
+        booked_flight = dao.get_flight_by_id(id= cus_ticket.flight_id)
+        if booked_flight.take_of_time <= pending_flight.take_of_time and booked_flight.landing_time>=pending_flight.landing_time:
+            return booked_flight.id
+    return None
 def checkduplicate_ticket(flightid=None,customer_id=None):
     flight = dao.get_flight_by_id(id = flightid)
     booked_flight = None

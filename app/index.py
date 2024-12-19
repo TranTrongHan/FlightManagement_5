@@ -7,7 +7,7 @@ import dao, utils
 from app import app, login, VNPAY_CONFIG,dao
 from flask_login import login_user, logout_user, login_required
 from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User
-
+from app.utils import check_pending_flighttime
 
 
 @app.route('/')
@@ -271,6 +271,12 @@ def payment_comfirm_page():
     booked_ticket = utils.checkduplicate_ticket(flightid=flight_id,customer_id=customer_id)
     if booked_ticket:
         return redirect('/duplicateticket')
+    booked_flightid = check_pending_flighttime(flightid=flight_id, customerid=customer_id)
+    if booked_flightid:
+        session['flightid_booked'] = booked_flightid
+        print(session.get('flightid_booked'))
+        return redirect('/invalid_tickets')
+
     ticket_info = {
         'order_id': f"ticket-{customer_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
         "flightid": flight.to_dict(),
