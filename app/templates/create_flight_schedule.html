@@ -1,0 +1,266 @@
+{% extends 'layout/staffbase.html' %}
+
+{% block staffcontent %}
+
+<div class="container mt-5">
+    <h3 class="text-center mb-4">Thông tin lịch chuyến bay</h3>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'warning' if category == 'warning' else 'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Form tạo chuyến bay -->
+    <form method="POST" action="{{ url_for('create_flight_schedule') }}">
+        <div class="row g-5"> <!-- Giãn các hàng giữa các ô nhập liệu -->
+            <!-- Tuyến bay -->
+            <div class="col-md-6">
+                <label for="route" class="form-label">Tuyến bay:</label>
+                <select class="form-control" id="route" name="route" required>
+                    <option value="" disabled selected>Chọn tuyến bay</option>
+                    {% for route in routes %}
+                    <option value="{{ route.id }}">{{ route.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="flight_name" class="form-label">Tên chuyến bay:</label>
+                 <input type="text" class="form-control" id="flight_name" name="name" required>
+            </div>
+            <div class="col-md-3">
+                <label for="plane" class="form-label">Hãng bay:</label>
+                <select class="form-control" id="plane" name="plane" required>
+                    <option value="" disabled selected>Chọn hãng bay</option>
+                    {% for plane in planes %}
+                    <option value="{{ plane.id }}">{{ plane.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row g-5 mt-2"> <!-- Giãn các hàng giữa các ô nhập liệu -->
+            <!-- Sân bay đi -->
+            <div class="col-md-6">
+                <label for="take_off_airport" class="form-label">Sân bay đi:</label>
+<!--                <select class="form-control" id="take_off_airport" name="take_off_airport" required disabled>-->
+<!--                    <option value="" disabled selected></option>-->
+<!--                &lt;!&ndash; Các sân bay sẽ được thêm vào đây bằng JavaScript &ndash;&gt;-->
+<!--                </select>-->
+                 <input type="text" class="form-control" id="take_off_airport" name="take_off_airport" >
+            </div>
+            <!-- Sân bay đến -->
+            <div class="col-md-6">
+                <label for="landing_airport" class="form-label">Sân bay đến:</label>
+<!--                <select class="form-control" id="landing_airport" name="landing_airport" required disabled>-->
+<!--                    <option value="" disabled selected></option>-->
+<!--        &lt;!&ndash; Sân bay đến sẽ được cập nhật từ API khi chọn tuyến bay &ndash;&gt;-->
+<!--                </select>-->
+                <input type="text" class="form-control" id="landing_airport" name="landing_airport" readonly>
+        </div>
+        </div>
+
+        <div class="row g-5 mt-2">
+            <!-- Ngày và giờ bay -->
+            <div class="col-md-6">
+                <label for="take_of_time" class="form-label">Ngày và giờ bay:</label>
+                <input type="datetime-local" class="form-control" id="take_of_time" name="take_of_time" required>
+            </div>
+             <!-- Thời gian bay -->
+            <div class="col-md-6">
+                <label for="flight_duration" class="form-label">Thời gian bay (giờ):</label>
+                <input type="number" class="form-control" id="flight_duration" name="flight_duration" placeholder="(giờ)" min="0.5" step="0.1" required>
+            </div>
+
+        </div>
+
+        <div class="row g-5 mt-2">
+            <!-- Sân bay trung gian 1 -->
+            <div class="col-md-6">
+                <label for="transit_airport_1" class="form-label">Sân bay trung gian 1:</label>
+                <select class="form-control" id="transit_airport_1" name="transit_airport_1" >
+                    <option value="" disabled selected>Chọn sân bay</option>
+                    {% for airport in airports %}
+                    <option value="{{ airport.id }}">{{ airport.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- Thời gian dừng tại trung gian 1 -->
+            <div class="col-md-6">
+                <label for="stopover_time_1" class="form-label">Thời gian dừng tại trung gian 1 (phút):</label>
+                <input type="number" class="form-control" id="stopover_time_1" name="stopover_time_1" placeholder="(phút)" min="20" max="30">
+                <small class="text-muted">Từ 20 đến 30 phút.</small>
+            </div>
+        </div>
+
+        <div class="row g-5 mt-2">
+            <!-- Ghi chú trung gian 1 -->
+            <div class="col-12">
+                <label for="note_transit_1" class="form-label">Ghi chú cho trung gian 1:</label>
+                <textarea class="form-control" id="note_transit_1" name="note_transit_1" rows="3"></textarea>
+            </div>
+        </div>
+
+        <div class="row g-5 mt-2">
+            <!-- Sân bay trung gian 2 -->
+            <div class="col-md-6">
+                <label for="transit_airport_2" class="form-label">Sân bay trung gian 2:</label>
+                <select class="form-control" id="transit_airport_2" name="transit_airport_2" >
+                    <option value="" disabled selected>Chọn sân bay</option>
+                    {% for airport in airports %}
+                    <option value="{{ airport.id }}">{{ airport.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- Thời gian dừng tại trung gian 2 -->
+            <div class="col-md-6">
+                <label for="stopover_time_2" class="form-label">Thời gian dừng tại trung gian 2 (phút):</label>
+                <input type="number" class="form-control" id="stopover_time_2" name="stopover_time_2" placeholder="(phút)" min="20" max="30">
+                <small class="text-muted">Từ 20 đến 30 phút.</small>
+            </div>
+        </div>
+
+        <div class="row g-5 mt-2">
+            <!-- Ghi chú trung gian 2 -->
+            <div class="col-12">
+                <label for="note_transit_2" class="form-label">Ghi chú cho trung gian 2:</label>
+                <textarea class="form-control" id="note_transit_2" name="note_transit_2" rows="3"></textarea>
+            </div>
+        </div>
+
+        <div class="row g-5 mt-2">
+            <!-- Số lượng vé hạng 1 -->
+            <div class="col-md-6">
+                <label for="num_of_1st_seat" class="form-label">Số lượng vé hạng 1:</label>
+                <input type="number" class="form-control" id="num_of_1st_seat" name="num_of_1st_seat" required>
+            </div>
+            <!-- Số lượng vé hạng 2 -->
+            <div class="col-md-6">
+                <label for="num_of_2st_seat" class="form-label">Số lượng vé hạng 2:</label>
+                <input type="number" class="form-control" id="num_of_2st_seat" name="num_of_2st_seat" required>
+            </div>
+        </div>
+
+        <!-- Nút lưu -->
+        <div class="col-12 text-center mt-4">
+            <button type="submit" class="btn btn-primary">Tạo chuyến bay</button>
+        </div>
+    </form>
+
+<!--    &lt;!&ndash; Hiển thị bảng thông tin chuyến bay &ndash;&gt;-->
+<!--    {% if flight_data_list %}-->
+<!--    <h4 class="mt-5">Thông tin các chuyến bay đã tạo</h4>-->
+<!--    <table class="table table-bordered mt-3">-->
+<!--        <thead>-->
+<!--        <tr>-->
+<!--            <th>STT</th>-->
+<!--            <th>Sân đi</th>-->
+<!--            <th>Sân đến</th>-->
+<!--            <th>Ngày và giờ bay</th>-->
+<!--            <th>Vé hạng 1</th>-->
+<!--            <th>Vé hạng 2</th>-->
+<!--            <th>Trung gian 1</th>-->
+<!--            <th>Trung gian 2</th>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--        {% for flight_data in flight_data_list %}-->
+<!--        <tr>-->
+<!--            <td>{{ loop.index }}</td>-->
+<!--            <td>{{ flight_data['take_off_airport'] }}</td>-->
+<!--            <td>{{ flight_data['landing_airport'] }}</td>-->
+<!--            <td>{{ flight_data['take_of_time'] }}</td>-->
+<!--            <td>{{ flight_data['num_of_1st_seat'] }}</td>-->
+<!--            <td>{{ flight_data['num_of_2st_seat'] }}</td>-->
+<!--            <td>-->
+<!--                {{ flight_data['transit_airport_1'] or 'Không có' }}-->
+<!--                <br> Dừng: {{ flight_data['stopover_time_1'] or '0 giờ' }}-->
+<!--                <br> Ghi chú: {{ flight_data['note_transit_1'] or 'Không có' }}-->
+<!--            </td>-->
+<!--            <td>-->
+<!--                {{ flight_data['transit_airport_2'] or 'Không có' }}-->
+<!--                <br> Dừng: {{ flight_data['stopover_time_2'] or '0 giờ' }}-->
+<!--                <br> Ghi chú: {{ flight_data['note_transit_2'] or 'Không có' }}-->
+<!--            </td>-->
+<!--        </tr>-->
+<!--        {% endfor %}-->
+<!--        </tbody>-->
+<!--    </table>-->
+<!--    {% endif %}-->
+</div>
+<script>
+   document.getElementById('route').addEventListener('change', function () {
+
+    const routeId = this.value;
+<!--     // Lấy ID của tuyến bay (chắc chắn đây phải là ID)-->
+
+<!--    // Kiểm tra nếu routeId hợp lệ-->
+    if (routeId) {
+
+        fetch(`/get-airports-by-route/${routeId}`)
+
+
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+
+            .then(data => {
+
+<!--                // Tìm các phần tử dropdown-->
+<!--                const takeOffSelect = document.getElementById('take_off_airport');-->
+<!--                     const landingSelect = document.getElementById('landing_airport');-->
+                // Tìm các input sân bay đi và đến
+                const takeOffInput = document.getElementById('take_off_airport');
+                const landingInput = document.getElementById('landing_airport');
+
+
+<!--                // Xóa các tùy chọn cũ-->
+<!--                takeOffSelect.innerHTML = '<option value="" disabled selected></option>';-->
+<!--                landingSelect.innerHTML = '<option value="" disabled selected></option>';-->
+
+<!--                console.log("Dữ liệu trả về từ server:", data.take_off_airport.id);-->
+<!--                console.log("Dữ liệu trả về từ server:", data.landing_airport.name);-->
+
+                if (data.take_off_airport) {
+
+<!--                    takeOffSelect.innerHTML += `<option value="${data.take_off_airport.id}">${data.take_off_airport.name}</option>`;-->
+                        takeOffInput.value = data.take_off_airport.name;                }else {
+                    console.log("Không có take_off_airport");
+                 }
+
+<!--                // Thêm sân bay đến-->
+                if (data.landing_airport) {
+<!--                    landingSelect.innerHTML += `<option value="${data.landing_airport.id}">${data.landing_airport.name}</option>`;-->
+                        landingInput.value = data.landing_airport.name;
+                }else {
+                     console.log("Không có landing_airport");
+                 }
+
+<!--                // Kích hoạt dropdown-->
+<!--                takeOffSelect.disabled = false;-->
+<!--                landingSelect.disabled = false;-->
+
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Có lỗi xảy ra khi tải sân bay.");
+            });
+    }
+});
+
+
+
+
+
+
+</script>
+{% endblock %}
+
