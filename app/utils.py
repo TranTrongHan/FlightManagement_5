@@ -3,7 +3,7 @@ from flask_mail import Message
 from flask import session
 from sqlalchemy import func
 from sqlalchemy.sql import extract
-from datetime import datetime
+from datetime import datetime, timedelta
 from app import dao, db, app, mail
 from app.models import Ticket, Flight, Customer, Seat, FareClass, Plane, Route
 
@@ -90,7 +90,15 @@ def checkduplicate_ticket(flightid=None,customer_id=None):
             booked_flight = dao.get_flight_by_id(id=ticket.flight_id)
 
     return booked_flight
-
+def check_valid_time(flightid=None):
+    pending_flight  =dao.get_flight_by_id(id = flightid)
+    current_time = datetime.now()
+    # lấy thời gian khởi hành của chuyến bay - 12 ra thời gian dc phép đặt vé
+    cut_off_time = pending_flight.take_of_time - timedelta(hours=12)
+    # so sánh nếu thời gian hiện tại nhỏ hơn thời gian dc phép đặt vé => ko đc đặt vé
+    if current_time > cut_off_time:
+        return False
+    return True
 
 def count_seat_of_flight(flightid=None):
     if flightid:

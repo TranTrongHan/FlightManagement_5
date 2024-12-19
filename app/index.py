@@ -27,9 +27,11 @@ def login_process():
                 login_user(u)
                 return redirect('/')
             elif not role_check:
-                return redirect('/role_alert')
+                flash(message="Người dùng không hợp lệ..", category="Thông báo")
+                return redirect('/login')
         elif not u:
-            return redirect('/user_alert')
+            flash(message="Tên đăng nhập hoặc mật khẩu không hợp lệ..", category="Lỗi đăng nhập")
+            return redirect('/login')
 
     return render_template('login.html')
 
@@ -46,9 +48,11 @@ def login_staff():
                 login_user(u)
                 return redirect('/staffpage')
             elif not role_check:
-                return redirect('/role_alert')
+                flash(message="Người dùng không hợp lệ.", category="Thông báo")
+                return redirect('/login_staff')
         elif not u:
-            return redirect('/user_alert')
+            flash(message="Tên đăng nhập hoặc mật khẩu không hợp lệ..", category="Thông báo")
+            return redirect('/login_staff')
 
     return render_template('login_staff.html')
 
@@ -62,16 +66,6 @@ def login_admin():
         login_user(u)
         return redirect('/admin')
     return redirect('/admin')
-
-
-@app.route('/user_alert')
-def user_alert():
-    return render_template('layout/alert/user_alert.html')
-
-
-@app.route('/role_alert')
-def role_alert():
-    return render_template('layout/user_role_alert.html')
 
 
 @app.route('/staffpage')
@@ -193,21 +187,18 @@ def bookticket():
         route = dao.load_specific_routes(takeoffId=takeoff_airport1, landingairportId=landing_airport1)
 
         if utils.check_valid_date(depart_time=departure_time, return_time=return_time):
-            flights = dao.load_flights(depart_time=departure_time, return_time=return_time)
+            flights = dao.load_flights(depart_time=departure_time)
             planes = dao.load_plane()
             return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
                                    airports=airportsID, route=route, flights=flights, planes=planes,
                                    fareclass=fareclass)
         else:
-            return redirect('/invalid_date')
+            flash(message="Thời gian về phải cách ít nhất 1 ngày",category="Thông báo")
+            return redirect('/bookticket')
 
     return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
                            airports=airportsID, fareclass=fareclass)
 
-
-@app.route('/invalid_date')
-def invalid_date_form():
-    return render_template('layout/alert/invalid_date.html')
 
 
 @app.route('/bookticket_process', methods=['GET', 'POST'])
@@ -231,11 +222,6 @@ def bookticket_process():
     return render_template('bookticket_process.html',
                                route=route, airports=airports, flight=flight, fareclass=fareclass, plane=plane,availseats=availseats)
 
-
-
-@app.route('/bookticket_error')
-def error_alert():
-    return render_template('layout/alert/bookticket_error_alert.html')
 
 
 @login.user_loader
@@ -262,21 +248,25 @@ def payment_comfirm_page():
     flight = Flight(id=flight_id)
     customer = Customer(user_id=customer_id)
     fareclass = FareClass(id=fareclass_id)
+    valid_time = utils.check_valid_time(flightid=flight_id)
+    if not valid_time:
+        flash(message="Thời gian không hợp lệ.",category="Lỗi chọn thời gian")
+        return redirect('/bookticket')
     if int(avail_seats) == 0:
-        return redirect('/outofseat')
-
+        flash(message="Không còn chỗ trống.Vui lòng đặt chuyến khác",category="Thông báo")
+        return redirect('/bookticket')
     if int(quantity) > int(avail_seats):
-        return redirect('/invalid_tickets')
-
-    booked_ticket = utils.checkduplicate_ticket(flightid=flight_id,customer_id=customer_id)
+        flash(message="Số lượng vé yêu cầu vượt quá số vé có sẵn.",category="Lỗi nhập vé")
+        return redirect('/bookticket')
+    booked_ticket = utils.checkduplicate_ticket(flightid=flight_id, customer_id=customer_id)
     if booked_ticket:
-        return redirect('/duplicateticket')
+        flash(message="Bạn đã đặt vé cho chuyến bay này.",category="Thông báo")
+        return redirect('/bookticket')
     booked_flightid = check_pending_flighttime(flightid=flight_id, customerid=customer_id)
     if booked_flightid:
         session['flightid_booked'] = booked_flightid
-        print(session.get('flightid_booked'))
-        return redirect('/invalid_tickets')
-
+        flash(message="Bạn đã có chuyến bay đang chờ.",category="Thông báo")
+        return redirect('/bookticket')
     ticket_info = {
         'order_id': f"ticket-{customer_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
         "flightid": flight.to_dict(),
@@ -292,16 +282,7 @@ def payment_comfirm_page():
     return render_template('payment.html', seats=seats, quantity=quantity, price=fareclass_price,
                                cus_name=customer_name,
                                fareclass_name=fareclass_name, plane_name=plane_name)
-@app.route('/duplicateticket')
-def duplicateticket():
-    return render_template('layout/alert/booked_ticket.html')
-@app.route('/invalid_tickets')
-def invalidtickets():
-    return render_template('layout/alert/invalid_tickets_quantity.html')
 
-@app.route('/outofseat')
-def outofseat():
-    return render_template('layout/alert/out_of_seats_alert.html')
 
 @app.route('/payment_process',methods=['GET','POST'])
 def paymentprocess():
@@ -339,12 +320,9 @@ def vnpay_return():
         utils.add_ticket(session.get('ticket_info'))
         utils.send_ticket_email(session.get('ticket_info'))
         del session['ticket_info']
+        flash(message="Đặt vé thành công", category="Thông báo")
+    return redirect('/')
 
-    return redirect('/successpayment')
-
-@app.route('/successpayment')
-def successpayment():
-    return render_template('layout/alert/successpayment.html')
 
 @app.route('/api/checkavailseat', methods=['POST'])
 @login_required

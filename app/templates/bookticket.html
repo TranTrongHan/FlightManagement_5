@@ -1,6 +1,43 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
+<div class="modal" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                        {% set first_message = messages[0] %}
+                        <h4 class="modal-title">{{ first_message[0] }}</h4>  <!-- Nội dung thông báo lỗi -->
+                    {% else %}
+                        <h4 class="modal-title">Thông báo</h4>  <!-- Tiêu đề mặc định -->
+                    {% endif %}
+                {% endwith %}
+                <a class="text-decoration-none text-light btn-close" href="/login"></a>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                        <p>{{ messages[0][1] }}</p>  <!-- Số lượng vé yêu cầu -->
+                    {% else %}
+                        <p>Không có thông báo.</p>
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                    <a class="text-decoration-none text-light" href="/bookticket">Đóng</a>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 {% if current_user.is_authenticated %}
 <div style="width: 1300px; background-color: rgba(240, 248, 255, 0.9); padding: 10px; margin: 50px auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
@@ -133,7 +170,7 @@
                 style="width: 100%; background-color: #0078FF; color: #fff; border: none; border-radius: 5px; padding: 10px; font-size: 1rem; cursor: pointer; margin-top: 15px;">Đăng nhập
         </button>
     </form>
-
+</div>
 {% endif %}
 
 <!--<script src="{{url_for('static',filename='js/bookticket.js')}}"></script>-->
@@ -165,6 +202,12 @@
 
 <!--</script>-->
 <script>
+     window.onload = function() {
+        var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+        {% if get_flashed_messages() %}
+            myModal.show();
+        {% endif %}
+    };
      function saveSelection() {
         // Lưu giá trị của các trường vào localStorage
         localStorage.setItem('takeoff', document.querySelector('select[name="takeoff1"]').value);

@@ -1,7 +1,46 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
+<div class="modal" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                        {% set first_message = messages[0] %}
+                        <h4 class="modal-title">{{ first_message[0] }}</h4>  <!-- Nội dung thông báo lỗi -->
+                    {% else %}
+                        <h4 class="modal-title">Thông báo</h4>  <!-- Tiêu đề mặc định -->
+                    {% endif %}
+                {% endwith %}
+                <a class="text-decoration-none text-light btn-close" href="/login"></a>
+            </div>
 
+            <!-- Modal body -->
+            <div class="modal-body">
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                        <p>{{ messages[0][1] }}</p>  <!-- Số lượng vé yêu cầu -->
+                    {% else %}
+                        <p>Không có thông báo.</p>
+                    {% endif %}
+                {% endwith %}
+                <br>
+                Xem vé đã đặt tại<a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover
+                        " href="/my_booked_tickets?/user_id={{current_user.id}}"> đây. </a>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                    <a class="text-decoration-none text-light" href="/login">Đóng</a>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 <div class="container mt-3  d-flex flex-column  justify-content-center">
     <div class="row">
         <div class="col-md-10 col-sm-12 ">
@@ -105,5 +144,12 @@
 
 
 </div>
-
+<script>
+    window.onload = function() {
+        var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+        {% if get_flashed_messages() %}
+            myModal.show();
+        {% endif %}
+    };
+</script>
 {% endblock %}

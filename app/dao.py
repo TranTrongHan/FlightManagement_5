@@ -45,10 +45,10 @@ def load_flights(flight_id=None,depart_time=None,return_time=None,route_id=None,
     if route_id:
         flights = Flight.query.filter(Flight.route_id == route_id).all()
         return flights()
-    if depart_time and return_time :
+    if depart_time:
         depart_time = datetime.strptime(depart_time, '%Y-%m-%d')
-        return_time = datetime.strptime(return_time, '%Y-%m-%d')
-        flights = Flight.query.filter(Flight.take_of_time >= depart_time,Flight.landing_time<=return_time).all()
+        # return_time = datetime.strptime(return_time, '%Y-%m-%d')
+        flights = Flight.query.filter(Flight.take_of_time >= depart_time).all()
         return flights
     if flight_id_of_ticket:
         flights = Flight.query.filter(Flight.id== flight_id_of_ticket)
