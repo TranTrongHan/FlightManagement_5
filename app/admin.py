@@ -44,7 +44,7 @@ class StatsView(AuthenticatedBaseView):
         year = request.args.get('year',datetime.now().year)
         return self.render('admin/stats.html',
                            stats = utils.route_stats(kw=kw,from_date=from_date,to_date=to_date),
-                           months_stats = utils.route_month_stats(year=year))
+                           )
 
 admin.add_view(FlightView(Flight,db.session))
 admin.add_view(RouteView(Route,db.session))

@@ -195,8 +195,8 @@ class Ticket(db.Model):
 
 if __name__ == "__main__":
     with app.app_context():
-        # db.drop_all()
-        # db.create_all()
+        db.drop_all()
+        db.create_all()
 
         rule1 = Rule(name='Số lượng ghế hạng 1',value ='5')
         rule2 = Rule(name='Số lượng ghế hạng 2', value='5')

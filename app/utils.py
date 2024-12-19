@@ -2,6 +2,7 @@ from random import choice
 from flask_mail import Message
 from flask import session
 from sqlalchemy import func
+from sqlalchemy.orm import aliased
 from sqlalchemy.sql import extract
 from datetime import datetime, timedelta
 from app import dao, db, app, mail
@@ -58,8 +59,7 @@ def add_ticket(ticket_info):
     tickets = []
     for seat in selected_seats.values():
         seat_obj = dao.get_seat_by_id(id=seat['id'])
-        ticket = Ticket(customer = customer_obj,flight= flight_obj,fareclass = fareclass_obj,
-                        seat = seat_obj,created_date = datetime.now())
+        ticket = Ticket(customer = customer_obj,flight= flight_obj,seat = seat_obj,created_date = datetime.now())
         db.session.add(ticket)
         tickets.append(ticket)
     db.session.commit()
@@ -130,14 +130,16 @@ def send_ticket_email(ticket_info):
     mail.send(msg)
 
 def route_stats(kw = None,from_date=None,to_date=None):
+
+
     route_stats = db.session.query(Route.id,Route.name,
                     func.sum(FareClass.price))\
                 .join(Flight,Flight.route_id.__eq__(Route.id),isouter = True) \
-                .join(Ticket, Ticket.flight_id.__eq__(Flight.id), isouter=True) \
-                .join(Seat, Seat.flight_id__eq__(Flight.id), isouter=True) \
-                .join(Ticket, Ticket.seat_id__eq__(Seat.id), isouter=True) \
-                .join(FareClass,FareClass.id.__eq__(Seat.fareclass_id), isouter=True)\
-            .group_by(Route.id,Route.name)
+                .join(Seat, Seat.flight_id.__eq__(Flight.id), isouter=True) \
+                .join(Ticket,Ticket.seat_id.__eq__(Seat.id),isouter=True)\
+                .join(FareClass,FareClass.id.__eq__(Seat.fareclass_id),isouter=True)\
+                .group_by(Route.id,Route.name).all()
+
     if kw:
         route_stats = route_stats.filter(Route.name.contains(kw))
     if from_date:
@@ -146,11 +148,11 @@ def route_stats(kw = None,from_date=None,to_date=None):
         route_stats = route_stats.filter(Ticket.created_date.__le__(to_date))
     return  route_stats.all()
 
-def route_month_stats(year):
-    return db.session.query(extract('month',Ticket.created_date)
-                            ,func.sum(FareClass.price)) \
-                            .join(Ticket, Ticket.seat_id.__eq__(Seat.id)) \
-                            .join(FareClass, FareClass.id.__eq__(Seat.fareclass_id))\
-                            .filter(extract('year',Ticket.created_date) == year)\
-                            .group_by(extract('month',Ticket.created_date))\
-                            .order_by(extract('month',Ticket.created_date)).all()
+# def route_month_stats(year):
+#     return db.session.query(extract('month',Ticket.created_date)
+#                             ,func.sum(FareClass.price)) \
+#                             .join(Ticket, Ticket.seat_id.__eq__(Seat.id)) \
+#                             .join(FareClass, FareClass.id.__eq__(Seat.fareclass_id))\
+#                             .filter(extract('year',Ticket.created_date) == year)\
+#                             .group_by(extract('month',Ticket.created_date))\
+#                             .order_by(extract('month',Ticket.created_date)).all()
