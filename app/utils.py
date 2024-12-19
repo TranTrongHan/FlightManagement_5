@@ -8,18 +8,15 @@ from app import dao, db, app, mail
 from app.models import Ticket, Flight, Customer, Seat, FareClass, Plane, Route
 
 
-def get_seat_by_quantity(quantity,flightid):
+def get_seat_by_quantity(quantity,flightid,fareclassid=None):
     if quantity:
         selected_seats = []
         seatinfo = {}
         for index  in range(quantity):
-            seats = Seat.query.filter(Seat.status == False, Seat.flight_id == flightid).all()
+            seats = Seat.query.filter(Seat.status == False, Seat.flight_id == flightid,Seat.fareclass_id==fareclassid).all()
             if seats:
                 rand_seat = choice(seats)
                 rand_seat.status = True
-                # print(f"Chỉ số hiện tại: {index}")
-                # print(f"Chỗ ngồi hiện tại: {rand_seat.name}")
-                print(rand_seat.status)
                 selected_seats.append(rand_seat)
                 seatinfo[int(rand_seat.id)]={
                     "id":int(rand_seat.id),
@@ -99,12 +96,15 @@ def check_valid_time(flightid=None):
     if current_time > cut_off_time:
         return False
     return True
-
-def count_seat_of_flight(flightid=None):
-    if flightid:
-        avail_seats = Seat.query.filter(Seat.flight_id == flightid,Seat.status==False).count()
+def check_seat(flightid=None,quantity=None,fareclassid=None):
+    fareclass_seats = Seat.query.filter(Seat.flight_id == flightid,Seat.status==False,Seat.fareclass_id == fareclassid).count()
+    if quantity > fareclass_seats:
+        return False
+    return True
+def count_seat_of_flight(flightid=None,fareclassid=None):
+    if flightid and fareclassid:
+        avail_seats = Seat.query.filter(Seat.flight_id == flightid,Seat.status==False,Seat.fareclass_id == fareclassid).count()
         return avail_seats
-
 
 def send_ticket_email(ticket_info):
     subject = f"Vé {ticket_info['order_id']} của bạn đã được ghi nhận."
@@ -134,7 +134,9 @@ def route_stats(kw = None,from_date=None,to_date=None):
                     func.sum(FareClass.price))\
                 .join(Flight,Flight.route_id.__eq__(Route.id),isouter = True) \
                 .join(Ticket, Ticket.flight_id.__eq__(Flight.id), isouter=True) \
-                .join(FareClass,FareClass.id.__eq__(Ticket.fareclass_id), isouter=True)\
+                .join(Seat, Seat.flight_id__eq__(Flight.id), isouter=True) \
+                .join(Ticket, Ticket.seat_id__eq__(Seat.id), isouter=True) \
+                .join(FareClass,FareClass.id.__eq__(Seat.fareclass_id), isouter=True)\
             .group_by(Route.id,Route.name)
     if kw:
         route_stats = route_stats.filter(Route.name.contains(kw))
@@ -146,8 +148,9 @@ def route_stats(kw = None,from_date=None,to_date=None):
 
 def route_month_stats(year):
     return db.session.query(extract('month',Ticket.created_date)
-                            ,func.sum(FareClass.price))\
-                            .join(FareClass, FareClass.id.__eq__(Ticket.fareclass_id))\
+                            ,func.sum(FareClass.price)) \
+                            .join(Ticket, Ticket.seat_id.__eq__(Seat.id)) \
+                            .join(FareClass, FareClass.id.__eq__(Seat.fareclass_id))\
                             .filter(extract('year',Ticket.created_date) == year)\
                             .group_by(extract('month',Ticket.created_date))\
                             .order_by(extract('month',Ticket.created_date)).all()

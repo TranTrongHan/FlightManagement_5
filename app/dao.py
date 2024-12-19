@@ -25,10 +25,12 @@ def load_airport_id(airportrole =None):
         query = Route.query.order_by('name').filter(Route.landing_airport_id)
     return query.all()
 
-def load_seats(flightid=None):
+def load_seats(flightid=None,fareclassid=None):
     seat = Seat.query
     if flightid:
         seat = seat.filter(Seat.flight_id == flightid)
+    if flightid and fareclassid:
+        seat = seat.filter(Seat.flight_id == flightid,Seat.fareclass_id == fareclassid)
     return seat.all()
 
 def load_airport():

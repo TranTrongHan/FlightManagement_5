@@ -21,10 +21,18 @@
         <!-- Số ghế trống -->
         <div class="row mb-3">
             <div class="col-12 col-md-4">
-                <label class="fw-bold fs-5 text-danger">Số ghế trống:</label>
+                <label class="fw-bold fs-5 text-danger">Số ghế trống hạng 1:</label>
             </div>
             <div class="col-12 col-md-8">
-                <input class="form-control form-control-lg" type="text" value="{{availseats}}" name="availseats" readonly>
+                <input class="form-control form-control-lg" type="text" value="{{first_seats_avail}}" name="first_seats_avail" readonly>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Số ghế trống hạng 2:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{second_seats_avail}}" name="second_seats_avail" readonly>
             </div>
         </div>
 
