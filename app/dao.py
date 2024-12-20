@@ -35,10 +35,10 @@ def load_seats(flightid=None,fareclassid=None):
 
 def load_airport():
     return Airport.query.all()
-def load_tickets(userid = None):
+def load_tickets(customerid = None):
     tickets = Ticket.query
-    if userid:
-        tickets = tickets.filter(Ticket.customer_id == userid)
+    if customerid:
+        tickets = tickets.filter(Ticket.customer_id == customerid)
     return tickets.all()
 def load_flights(flight_id=None,depart_time=None,return_time=None,route_id=None,flight_id_of_ticket=None):
     if flight_id:
@@ -89,6 +89,10 @@ def add_user(name, phone, address,email ,avatar ,username,password ):
              username = username,password = password)
     db.session.add(u)
     db.session.commit()
+    cus = Customer(user_id = u.id)
+    db.session.add(cus)
+    db.session.commit()
+    print('added')
 def edit_user(name = None,phone=None,address=None,email = None,avartar = None,passwd = None,user_id=None):
     user = User.query.get(user_id)
     if not user:
@@ -128,7 +132,8 @@ def existence_check(attribute ,value):
 
 def get_user_by_id(id):
     return User.query.get(id)
-
+def get_customer_by_id(id):
+    return Customer.query.filter(Customer.user_id==id).first()
 def get_flight_by_id(id):
     return Flight.query.get(id)
 def get_plane_by_id(id):

@@ -1,0 +1,123 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<h1 class="text-center text-danger">THỐNG KÊ BÁO CÁO</h1>
+<div class="row">
+    <div class="col-md-6 col-12">
+        <table class="table">
+            <tr>
+                <th>Tuyến bay</th>
+                <th>Doanh thu</th>
+                <th>Số lượt bay</th>
+                <th>Tỉ lệ</th>
+            </tr>
+            {% for s in monthly_stats %}
+            <tr>
+                <td>{{s[0]}}</td>
+                <td>{{ "{:,.1f}".format(s[1])}} VNĐ</td>
+                <td>{{ s[2] }} </td>
+                <td>{{ s[3] }} % </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-6 col-12">
+        <form>
+            <div class="form-group">
+                <div>
+                    <select class="form-select" aria-label="Chọn năm" name="year" id="year"required>
+                        <option selected disabled>Chọn năm</option>
+                        {% for year in range(2015, 2026) %}
+                        <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                 <div>
+                    <select class="form-select" aria-label="Chọn tháng" name="month" id="month"required>
+                        <option selected disabled>Chọn tháng</option>
+                        {% for month in range(1, 13) %}
+                        <option value="{{ month }}">{{ month }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input type="submit" value="Xem báo cáo" class="btn btn-primary">
+            </div>
+        </form>
+        <canvas id="MonthChartId"></canvas>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = [], labels2=[]
+    let data = [], data2=[]
+    let colors = [], colors2=[]
+    let borderColors = [], borderColors2=[]
+    let r,g,b;
+
+    {% for s in monthly_stats %}
+    labels.push( '{{ s[0] }}');
+    data.push({{ (s[1]) }});
+
+    r = parseInt(Math.random() * 255 )
+    g = parseInt(Math.random() * 255 )
+    b = parseInt(Math.random() * 255 )
+
+    colors.push(`rgba( ${r}, ${g}, ${b}, 0.2)`)
+    borderColors.push(`rgba( ${r}, ${g}, ${b}, 1)`)
+    {% endfor %}
+
+
+    window.onload = function(){
+        let contx = document.getElementById('MonthChartId').getContext('2d');
+        loadChart(contx,labels,data,'bar',colors,borderColors)
+    }
+
+    function loadChart(ctx,labels,data,type,color,borderColors){
+       const myChart = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Tuyến bay',
+            data: data,
+            backgroundColor:colors,
+            borderColor: borderColors,
+            borderWidth:1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Khôi phục lựa chọn từ localStorage
+    const savedYear = localStorage.getItem('selectedYear');
+    const savedMonth = localStorage.getItem('selectedMonth');
+
+    if (savedYear) {
+        document.getElementById('year').value = savedYear;
+    }
+    if (savedMonth) {
+        document.getElementById('month').value = savedMonth;
+    }
+
+    // Lưu lựa chọn vào localStorage khi người dùng thay đổi
+    document.getElementById('year').addEventListener('change', function() {
+        localStorage.setItem('selectedYear', this.value);
+    });
+
+    document.getElementById('month').addEventListener('change', function() {
+        localStorage.setItem('selectedMonth', this.value);
+    });
+});
+</script>
+
+{% endblock %}

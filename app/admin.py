@@ -1,6 +1,7 @@
+from calendar import month
 from datetime import datetime
 
-from app import app,db,utils
+from app import app,db,utils,dao
 from flask import redirect,request
 from flask_admin import Admin,BaseView,expose
 from flask_admin.contrib.sqla import ModelView
@@ -41,10 +42,22 @@ class StatsView(AuthenticatedBaseView):
         kw = request.args.get('kw')
         from_date = request.args.get('from_date')
         to_date = request.args.get('to_date')
-        year = request.args.get('year',datetime.now().year)
+        routes = dao.load_route()
         return self.render('admin/stats.html',
-                           stats = utils.route_stats(kw=kw,from_date=from_date,to_date=to_date),
-                           )
+                           stats = utils.route_stats(kw=kw,from_date=from_date,to_date=to_date))
+
+class FrequencyStats(AuthenticatedBaseView):
+    @expose("/", methods=['GET', 'POST'])
+    def __index__(self):
+        year = request.args.get('year',default=datetime.now().year)
+        month = request.args.get('month',default=datetime.now().month)
+
+        routes = dao.load_route()
+
+        return self.render('admin/frequencystats.html', routes=routes,year = year,
+                           monthly_stats = utils.route_month_stats(year=year,month=month))
+
+
 
 admin.add_view(FlightView(Flight,db.session))
 admin.add_view(RouteView(Route,db.session))
@@ -54,6 +67,6 @@ admin.add_view(AuthenticatedView(Plane,db.session))
 admin.add_view(AuthenticatedView(Airport,db.session))
 admin.add_view(LogoutView(name="Đăng xuất"))
 admin.add_view(StatsView(name="Thống kê"))
-
+admin.add_view(FrequencyStats(name="Thống kê tần suất"))
 
 

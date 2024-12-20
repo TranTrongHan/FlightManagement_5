@@ -1,53 +1,3 @@
-<!--<nav class="navbar navbar-expand-sm bg-light navbar-dark">-->
-<!--    <div class="container-fluid">-->
-<!--        <a class="navbar-brand" href="/">-->
-<!--            <img src="/static/images/logo.png" alt="Avatar Logo" width="100px" height="80px" class="rounded-pill">-->
-<!--        </a>-->
-<!--        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">-->
-<!--            <span class="navbar-toggler-icon"></span>-->
-<!--        </button>-->
-<!--        <div class="collapse navbar-collapse" id="collapsibleNavbar">-->
-<!--            <ul class="navbar-nav ">-->
-<!--                <li class="nav-item ">-->
-<!--                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/">Trang chủ</a>-->
-<!--                </li>-->
-
-<!--                {% if current_user.is_authenticated %}-->
-<!--                <li class="nav-item  ">-->
-<!--                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/bookticket">Đặt vé</a>-->
-<!--                </li>-->
-<!--                <li class="nav-item  ">-->
-<!--                    <div class="dropdown">-->
-<!--                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">-->
-<!--                            <span class="fw-bolder t text-capitalize">Chào, {{ current_user.username }}</span>-->
-<!--                        </button>-->
-
-<!--                        <ul class="dropdown-menu">-->
-<!--                            <li><a class="dropdown-item" href="/myinfo">Thông tin của-->
-<!--                                tôi</a></li>-->
-<!--                            <li><a class="dropdown-item" href="/my_booked_tickets?user_id={{current_user.id}} ">Danh-->
-<!--                                sách vé đã đặt</a></li>-->
-<!--                        </ul>-->
-
-<!--                    </div>-->
-<!--                </li>-->
-<!--                <li class="nav-item ">-->
-<!--                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/logout">Đăng xuất</a>-->
-<!--                </li>-->
-
-<!--                {% else %}-->
-<!--                <li class="nav-item ms-auto ">-->
-<!--                    <a class="nav-link text-primary text-uppercase font-weight-bold " href="/login">Đăng nhập</a>-->
-<!--                </li>-->
-<!--                <li class="nav-item ms-auto  ">-->
-<!--                    <a class="nav-link text-primary text-uppercase font-weight-bold" href="/register">Đăng ký</a>-->
-<!--                </li>-->
-<!--                {% endif %}-->
-
-<!--            </ul>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</nav>-->
 <nav class="navbar navbar-expand-sm navbar-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
@@ -59,126 +9,152 @@
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
             <!-- Các liên kết được căn trái -->
             <ul class="navbar-nav me-auto">
+                {% if not current_user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'index' else '' }}" href="/">Trang chủ</a>
+                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'index' else '' }}" href="/">Trang
+                        chủ</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'login' else '' }}"
+                       href="/login">Đăng nhập</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'register' else '' }}"
+                       href="/register">Đăng ký</a>
+                </li>
+                {% endif %}
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'bookticket' else '' }}" href="/bookticket">Đặt vé</a>
-                </li>
-            </ul>
-
-            <!-- Dropdown và Đăng xuất ở bên phải -->
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle custom-nav-btn" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{{current_user.avatar }}" width="25" class="rounded-circle">
-                        <span class="fw-bolder text-capitalize">Chào, {{ current_user.username }}</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <!-- Thêm các mục dropdown cho thông tin cá nhân và danh sách vé -->
-                        <li><a class="dropdown-item" href="/myinfo">Thông tin của tôi</a></li>
-                        <li><a class="dropdown-item" href="/my_booked_tickets?user_id={{current_user.id}}">Danh sách vé đã đặt</a></li>
-                        <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
-                    </ul>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'login' else '' }}" href="/login">Đăng nhập</a>
+                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'index' else '' }}" href="/">Trang
+                        chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'register' else '' }}" href="/register">Đăng ký</a>
+                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'bookticket' else '' }}"
+                       href="/bookticket">Đặt vé</a>
+                </li>
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle custom-nav-btn" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{current_user.avatar }}" width="25" class="rounded-circle">
+                            <span class="fw-bolder text-capitalize">Chào, {{ current_user.username }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <!-- Thêm các mục dropdown cho thông tin cá nhân và danh sách vé -->
+                            <li><a class="dropdown-item" href="/myinfo">Thông tin của tôi</a></li>
+                            <li><a class="dropdown-item" href="/my_booked_tickets?user_id={{current_user.id}}">Danh sách
+                                vé đã đặt</a></li>
+                            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                {% endif %}
+                {% if current_user.is_authenticated and current_user.user_role != UserRoleEnum.CUSTOMER %}
+                <li class="nav-item">
+                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'index' else '' }}"
+                       href="/staffpage">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'create_flight_schedule' else '' }}"
+                       href="/create_flight_schedule">Lập lịch chuyến bay</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'sell_tickets' else '' }}"
+                       href="/sell_tickets">Bán vé</a>
                 </li>
                 {% endif %}
             </ul>
+
+            <!-- Dropdown và Đăng xuất ở bên phải -->
+
         </div>
     </div>
 </nav>
 
 <style>
-/* Thanh điều hướng */
-.navbar {
-    background-color: #80c7ff; /* Màu xanh nền nhẹ */
-}
-/* Nút đăng nhập và đăng ký */
-.navbar-nav .nav-link.custom-nav-btn {
-    background-color: #aad4ff; /* Màu nền cho nút */
-    color: #4e4e4e; /* Màu chữ */
-    border-radius: 25px; /* Làm tròn các góc */
-    padding: 10px 20px;
-    margin: 5px;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    transition: all 0.3s ease; /* Hiệu ứng chuyển động */
-}
+    /* Thanh điều hướng */
+    .navbar {
+        background-color: #80c7ff; /* Màu xanh nền nhẹ */
+    }
+    /* Nút đăng nhập và đăng ký */
+    .navbar-nav .nav-link.custom-nav-btn {
+        background-color: #aad4ff; /* Màu nền cho nút */
+        color: #4e4e4e; /* Màu chữ */
+        border-radius: 25px; /* Làm tròn các góc */
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        transition: all 0.3s ease; /* Hiệu ứng chuyển động */
+    }
 
-/* Nút đăng nhập và đăng ký khi hover */
-.navbar-nav .nav-link.custom-nav-btn:hover {
-    background-color: #7bbaff; /* Màu nền khi hover */
-    color: white; /* Màu chữ khi hover */
-}
+    /* Nút đăng nhập và đăng ký khi hover */
+    .navbar-nav .nav-link.custom-nav-btn:hover {
+        background-color: #7bbaff; /* Màu nền khi hover */
+        color: white; /* Màu chữ khi hover */
+    }
 
-/* Nút đăng nhập và đăng ký khi active */
-.navbar-nav .nav-link.custom-nav-btn.active {
-    background-color: #66aaff; /* Màu nền khi active */
-    color: white; /* Màu chữ khi active */
-}
+    /* Nút đăng nhập và đăng ký khi active */
+    .navbar-nav .nav-link.custom-nav-btn.active {
+        background-color: #66aaff; /* Màu nền khi active */
+        color: white; /* Màu chữ khi active */
+    }
 
-/* Các nút trong navbar */
-.navbar-nav .nav-link {
-    border-radius: 25px; /* Làm tròn các nút */
-    padding: 10px 20px;
-    margin: 5px;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-}
+    /* Các nút trong navbar */
+    .navbar-nav .nav-link {
+        border-radius: 25px; /* Làm tròn các nút */
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
 
-/* Ảnh đại diện người dùng */
-.navbar-nav .nav-link img {
-    border-radius: 50%;
-}
+    /* Ảnh đại diện người dùng */
+    .navbar-nav .nav-link img {
+        border-radius: 50%;
+    }
 
-/* Tên người dùng */
-.navbar-nav .nav-link span {
-    font-size: 14px;
-    font-weight: 600;
-}
+    /* Tên người dùng */
+    .navbar-nav .nav-link span {
+        font-size: 14px;
+        font-weight: 600;
+    }
 
-/* Dropdown menu */
-.dropdown-menu {
-    background-color: #aad4ff; /* Màu nền dropdown */
-    border-radius: 10px;
-}
+    /* Dropdown menu */
+    .dropdown-menu {
+        background-color: #aad4ff; /* Màu nền dropdown */
+        border-radius: 10px;
+    }
 
-.dropdown-menu .dropdown-item {
-    font-size: 14px;
-    color: #4e4e4e;
-    font-weight: 500;
-    padding: 10px 20px;
-}
+    .dropdown-menu .dropdown-item {
+        font-size: 14px;
+        color: #4e4e4e;
+        font-weight: 500;
+        padding: 10px 20px;
+    }
 
-/* Hover hiệu ứng trong dropdown */
-.dropdown-menu .dropdown-item:hover {
-    background-color: #7bbaff;
-    color: white;
-}
+    /* Hover hiệu ứng trong dropdown */
+    .dropdown-menu .dropdown-item:hover {
+        background-color: #7bbaff;
+        color: white;
+    }
 
-/* Căn chỉnh các mục bên trái */
-.navbar-nav.me-auto {
-    margin-left: 0;
-}
+    /* Căn chỉnh các mục bên trái */
+    .navbar-nav.me-auto {
+        margin-left: 0;
+    }
 
-/* Căn chỉnh các mục bên phải */
-.navbar-nav.ms-auto {
-    margin-right: 0;
-}
+    /* Căn chỉnh các mục bên phải */
+    .navbar-nav.ms-auto {
+        margin-right: 0;
+    }
 
-/* Dropdown menu căn phải */
-.dropdown-menu {
-    width: auto; /* Hoặc bạn có thể thay bằng một giá trị cố định như 150px nếu muốn */
-    min-width: 100px; /* Đảm bảo dropdown không quá nhỏ */
-}
+    /* Dropdown menu căn phải */
+    .dropdown-menu {
+        width: auto; /* Hoặc bạn có thể thay bằng một giá trị cố định như 150px nếu muốn */
+        min-width: 100px; /* Đảm bảo dropdown không quá nhỏ */
+    }
 </style>

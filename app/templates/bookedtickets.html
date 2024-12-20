@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-{% if current_user.is_authenticated %}
+{% if current_user.is_authenticated  %}
 {% if tickets %}
 <div class="row  p-3 mt-3">
     <table class="table">
@@ -17,9 +17,11 @@
         <tr>
             <td>{{ticket.id}}</td>
             {% for fareclass in fareclass %}
-            {% if ticket.fareclass_id == fareclass.id %}
+            {% for seat in seats %}
+            {% if ticket.seat_id == seat.id and seat.fareclass_id == fareclass.id %}
             <td> {{fareclass.name}}</td>
             {% endif %}
+            {% endfor %}
             {% endfor %}
 
             {% for route in routes %}

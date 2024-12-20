@@ -14,7 +14,7 @@
                         <h4 class="modal-title">Thông báo</h4>  <!-- Tiêu đề mặc định -->
                     {% endif %}
                 {% endwith %}
-                <a class="text-decoration-none text-light btn-close" href="/login"></a>
+                <a class="text-decoration-none text-light btn-close" href="/"></a>
             </div>
 
             <!-- Modal body -->
@@ -28,7 +28,7 @@
                 {% endwith %}
                 <br>
                 Xem vé đã đặt tại<a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover
-                        " href="/my_booked_tickets?/user_id={{current_user.id}}"> đây. </a>
+                        " href="/my_booked_tickets?user_id={{current_user.id}}"> đây. </a>
             </div>
 
             <!-- Modal footer -->

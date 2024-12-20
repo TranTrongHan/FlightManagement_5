@@ -34,7 +34,7 @@
 <!--</nav>-->
 <nav class="navbar navbar-expand-sm navbar-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">
+        <a class="navbar-brand" href="/staffpage">
             <img src="/static/images/logo.png" alt="Avatar Logo" width="100px" height="80px" class="rounded-pill">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
@@ -43,7 +43,7 @@
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
             <ul class="navbar-nav me-auto"> <!-- Các mục bên trái -->
                 <li class="nav-item">
-                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'index' else '' }}" href="/">Trang chủ</a>
+                    <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'index' else '' }}" href="/staffpage">Trang chủ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'create_flight_schedule' else '' }}" href="/create_flight_schedule">Lập lịch chuyến bay</a>

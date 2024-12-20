@@ -25,7 +25,7 @@ class User(db.Model, UserMixin):
     # first_name = Column(String(50), nullable=False)
     name = Column(String(50), nullable=False)
     phone = Column(String(50), nullable=False)
-    address = Column(String(50), nullable=False)
+    address = Column(String(50))
     email = Column(String(50), nullable=False, unique=True)
     avatar = Column(String(100),
                     default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg')
@@ -44,20 +44,20 @@ class User(db.Model, UserMixin):
 
     #####################################
 class Customer(db.Model):
-    # id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(User.id), primary_key=True, nullable=False, unique=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey(User.id),nullable=False,unique=True)
     ticket = relationship("Ticket", backref="customer", lazy=True)
 
     def to_dict(self):
         return {
-            # 'id': self.id,
+            'id': self.id,
             'user_id': self.user_id,
         }
 
     @classmethod
     def from_dict(cls, data):
         return cls(
-            # id=data['id'],
+            id=data['id'],
             user_id=data['user_id'],
         )
 
@@ -188,7 +188,7 @@ class Seat(db.Model):
 #####################################
 class Ticket(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    customer_id = Column(Integer, ForeignKey(Customer.user_id), nullable=False, primary_key=True)
+    customer_id = Column(Integer, ForeignKey(Customer.id), nullable=False, primary_key=True)
     flight_id = Column(Integer, ForeignKey(Flight.id), nullable=False, primary_key=True)
     seat_id = Column(Integer, ForeignKey(Seat.id), nullable=True, unique=True)
     created_date = Column(DateTime,nullable=False)
@@ -203,26 +203,34 @@ if __name__ == "__main__":
         rule3 = Rule(name='thời gian dừng tối thiểu', value='20')
         rule4 = Rule(name='1st_seat_price', value=1500000)
         rule5 = Rule(name='2st_seat_price', value=1000000)
-        user1 = User(name='Nguyen An', phone='0123456789', address='123 Street A', email='an.nguyen@example.com',
+        user1 = User(name='Nguyễn An', phone='0123456789', address='123 Street A', email='an.nguyen@example.com',
                      user_role=UserRoleEnum.ADMIN, username='admin1',
                      password=str(hashlib.md5('admin1'.encode('utf-8')).hexdigest()))
-        user2 = User(name='Tran Binh', phone='0123456790', address='456 Street B', email='binh.tran@example.com',
+        user2 = User(name='Trần Lê Bình', phone='0123456790', address='456 Street B', email='binh.tran@example.com',
                      user_role=UserRoleEnum.ADMIN, username='admin2',
                      password=str(hashlib.md5('admin2'.encode('utf-8')).hexdigest()))
-        user3 = User(name='Le Cuc', phone='0123456791', address='789 Street C', email='cuc.le@example.com',
+        user3 = User(name='Lê Kim Cúc', phone='0123456791', address='789 Street C', email='cuc.le@example.com',
                      user_role=UserRoleEnum.STAFF, username='staff1',
                      password=str(hashlib.md5('staff1'.encode('utf-8')).hexdigest()))
-        user4 = User(name='Pham Duong', phone='0123456792', address='101 Street D', email='duong.pham@example.com',
+        user4 = User(name='Phạm Hải Dương', phone='0123456792', address='101 Street D', email='duong.pham@example.com',
                      user_role=UserRoleEnum.STAFF, username='staff2',
                      password=str(hashlib.md5('staff2'.encode('utf-8')).hexdigest()))
-        user5 = User(name='Nguyen Minh', phone='0123456793', address='202 Street W',
+        user5 = User(name='Nguyễn Duy Minh', phone='0123456793', address='202 Street W',
                      email='minh.nguyen@example.com', user_role=UserRoleEnum.CUSTOMER, username='customer1',
                      password=str(hashlib.md5('customer1'.encode('utf-8')).hexdigest()))
-        user6 = User(name='Hoang Tu', phone='0123456723', address='202 Street B', email='tu.hoang@example.com',
+        user6 = User(name='Hoàng Minh Tú', phone='0123456723', address='202 Street B', email='tu.hoang@example.com',
                      user_role=UserRoleEnum.CUSTOMER, username='customer2',
                      password=str(hashlib.md5('customer2'.encode('utf-8')).hexdigest()))
-
-        db.session.add_all([user1, user2, user3, user4, user5, user6])
+        user7 = User(name='Trần Văn A', phone='0133456723', address='202 Street B', email='a.tran@example.com',
+                     user_role=UserRoleEnum.CUSTOMER, username='customer3',
+                     password=str(hashlib.md5('customer3'.encode('utf-8')).hexdigest()))
+        user8 = User(name='Cao Thị C', phone='0124456723', address='202 Street B', email='c.cao@example.com',
+                     user_role=UserRoleEnum.CUSTOMER, username='customer4',
+                     password=str(hashlib.md5('customer4'.encode('utf-8')).hexdigest()))
+        user9 = User(name='Nguyễn Minh Khải', phone='01255456723', address='202 Street B', email='khai.nguyen@example.com',
+                     user_role=UserRoleEnum.CUSTOMER, username='customer5',
+                     password=str(hashlib.md5('customer5'.encode('utf-8')).hexdigest()))
+        db.session.add_all([user1, user2, user3, user4, user5, user6,user7,user8,user9])
         db.session.commit()
 
         admin1 = Admin(user_id='1')
@@ -237,7 +245,10 @@ if __name__ == "__main__":
 
         customer1 = Customer(user_id='5')
         customer2 = Customer(user_id='6')
-        db.session.add_all([customer1, customer2])
+        customer3 = Customer(user_id='7')
+        customer4 = Customer(user_id='8')
+        customer5 = Customer(user_id='9')
+        db.session.add_all([customer1, customer2,customer3,customer4,customer5])
         db.session.commit()
 
         plane1 = Plane(name='VietNam Airlines')
@@ -405,25 +416,6 @@ if __name__ == "__main__":
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='13')
 
 
-        #         ==============================Các chuyến bay đã qua lịch hiện tại ======================================
-        flight31 = Flight(name='Hà Nội(HAN) - Phú Yên(UIH)', take_of_time=datetime(2024, 12, 15, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 27, 23, 00, 00),
-                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='13')
-        flight32 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 11, 15, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 27, 23, 00, 00),
-                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='9')
-        flight33 = Flight(name='Hồ Chí Minh(SGN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 10, 15, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 27, 23, 00, 00),
-                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='7')
-        flight34 = Flight(name='Hà Nội(HAN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 8, 15, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 27, 23, 00, 00),
-                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='6')
-        flight35 = Flight(name='TP HCM(SG)- Nha Trang(CXR)', take_of_time=datetime(2024, 9, 15, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 27, 23, 00, 00),
-                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='5')
-        flight36 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 10, 15, 11, 00, 00),
-                          landing_time=datetime(2024, 12, 27, 23, 00, 00),
-                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='1')
 
         db.session.add_all([flight1, flight2, flight3, flight4, flight5,
                             flight6, flight7, flight8, flight9, flight10,
@@ -431,7 +423,7 @@ if __name__ == "__main__":
                             flight16, flight17, flight18, flight19, flight20,
                             flight21, flight22, flight23, flight24, flight25,
                             flight26, flight27, flight28, flight29, flight30,
-                            flight31, flight32, flight33, flight34, flight35,flight36])
+                            ])
         db.session.commit()
 
 
@@ -639,43 +631,7 @@ if __name__ == "__main__":
         seat149 = Seat(name='Seat04', status=False, flight_id='30',fareclass_id='1')
         seat150 = Seat(name='Seat05', status=False, flight_id='30',fareclass_id='1')
 
-        seat151 = Seat(name='Seat01', status=False, flight_id='31',fareclass_id='1')
-        seat152 = Seat(name='Seat02', status=False, flight_id='31',fareclass_id='1')
-        seat153 = Seat(name='Seat03', status=False, flight_id='31',fareclass_id='1')
-        seat154 = Seat(name='Seat04', status=False, flight_id='31',fareclass_id='1')
-        seat155 = Seat(name='Seat05', status=False, flight_id='31',fareclass_id='1')
 
-        seat156 = Seat(name='Seat01', status=False, flight_id='32',fareclass_id='1')
-        seat157 = Seat(name='Seat02', status=False, flight_id='32',fareclass_id='1')
-        seat158 = Seat(name='Seat03', status=False, flight_id='32',fareclass_id='1')
-        seat159 = Seat(name='Seat04', status=False, flight_id='32',fareclass_id='1')
-        seat160 = Seat(name='Seat05', status=False, flight_id='32',fareclass_id='1')
-
-        seat161 = Seat(name='Seat01', status=False, flight_id='33',fareclass_id='1')
-        seat162 = Seat(name='Seat02', status=False, flight_id='33',fareclass_id='1')
-        seat163 = Seat(name='Seat03', status=False, flight_id='33',fareclass_id='1')
-        seat164 = Seat(name='Seat04', status=False, flight_id='33',fareclass_id='1')
-        seat165 = Seat(name='Seat05', status=False, flight_id='33',fareclass_id='1')
-
-        seat166 = Seat(name='Seat01', status=False, flight_id='34',fareclass_id='1')
-        seat167 = Seat(name='Seat02', status=False, flight_id='34',fareclass_id='1')
-        seat168 = Seat(name='Seat03', status=False, flight_id='34',fareclass_id='1')
-        seat169 = Seat(name='Seat04', status=False, flight_id='34',fareclass_id='1')
-        seat170 = Seat(name='Seat05', status=False, flight_id='34',fareclass_id='1')
-
-        seat171 = Seat(name='Seat01', status=False, flight_id='35',fareclass_id='1')
-        seat172 = Seat(name='Seat02', status=False, flight_id='35',fareclass_id='1')
-        seat173 = Seat(name='Seat03', status=False, flight_id='35',fareclass_id='1')
-        seat174 = Seat(name='Seat04', status=False, flight_id='35',fareclass_id='1')
-        seat175 = Seat(name='Seat05', status=False, flight_id='35',fareclass_id='1')
-
-        seat176 = Seat(name='Seat01', status=False, flight_id='36',fareclass_id='1')
-        seat177 = Seat(name='Seat02', status=False, flight_id='36',fareclass_id='1')
-        seat178 = Seat(name='Seat03', status=False, flight_id='36',fareclass_id='1')
-        seat179 = Seat(name='Seat04', status=False, flight_id='36',fareclass_id='1')
-        seat180 = Seat(name='Seat05', status=False, flight_id='36',fareclass_id='1')
-
-        # Thêm tất cả các ghế vào session
         db.session.add_all([
             seat1, seat2, seat3, seat4, seat5,
             seat6, seat7, seat8, seat9, seat10,
@@ -707,194 +663,158 @@ if __name__ == "__main__":
             seat136, seat137, seat138, seat139, seat140,
             seat141, seat142, seat143, seat144, seat145,
             seat146, seat147, seat148, seat149, seat150,
-            seat151, seat152, seat153, seat154, seat155,
-            seat156, seat157, seat158, seat159, seat160,
-            seat161, seat162, seat163, seat164, seat165,
-            seat166, seat167, seat168, seat169, seat170,
-            seat171, seat172, seat173, seat174, seat175,
-            seat176, seat177, seat178, seat179, seat180
         ])
         db.session.commit()
-        seat181 = Seat(name='Seat181', status=False, flight_id='1', fareclass_id='2')
-        seat182 = Seat(name='Seat182', status=False, flight_id='1', fareclass_id='2')
-        seat183 = Seat(name='Seat183', status=False, flight_id='1', fareclass_id='2')
-        seat184 = Seat(name='Seat184', status=False, flight_id='1', fareclass_id='2')
-        seat185 = Seat(name='Seat185', status=False, flight_id='1', fareclass_id='2')
-        seat186 = Seat(name='Seat186', status=False, flight_id='2', fareclass_id='2')
-        seat187 = Seat(name='Seat187', status=False, flight_id='2', fareclass_id='2')
-        seat188 = Seat(name='Seat188', status=False, flight_id='2', fareclass_id='2')
-        seat189 = Seat(name='Seat189', status=False, flight_id='2', fareclass_id='2')
-        seat190 = Seat(name='Seat190', status=False, flight_id='2', fareclass_id='2')
-        seat191 = Seat(name='Seat191', status=False, flight_id='3', fareclass_id='2')
-        seat192 = Seat(name='Seat192', status=False, flight_id='3', fareclass_id='2')
-        seat193 = Seat(name='Seat193', status=False, flight_id='3', fareclass_id='2')
-        seat194 = Seat(name='Seat194', status=False, flight_id='3', fareclass_id='2')
-        seat195 = Seat(name='Seat195', status=False, flight_id='3', fareclass_id='2')
-        seat196 = Seat(name='Seat196', status=False, flight_id='4', fareclass_id='2')
-        seat197 = Seat(name='Seat197', status=False, flight_id='4', fareclass_id='2')
-        seat198 = Seat(name='Seat198', status=False, flight_id='4', fareclass_id='2')
-        seat199 = Seat(name='Seat199', status=False, flight_id='4', fareclass_id='2')
-        seat200 = Seat(name='Seat200', status=False, flight_id='4', fareclass_id='2')
-        seat201 = Seat(name='Seat201', status=False, flight_id='5', fareclass_id='2')
-        seat202 = Seat(name='Seat202', status=False, flight_id='5', fareclass_id='2')
-        seat203 = Seat(name='Seat203', status=False, flight_id='5', fareclass_id='2')
-        seat204 = Seat(name='Seat204', status=False, flight_id='5', fareclass_id='2')
-        seat205 = Seat(name='Seat205', status=False, flight_id='5', fareclass_id='2')
-        seat206 = Seat(name='Seat206', status=False, flight_id='6', fareclass_id='2')
-        seat207 = Seat(name='Seat207', status=False, flight_id='6', fareclass_id='2')
-        seat208 = Seat(name='Seat208', status=False, flight_id='6', fareclass_id='2')
-        seat209 = Seat(name='Seat209', status=False, flight_id='6', fareclass_id='2')
-        seat210 = Seat(name='Seat210', status=False, flight_id='6', fareclass_id='2')
-        seat211 = Seat(name='Seat211', status=False, flight_id='7', fareclass_id='2')
-        seat212 = Seat(name='Seat212', status=False, flight_id='7', fareclass_id='2')
-        seat213 = Seat(name='Seat213', status=False, flight_id='7', fareclass_id='2')
-        seat214 = Seat(name='Seat214', status=False, flight_id='7', fareclass_id='2')
-        seat215 = Seat(name='Seat215', status=False, flight_id='7', fareclass_id='2')
-        seat216 = Seat(name='Seat216', status=False, flight_id='8', fareclass_id='2')
-        seat217 = Seat(name='Seat217', status=False, flight_id='8', fareclass_id='2')
-        seat218 = Seat(name='Seat218', status=False, flight_id='8', fareclass_id='2')
-        seat219 = Seat(name='Seat219', status=False, flight_id='8', fareclass_id='2')
-        seat220 = Seat(name='Seat220', status=False, flight_id='8', fareclass_id='2')
-        seat221 = Seat(name='Seat221', status=False, flight_id='9', fareclass_id='2')
-        seat222 = Seat(name='Seat222', status=False, flight_id='9', fareclass_id='2')
-        seat223 = Seat(name='Seat223', status=False, flight_id='9', fareclass_id='2')
-        seat224 = Seat(name='Seat224', status=False, flight_id='9', fareclass_id='2')
-        seat225 = Seat(name='Seat225', status=False, flight_id='9', fareclass_id='2')
-        seat226 = Seat(name='Seat226', status=False, flight_id='10', fareclass_id='2')
-        seat227 = Seat(name='Seat227', status=False, flight_id='10', fareclass_id='2')
-        seat228 = Seat(name='Seat228', status=False, flight_id='10', fareclass_id='2')
-        seat229 = Seat(name='Seat229', status=False, flight_id='10', fareclass_id='2')
-        seat230 = Seat(name='Seat230', status=False, flight_id='10', fareclass_id='2')
-        seat231 = Seat(name='Seat231', status=False, flight_id='11', fareclass_id='2')
-        seat232 = Seat(name='Seat232', status=False, flight_id='11', fareclass_id='2')
-        seat233 = Seat(name='Seat233', status=False, flight_id='11', fareclass_id='2')
-        seat234 = Seat(name='Seat234', status=False, flight_id='11', fareclass_id='2')
-        seat235 = Seat(name='Seat235', status=False, flight_id='11', fareclass_id='2')
-        seat236 = Seat(name='Seat236', status=False, flight_id='12', fareclass_id='2')
-        seat237 = Seat(name='Seat237', status=False, flight_id='12', fareclass_id='2')
-        seat238 = Seat(name='Seat238', status=False, flight_id='12', fareclass_id='2')
-        seat239 = Seat(name='Seat239', status=False, flight_id='12', fareclass_id='2')
-        seat240 = Seat(name='Seat240', status=False, flight_id='12', fareclass_id='2')
-        seat241 = Seat(name='Seat241', status=False, flight_id='13', fareclass_id='2')
-        seat242 = Seat(name='Seat242', status=False, flight_id='13', fareclass_id='2')
-        seat243 = Seat(name='Seat243', status=False, flight_id='13', fareclass_id='2')
-        seat244 = Seat(name='Seat244', status=False, flight_id='13', fareclass_id='2')
-        seat245 = Seat(name='Seat245', status=False, flight_id='13', fareclass_id='2')
-        seat246 = Seat(name='Seat246', status=False, flight_id='14', fareclass_id='2')
-        seat247 = Seat(name='Seat247', status=False, flight_id='14', fareclass_id='2')
-        seat248 = Seat(name='Seat248', status=False, flight_id='14', fareclass_id='2')
-        seat249 = Seat(name='Seat249', status=False, flight_id='14', fareclass_id='2')
-        seat250 = Seat(name='Seat250', status=False, flight_id='14', fareclass_id='2')
-        seat251 = Seat(name='Seat251', status=False, flight_id='15', fareclass_id='2')
-        seat252 = Seat(name='Seat252', status=False, flight_id='15', fareclass_id='2')
-        seat253 = Seat(name='Seat253', status=False, flight_id='15', fareclass_id='2')
-        seat254 = Seat(name='Seat254', status=False, flight_id='15', fareclass_id='2')
-        seat255 = Seat(name='Seat255', status=False, flight_id='15', fareclass_id='2')
-        seat256 = Seat(name='Seat256', status=False, flight_id='16', fareclass_id='2')
-        seat257 = Seat(name='Seat257', status=False, flight_id='16', fareclass_id='2')
-        seat258 = Seat(name='Seat258', status=False, flight_id='16', fareclass_id='2')
-        seat259 = Seat(name='Seat259', status=False, flight_id='16', fareclass_id='2')
-        seat260 = Seat(name='Seat260', status=False, flight_id='16', fareclass_id='2')
-        seat261 = Seat(name='Seat261', status=False, flight_id='17', fareclass_id='2')
-        seat262 = Seat(name='Seat262', status=False, flight_id='17', fareclass_id='2')
-        seat263 = Seat(name='Seat263', status=False, flight_id='17', fareclass_id='2')
-        seat264 = Seat(name='Seat264', status=False, flight_id='17', fareclass_id='2')
-        seat265 = Seat(name='Seat265', status=False, flight_id='17', fareclass_id='2')
-        seat266 = Seat(name='Seat266', status=False, flight_id='18', fareclass_id='2')
-        seat267 = Seat(name='Seat267', status=False, flight_id='18', fareclass_id='2')
-        seat268 = Seat(name='Seat268', status=False, flight_id='18', fareclass_id='2')
-        seat269 = Seat(name='Seat269', status=False, flight_id='18', fareclass_id='2')
-        seat270 = Seat(name='Seat270', status=False, flight_id='18', fareclass_id='2')
-        seat271 = Seat(name='Seat271', status=False, flight_id='19', fareclass_id='2')
-        seat272 = Seat(name='Seat272', status=False, flight_id='19', fareclass_id='2')
-        seat273 = Seat(name='Seat273', status=False, flight_id='19', fareclass_id='2')
-        seat274 = Seat(name='Seat274', status=False, flight_id='19', fareclass_id='2')
-        seat275 = Seat(name='Seat275', status=False, flight_id='19', fareclass_id='2')
-        seat276 = Seat(name='Seat276', status=False, flight_id='20', fareclass_id='2')
-        seat277 = Seat(name='Seat277', status=False, flight_id='20', fareclass_id='2')
-        seat278 = Seat(name='Seat278', status=False, flight_id='20', fareclass_id='2')
-        seat279 = Seat(name='Seat279', status=False, flight_id='20', fareclass_id='2')
-        seat280 = Seat(name='Seat280', status=False, flight_id='20', fareclass_id='2')
-        seat281 = Seat(name='Seat281', status=False, flight_id='21', fareclass_id='2')
-        seat282 = Seat(name='Seat282', status=False, flight_id='21', fareclass_id='2')
-        seat283 = Seat(name='Seat283', status=False, flight_id='21', fareclass_id='2')
-        seat284 = Seat(name='Seat284', status=False, flight_id='21', fareclass_id='2')
-        seat285 = Seat(name='Seat285', status=False, flight_id='21', fareclass_id='2')
-        seat286 = Seat(name='Seat286', status=False, flight_id='22', fareclass_id='2')
-        seat287 = Seat(name='Seat287', status=False, flight_id='22', fareclass_id='2')
-        seat288 = Seat(name='Seat288', status=False, flight_id='22', fareclass_id='2')
-        seat289 = Seat(name='Seat289', status=False, flight_id='22', fareclass_id='2')
-        seat290 = Seat(name='Seat290', status=False, flight_id='22', fareclass_id='2')
-        seat291 = Seat(name='Seat291', status=False, flight_id='23', fareclass_id='2')
-        seat292 = Seat(name='Seat292', status=False, flight_id='23', fareclass_id='2')
-        seat293 = Seat(name='Seat293', status=False, flight_id='23', fareclass_id='2')
-        seat294 = Seat(name='Seat294', status=False, flight_id='23', fareclass_id='2')
-        seat295 = Seat(name='Seat295', status=False, flight_id='23', fareclass_id='2')
-        seat296 = Seat(name='Seat296', status=False, flight_id='24', fareclass_id='2')
-        seat297 = Seat(name='Seat297', status=False, flight_id='24', fareclass_id='2')
-        seat298 = Seat(name='Seat298', status=False, flight_id='24', fareclass_id='2')
-        seat299 = Seat(name='Seat299', status=False, flight_id='24', fareclass_id='2')
-        seat300 = Seat(name='Seat300', status=False, flight_id='24', fareclass_id='2')
-        seat301 = Seat(name='Seat301', status=False, flight_id='25', fareclass_id='2')
-        seat302 = Seat(name='Seat302', status=False, flight_id='25', fareclass_id='2')
-        seat303 = Seat(name='Seat303', status=False, flight_id='25', fareclass_id='2')
-        seat304 = Seat(name='Seat304', status=False, flight_id='25', fareclass_id='2')
-        seat305 = Seat(name='Seat305', status=False, flight_id='25', fareclass_id='2')
-        seat306 = Seat(name='Seat306', status=False, flight_id='26', fareclass_id='2')
-        seat307 = Seat(name='Seat307', status=False, flight_id='26', fareclass_id='2')
-        seat308 = Seat(name='Seat308', status=False, flight_id='26', fareclass_id='2')
-        seat309 = Seat(name='Seat309', status=False, flight_id='26', fareclass_id='2')
-        seat310 = Seat(name='Seat310', status=False, flight_id='26', fareclass_id='2')
-        seat311 = Seat(name='Seat311', status=False, flight_id='27', fareclass_id='2')
-        seat312 = Seat(name='Seat312', status=False, flight_id='27', fareclass_id='2')
-        seat313 = Seat(name='Seat313', status=False, flight_id='27', fareclass_id='2')
-        seat314 = Seat(name='Seat314', status=False, flight_id='27', fareclass_id='2')
-        seat315 = Seat(name='Seat315', status=False, flight_id='27', fareclass_id='2')
-        seat316 = Seat(name='Seat316', status=False, flight_id='28', fareclass_id='2')
-        seat317 = Seat(name='Seat317', status=False, flight_id='28', fareclass_id='2')
-        seat318 = Seat(name='Seat318', status=False, flight_id='28', fareclass_id='2')
-        seat319 = Seat(name='Seat319', status=False, flight_id='28', fareclass_id='2')
-        seat320 = Seat(name='Seat320', status=False, flight_id='28', fareclass_id='2')
-        seat321 = Seat(name='Seat321', status=False, flight_id='29', fareclass_id='2')
-        seat322 = Seat(name='Seat322', status=False, flight_id='29', fareclass_id='2')
-        seat323 = Seat(name='Seat323', status=False, flight_id='29', fareclass_id='2')
-        seat324 = Seat(name='Seat324', status=False, flight_id='29', fareclass_id='2')
-        seat325 = Seat(name='Seat325', status=False, flight_id='29', fareclass_id='2')
-        seat326 = Seat(name='Seat326', status=False, flight_id='30', fareclass_id='2')
-        seat327 = Seat(name='Seat327', status=False, flight_id='30', fareclass_id='2')
-        seat328 = Seat(name='Seat328', status=False, flight_id='30', fareclass_id='2')
-        seat329 = Seat(name='Seat329', status=False, flight_id='30', fareclass_id='2')
-        seat330 = Seat(name='Seat330', status=False, flight_id='30', fareclass_id='2')
-        seat331 = Seat(name='Seat331', status=False, flight_id='31', fareclass_id='2')
-        seat332 = Seat(name='Seat332', status=False, flight_id='31', fareclass_id='2')
-        seat333 = Seat(name='Seat333', status=False, flight_id='31', fareclass_id='2')
-        seat334 = Seat(name='Seat334', status=False, flight_id='31', fareclass_id='2')
-        seat335 = Seat(name='Seat335', status=False, flight_id='31', fareclass_id='2')
-        seat336 = Seat(name='Seat336', status=False, flight_id='32', fareclass_id='2')
-        seat337 = Seat(name='Seat337', status=False, flight_id='32', fareclass_id='2')
-        seat338 = Seat(name='Seat338', status=False, flight_id='32', fareclass_id='2')
-        seat339 = Seat(name='Seat339', status=False, flight_id='32', fareclass_id='2')
-        seat340 = Seat(name='Seat340', status=False, flight_id='32', fareclass_id='2')
-        seat341 = Seat(name='Seat341', status=False, flight_id='33', fareclass_id='2')
-        seat342 = Seat(name='Seat342', status=False, flight_id='33', fareclass_id='2')
-        seat343 = Seat(name='Seat343', status=False, flight_id='33', fareclass_id='2')
-        seat344 = Seat(name='Seat344', status=False, flight_id='33', fareclass_id='2')
-        seat345 = Seat(name='Seat345', status=False, flight_id='33', fareclass_id='2')
-        seat346 = Seat(name='Seat346', status=False, flight_id='34', fareclass_id='2')
-        seat347 = Seat(name='Seat347', status=False, flight_id='34', fareclass_id='2')
-        seat348 = Seat(name='Seat348', status=False, flight_id='34', fareclass_id='2')
-        seat349 = Seat(name='Seat349', status=False, flight_id='34', fareclass_id='2')
-        seat350 = Seat(name='Seat350', status=False, flight_id='34', fareclass_id='2')
-        seat351 = Seat(name='Seat351', status=False, flight_id='35', fareclass_id='2')
-        seat352 = Seat(name='Seat352', status=False, flight_id='35', fareclass_id='2')
-        seat353 = Seat(name='Seat353', status=False, flight_id='35', fareclass_id='2')
-        seat354 = Seat(name='Seat354', status=False, flight_id='35', fareclass_id='2')
-        seat355 = Seat(name='Seat355', status=False, flight_id='35', fareclass_id='2')
-        seat356 = Seat(name='Seat356', status=False, flight_id='36', fareclass_id='2')
-        seat357 = Seat(name='Seat357', status=False, flight_id='36', fareclass_id='2')
-        seat358 = Seat(name='Seat358', status=False, flight_id='36', fareclass_id='2')
-        seat359 = Seat(name='Seat359', status=False, flight_id='36', fareclass_id='2')
-        seat360 = Seat(name='Seat360', status=False, flight_id='36', fareclass_id='2')
+        seat181 = Seat(name='Seat01', status=False, flight_id='1', fareclass_id='2')
+        seat182 = Seat(name='Seat02', status=False, flight_id='1', fareclass_id='2')
+        seat183 = Seat(name='Seat03', status=False, flight_id='1', fareclass_id='2')
+        seat184 = Seat(name='Seat04', status=False, flight_id='1', fareclass_id='2')
+        seat185 = Seat(name='Seat05', status=False, flight_id='1', fareclass_id='2')
+        seat186 = Seat(name='Seat01', status=False, flight_id='2', fareclass_id='2')
+        seat187 = Seat(name='Seat02', status=False, flight_id='2', fareclass_id='2')
+        seat188 = Seat(name='Seat03', status=False, flight_id='2', fareclass_id='2')
+        seat189 = Seat(name='Seat04', status=False, flight_id='2', fareclass_id='2')
+        seat190 = Seat(name='Seat05', status=False, flight_id='2', fareclass_id='2')
+        seat191 = Seat(name='Seat01', status=False, flight_id='3', fareclass_id='2')
+        seat192 = Seat(name='Seat02', status=False, flight_id='3', fareclass_id='2')
+        seat193 = Seat(name='Seat03', status=False, flight_id='3', fareclass_id='2')
+        seat194 = Seat(name='Seat04', status=False, flight_id='3', fareclass_id='2')
+        seat195 = Seat(name='Seat05', status=False, flight_id='3', fareclass_id='2')
+        seat196 = Seat(name='Seat01', status=False, flight_id='4', fareclass_id='2')
+        seat197 = Seat(name='Seat02', status=False, flight_id='4', fareclass_id='2')
+        seat198 = Seat(name='Seat03', status=False, flight_id='4', fareclass_id='2')
+        seat199 = Seat(name='Seat04', status=False, flight_id='4', fareclass_id='2')
+        seat200 = Seat(name='Seat05', status=False, flight_id='4', fareclass_id='2')
+        seat201 = Seat(name='Seat01', status=False, flight_id='5', fareclass_id='2')
+        seat202 = Seat(name='Seat02', status=False, flight_id='5', fareclass_id='2')
+        seat203 = Seat(name='Seat03', status=False, flight_id='5', fareclass_id='2')
+        seat204 = Seat(name='Seat04', status=False, flight_id='5', fareclass_id='2')
+        seat205 = Seat(name='Seat05', status=False, flight_id='5', fareclass_id='2')
+        seat206 = Seat(name='Seat01', status=False, flight_id='6', fareclass_id='2')
+        seat207 = Seat(name='Seat02', status=False, flight_id='6', fareclass_id='2')
+        seat208 = Seat(name='Seat03', status=False, flight_id='6', fareclass_id='2')
+        seat209 = Seat(name='Seat04', status=False, flight_id='6', fareclass_id='2')
+        seat210 = Seat(name='Seat05', status=False, flight_id='6', fareclass_id='2')
+        seat211 = Seat(name='Seat01', status=False, flight_id='7', fareclass_id='2')
+        seat212 = Seat(name='Seat02', status=False, flight_id='7', fareclass_id='2')
+        seat213 = Seat(name='Seat03', status=False, flight_id='7', fareclass_id='2')
+        seat214 = Seat(name='Seat04', status=False, flight_id='7', fareclass_id='2')
+        seat215 = Seat(name='Seat05', status=False, flight_id='7', fareclass_id='2')
+        seat216 = Seat(name='Seat01', status=False, flight_id='8', fareclass_id='2')
+        seat217 = Seat(name='Seat02', status=False, flight_id='8', fareclass_id='2')
+        seat218 = Seat(name='Seat03', status=False, flight_id='8', fareclass_id='2')
+        seat219 = Seat(name='Seat04', status=False, flight_id='8', fareclass_id='2')
+        seat220 = Seat(name='Seat05', status=False, flight_id='8', fareclass_id='2')
+        seat221 = Seat(name='Seat01', status=False, flight_id='9', fareclass_id='2')
+        seat222 = Seat(name='Seat02', status=False, flight_id='9', fareclass_id='2')
+        seat223 = Seat(name='Seat03', status=False, flight_id='9', fareclass_id='2')
+        seat224 = Seat(name='Seat04', status=False, flight_id='9', fareclass_id='2')
+        seat225 = Seat(name='Seat05', status=False, flight_id='9', fareclass_id='2')
+        seat226 = Seat(name='Seat01', status=False, flight_id='10', fareclass_id='2')
+        seat227 = Seat(name='Seat02', status=False, flight_id='10', fareclass_id='2')
+        seat228 = Seat(name='Seat03', status=False, flight_id='10', fareclass_id='2')
+        seat229 = Seat(name='Seat04', status=False, flight_id='10', fareclass_id='2')
+        seat230 = Seat(name='Seat05', status=False, flight_id='10', fareclass_id='2')
+        seat231 = Seat(name='Seat01', status=False, flight_id='11', fareclass_id='2')
+        seat232 = Seat(name='Seat02', status=False, flight_id='11', fareclass_id='2')
+        seat233 = Seat(name='Seat03', status=False, flight_id='11', fareclass_id='2')
+        seat234 = Seat(name='Seat04', status=False, flight_id='11', fareclass_id='2')
+        seat235 = Seat(name='Seat05', status=False, flight_id='11', fareclass_id='2')
+        seat236 = Seat(name='Seat01', status=False, flight_id='12', fareclass_id='2')
+        seat237 = Seat(name='Seat02', status=False, flight_id='12', fareclass_id='2')
+        seat238 = Seat(name='Seat03', status=False, flight_id='12', fareclass_id='2')
+        seat239 = Seat(name='Seat04', status=False, flight_id='12', fareclass_id='2')
+        seat240 = Seat(name='Seat05', status=False, flight_id='12', fareclass_id='2')
+        seat241 = Seat(name='Seat01', status=False, flight_id='13', fareclass_id='2')
+        seat242 = Seat(name='Seat02', status=False, flight_id='13', fareclass_id='2')
+        seat243 = Seat(name='Seat03', status=False, flight_id='13', fareclass_id='2')
+        seat244 = Seat(name='Seat04', status=False, flight_id='13', fareclass_id='2')
+        seat245 = Seat(name='Seat05', status=False, flight_id='13', fareclass_id='2')
+        seat246 = Seat(name='Seat01', status=False, flight_id='14', fareclass_id='2')
+        seat247 = Seat(name='Seat02', status=False, flight_id='14', fareclass_id='2')
+        seat248 = Seat(name='Seat03', status=False, flight_id='14', fareclass_id='2')
+        seat249 = Seat(name='Seat04', status=False, flight_id='14', fareclass_id='2')
+        seat250 = Seat(name='Seat05', status=False, flight_id='14', fareclass_id='2')
+        seat251 = Seat(name='Seat01', status=False, flight_id='15', fareclass_id='2')
+        seat252 = Seat(name='Seat02', status=False, flight_id='15', fareclass_id='2')
+        seat253 = Seat(name='Seat03', status=False, flight_id='15', fareclass_id='2')
+        seat254 = Seat(name='Seat04', status=False, flight_id='15', fareclass_id='2')
+        seat255 = Seat(name='Seat05', status=False, flight_id='15', fareclass_id='2')
+        seat256 = Seat(name='Seat01', status=False, flight_id='16', fareclass_id='2')
+        seat257 = Seat(name='Seat02', status=False, flight_id='16', fareclass_id='2')
+        seat258 = Seat(name='Seat03', status=False, flight_id='16', fareclass_id='2')
+        seat259 = Seat(name='Seat04', status=False, flight_id='16', fareclass_id='2')
+        seat260 = Seat(name='Seat05', status=False, flight_id='16', fareclass_id='2')
+        seat261 = Seat(name='Seat01', status=False, flight_id='17', fareclass_id='2')
+        seat262 = Seat(name='Seat02', status=False, flight_id='17', fareclass_id='2')
+        seat263 = Seat(name='Seat03', status=False, flight_id='17', fareclass_id='2')
+        seat264 = Seat(name='Seat04', status=False, flight_id='17', fareclass_id='2')
+        seat265 = Seat(name='Seat05', status=False, flight_id='17', fareclass_id='2')
+        seat266 = Seat(name='Seat01', status=False, flight_id='18', fareclass_id='2')
+        seat267 = Seat(name='Seat02', status=False, flight_id='18', fareclass_id='2')
+        seat268 = Seat(name='Seat03', status=False, flight_id='18', fareclass_id='2')
+        seat269 = Seat(name='Seat04', status=False, flight_id='18', fareclass_id='2')
+        seat270 = Seat(name='Seat05', status=False, flight_id='18', fareclass_id='2')
+        seat271 = Seat(name='Seat01', status=False, flight_id='19', fareclass_id='2')
+        seat272 = Seat(name='Seat02', status=False, flight_id='19', fareclass_id='2')
+        seat273 = Seat(name='Seat03', status=False, flight_id='19', fareclass_id='2')
+        seat274 = Seat(name='Seat04', status=False, flight_id='19', fareclass_id='2')
+        seat275 = Seat(name='Seat05', status=False, flight_id='19', fareclass_id='2')
+        seat276 = Seat(name='Seat01', status=False, flight_id='20', fareclass_id='2')
+        seat277 = Seat(name='Seat02', status=False, flight_id='20', fareclass_id='2')
+        seat278 = Seat(name='Seat03', status=False, flight_id='20', fareclass_id='2')
+        seat279 = Seat(name='Seat04', status=False, flight_id='20', fareclass_id='2')
+        seat280 = Seat(name='Seat05', status=False, flight_id='20', fareclass_id='2')
+        seat281 = Seat(name='Seat01', status=False, flight_id='21', fareclass_id='2')
+        seat282 = Seat(name='Seat02', status=False, flight_id='21', fareclass_id='2')
+        seat283 = Seat(name='Seat03', status=False, flight_id='21', fareclass_id='2')
+        seat284 = Seat(name='Seat04', status=False, flight_id='21', fareclass_id='2')
+        seat285 = Seat(name='Seat05', status=False, flight_id='21', fareclass_id='2')
+        seat286 = Seat(name='Seat01', status=False, flight_id='22', fareclass_id='2')
+        seat287 = Seat(name='Seat02', status=False, flight_id='22', fareclass_id='2')
+        seat288 = Seat(name='Seat03', status=False, flight_id='22', fareclass_id='2')
+        seat289 = Seat(name='Seat04', status=False, flight_id='22', fareclass_id='2')
+        seat290 = Seat(name='Seat05', status=False, flight_id='22', fareclass_id='2')
+        seat291 = Seat(name='Seat01', status=False, flight_id='23', fareclass_id='2')
+        seat292 = Seat(name='Seat02', status=False, flight_id='23', fareclass_id='2')
+        seat293 = Seat(name='Seat03', status=False, flight_id='23', fareclass_id='2')
+        seat294 = Seat(name='Seat04', status=False, flight_id='23', fareclass_id='2')
+        seat295 = Seat(name='Seat05', status=False, flight_id='23', fareclass_id='2')
+        seat296 = Seat(name='Seat01', status=False, flight_id='24', fareclass_id='2')
+        seat297 = Seat(name='Seat02', status=False, flight_id='24', fareclass_id='2')
+        seat298 = Seat(name='Seat03', status=False, flight_id='24', fareclass_id='2')
+        seat299 = Seat(name='Seat04', status=False, flight_id='24', fareclass_id='2')
+        seat300 = Seat(name='Seat05', status=False, flight_id='24', fareclass_id='2')
+        seat301 = Seat(name='Seat01', status=False, flight_id='25', fareclass_id='2')
+        seat302 = Seat(name='Seat02', status=False, flight_id='25', fareclass_id='2')
+        seat303 = Seat(name='Seat03', status=False, flight_id='25', fareclass_id='2')
+        seat304 = Seat(name='Seat04', status=False, flight_id='25', fareclass_id='2')
+        seat305 = Seat(name='Seat05', status=False, flight_id='25', fareclass_id='2')
+        seat306 = Seat(name='Seat01', status=False, flight_id='26', fareclass_id='2')
+        seat307 = Seat(name='Seat02', status=False, flight_id='26', fareclass_id='2')
+        seat308 = Seat(name='Seat03', status=False, flight_id='26', fareclass_id='2')
+        seat309 = Seat(name='Seat04', status=False, flight_id='26', fareclass_id='2')
+        seat310 = Seat(name='Seat05', status=False, flight_id='26', fareclass_id='2')
+        seat311 = Seat(name='Seat01', status=False, flight_id='27', fareclass_id='2')
+        seat312 = Seat(name='Seat02', status=False, flight_id='27', fareclass_id='2')
+        seat313 = Seat(name='Seat03', status=False, flight_id='27', fareclass_id='2')
+        seat314 = Seat(name='Seat04', status=False, flight_id='27', fareclass_id='2')
+        seat315 = Seat(name='Seat05', status=False, flight_id='27', fareclass_id='2')
+        seat316 = Seat(name='Seat01', status=False, flight_id='28', fareclass_id='2')
+        seat317 = Seat(name='Seat02', status=False, flight_id='28', fareclass_id='2')
+        seat318 = Seat(name='Seat03', status=False, flight_id='28', fareclass_id='2')
+        seat319 = Seat(name='Seat04', status=False, flight_id='28', fareclass_id='2')
+        seat320 = Seat(name='Seat05', status=False, flight_id='28', fareclass_id='2')
+        seat321 = Seat(name='Seat01', status=False, flight_id='29', fareclass_id='2')
+        seat322 = Seat(name='Seat02', status=False, flight_id='29', fareclass_id='2')
+        seat323 = Seat(name='Seat03', status=False, flight_id='29', fareclass_id='2')
+        seat324 = Seat(name='Seat04', status=False, flight_id='29', fareclass_id='2')
+        seat325 = Seat(name='Seat05', status=False, flight_id='29', fareclass_id='2')
+        seat326 = Seat(name='Seat01', status=False, flight_id='30', fareclass_id='2')
+        seat327 = Seat(name='Seat02', status=False, flight_id='30', fareclass_id='2')
+        seat328 = Seat(name='Seat03', status=False, flight_id='30', fareclass_id='2')
+        seat329 = Seat(name='Seat04', status=False, flight_id='30', fareclass_id='2')
+        seat330 = Seat(name='Seat05', status=False, flight_id='30', fareclass_id='2')
         db.session.add_all([
             seat181, seat182, seat183, seat184, seat185,
             seat186, seat187, seat188, seat189, seat190,
@@ -926,19 +846,94 @@ if __name__ == "__main__":
             seat316, seat317, seat318, seat319, seat320,
             seat321, seat322, seat323, seat324, seat325,
             seat326, seat327, seat328, seat329, seat330,
-            seat331, seat332, seat333, seat334, seat335,
-            seat336, seat337, seat338, seat339, seat340,
-            seat341, seat342, seat343, seat344, seat345,
-            seat346, seat347, seat348, seat349, seat350,
-            seat351, seat352, seat353, seat354, seat355,
-            seat356, seat357, seat358, seat359, seat360
         ])
         db.session.commit()
+
+
+
+        # CHUYEN BAY THANG 10
+        flight31 = Flight(name='Hà Nội(HAN) - Phú Yên(UIH)', take_of_time=datetime(2024, 10, 15, 11, 00, 00),
+                          landing_time=datetime(2024, 10, 27, 23, 00, 00),
+                          first_seat_quantity=rule1.value, second_seat_quantity=rule2.value, plane_id='1',
+                          route_id='1')
+        db.session.add(flight31)
+        db.session.commit()
+        # CHO NGOI CUA CHUYEN BAY THANG 10,STATUS = TRUE CHO NHUNG VE DUOC DAT
+        seat151 = Seat(name='Seat01', status=True, flight_id='31', fareclass_id='1')
+        seat152 = Seat(name='Seat02', status=True, flight_id='31', fareclass_id='1')
+        seat153 = Seat(name='Seat03', status=True, flight_id='31', fareclass_id='1')
+        seat154 = Seat(name='Seat04', status=False, flight_id='31', fareclass_id='1')
+        seat155 = Seat(name='Seat05', status=False, flight_id='31', fareclass_id='1')
+        seat331 = Seat(name='Seat01', status=True, flight_id='31', fareclass_id='2')
+        seat332 = Seat(name='Seat02', status=True, flight_id='31', fareclass_id='2')
+        seat333 = Seat(name='Seat03', status=False, flight_id='31', fareclass_id='2')
+        seat334 = Seat(name='Seat04', status=False, flight_id='31', fareclass_id='2')
+        seat335 = Seat(name='Seat05', status=False, flight_id='31', fareclass_id='2')
+        db.session.add_all([ seat151,seat152,seat153,seat154,seat155,seat331,seat332,seat333,seat334,seat335])
+        db.session.commit()
+        # VE CUA THANG 10
+        ticket1 = Ticket(customer_id='1', flight_id='31', seat_id='301', created_date=datetime(2024, 10, 1, 11, 00, 00))
+        ticket2 = Ticket(customer_id='2', flight_id='31', seat_id='302', created_date=datetime(2024, 10, 1, 11, 00, 00))
+        ticket3 = Ticket(customer_id='3', flight_id='31', seat_id='303', created_date=datetime(2024, 10, 1, 11, 00, 00))
+        ticket4 = Ticket(customer_id='4', flight_id='31', seat_id='306', created_date=datetime(2024, 10, 1, 11, 00, 00))
+        ticket5 = Ticket(customer_id='5', flight_id='31', seat_id='307', created_date=datetime(2024, 10, 1, 11, 00, 00))
+        db.session.add_all([ticket1,ticket2,ticket3,ticket4,ticket5])
+        db.session.commit()
+        # CHUYEN BAY THANG 11
+        flight32 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 11, 15, 11, 00, 00),
+                          landing_time=datetime(2024, 11, 27, 23, 00, 00),
+                          first_seat_quantity=rule1.value, second_seat_quantity=rule2.value, plane_id='1', route_id='2')
+        db.session.add(flight32)
+        db.session.commit()
+        # CHO NGOI CUA CHUYEN BAY THANG 11,STATUS = TRUE CHO NHUNG VE DUOC DAT
+        seat156 = Seat(name='Seat01', status=False, flight_id='32', fareclass_id='1')
+        seat157 = Seat(name='Seat02', status=True, flight_id='32', fareclass_id='1')
+        seat158 = Seat(name='Seat03', status=True, flight_id='32', fareclass_id='1')
+        seat159 = Seat(name='Seat04', status=False, flight_id='32', fareclass_id='1')
+        seat160 = Seat(name='Seat05', status=False, flight_id='32', fareclass_id='1')
+        seat336 = Seat(name='Seat01', status=True, flight_id='32', fareclass_id='2')
+        seat337 = Seat(name='Seat02', status=True, flight_id='32', fareclass_id='2')
+        seat338 = Seat(name='Seat03', status=True, flight_id='32', fareclass_id='2')
+        seat339 = Seat(name='Seat04', status=False, flight_id='32', fareclass_id='2')
+        seat340 = Seat(name='Seat05', status=False, flight_id='32', fareclass_id='2')
+        db.session.add_all([seat156, seat157, seat158, seat159, seat160, seat336, seat337, seat338, seat339, seat340])
+        db.session.commit()
+        # VE CUA THANG 11
+        ticket9 = Ticket(customer_id='1', flight_id='32', seat_id='312', created_date=datetime(2024, 11, 1, 11, 00, 00))
+        ticket10 = Ticket(customer_id='2', flight_id='32', seat_id='313', created_date=datetime(2024, 11, 1, 11, 00, 00))
+        ticket11 = Ticket(customer_id='3', flight_id='32', seat_id='316', created_date=datetime(2024, 11, 1, 11, 00, 00))
+        ticket12 = Ticket(customer_id='4', flight_id='32', seat_id='317', created_date=datetime(2024, 11, 1, 11, 00, 00))
+        ticket13 = Ticket(customer_id='5', flight_id='32', seat_id='318', created_date=datetime(2024, 11, 1, 11, 00, 00))
+        db.session.add_all([ticket9, ticket10, ticket11, ticket12, ticket13])
+        db.session.commit()
         #
-        # db.session.add_all([ticket1,ticket2,ticket3,ticket4,ticket5,
-        #                     ticket6,ticket7,ticket8,ticket9,ticket10,
-        #                     ticket11,ticket12,ticket13,ticket14,ticket15,
-        #                     ticket16,ticket17,ticket18,ticket19,ticket20,
-        #                     ticket21,ticket22,ticket23,ticket24,ticket25,ticket26])
-        #
-        # db.session.commit()
+        # CHUYEN BAY THANG 8
+        flight33 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 8, 15, 11, 00, 00),
+                          landing_time=datetime(2024, 8, 27, 23, 00, 00),
+                          first_seat_quantity=rule1.value, second_seat_quantity=rule2.value, plane_id='1', route_id='13')
+        db.session.add(flight33)
+        db.session.commit()
+        # CHO NGOI CUA CHUYEN BAY THANG 8,STATUS = TRUE CHO NHUNG VE DUOC DAT
+        seat161 = Seat(name='Seat01', status=True, flight_id='33', fareclass_id='1')
+        seat162 = Seat(name='Seat02', status=True, flight_id='33', fareclass_id='1')
+        seat163 = Seat(name='Seat03', status=True, flight_id='33', fareclass_id='1')
+        seat164 = Seat(name='Seat04', status=True, flight_id='33', fareclass_id='1')
+        seat165 = Seat(name='Seat05', status=False, flight_id='33', fareclass_id='1')
+        seat341 = Seat(name='Seat341', status=False, flight_id='33', fareclass_id='2')
+        seat342 = Seat(name='Seat342', status=False, flight_id='33', fareclass_id='2')
+        seat343 = Seat(name='Seat343', status=True, flight_id='33', fareclass_id='2')
+        seat344 = Seat(name='Seat344', status=False, flight_id='33', fareclass_id='2')
+        seat345 = Seat(name='Seat345', status=False, flight_id='33', fareclass_id='2')
+        db.session.add_all([seat161, seat162, seat163, seat164, seat165, seat341, seat342, seat343, seat344, seat345])
+        db.session.commit()
+        # VE CUA THANG 8
+        ticket17 = Ticket(customer_id='1', flight_id='33', seat_id='321', created_date=datetime(2024, 8, 1, 11, 00, 00))
+        ticket18 = Ticket(customer_id='2', flight_id='33', seat_id='322', created_date=datetime(2024, 8, 1, 11, 00, 00))
+        ticket19 = Ticket(customer_id='3', flight_id='33', seat_id='323', created_date=datetime(2024, 8, 1, 11, 00, 00))
+        ticket20 = Ticket(customer_id='4', flight_id='33', seat_id='324', created_date=datetime(2024, 8, 1, 11, 00, 00))
+        ticket21 = Ticket(customer_id='5', flight_id='33', seat_id='328',created_date=datetime(2024, 8, 1, 11, 00, 00))
+        db.session.add_all([ticket17, ticket18, ticket19, ticket20, ticket21])
+        db.session.commit()
+
+
+

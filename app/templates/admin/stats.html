@@ -12,14 +12,10 @@
             </tr>
             {% for s in stats %}
             <tr>
-                <td>{{ s[0] }}</td>
-                <td>{{ s[1] }}</td>
+                <td>{{ s['id'] }}</td>
+                <td>{{ s['name'] }}</td>
                 <td>
-                    {% if s[2] %}
-                    {{ "{:,.1f}".format(s[2]) }} VNĐ
-                    {% else %}
-                    0 VNĐ
-                    {% endif %}
+                    {{ "{:,.0f}".format(s['total_revenue']) }} VNĐ
                 </td>
             </tr>
             {% endfor %}
@@ -41,33 +37,7 @@
         <canvas id="myChart"></canvas>
     </div>
 </div>
-<div class="row">
-    <div class="col-md-6 col-12">
-        <table class="table">
-            <tr>
-                <th>Tháng</th>
-                <th>Doanh thu</th>
-            </tr>
 
-            {% for s in months_stats %}
-            <tr>
-                <td>{{s[0]}}</td>
-                <td>{{ "{:,.1f}".format(s[1]) }} VNĐ</td>
-            </tr>
-            {% endfor %}
-
-        </table>
-    </div>
-    <div class="col-md-6 col-12">
-        <form>
-            <div class="form-group">
-                <input type="number" min="2000" name="year" class="form-control" placeholder="Nhập năm...">
-                <input type="submit" value="Thống kê" class="btn btn-primary">
-            </div>
-        </form>
-        <canvas id="productMonthChartId"></canvas>
-    </div>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     let labels = [], labels2=[]
@@ -77,9 +47,9 @@
     let r,g,b;
 
     {% for s in stats %}
-    {% if s[2] %}
-    labels.push('{{ s[1] }}')
-    data.push('{{ s[2] }}')
+    {% if s['total_revenue'] %}
+    labels.push( '{{ s['name'] }}');  // Giả sử id là số
+    data.push({{ s['total_revenue'] }});
 
     r = parseInt(Math.random() * 255 )
     g = parseInt(Math.random() * 255 )
@@ -91,8 +61,8 @@
     {% endfor %}
 
     {% for s in months_stats %}
-    labels2.push({{ s[0] }})
-    data2.push('{{ s[1] }}')
+    labels2.push('{{ s['name'] }}')
+    data2.push({{s['total_revenue']}})
 
     r = parseInt(Math.random() * 255 )
     g = parseInt(Math.random() * 255 )
@@ -104,9 +74,9 @@
 
     window.onload = function(){
         let contx = document.getElementById('myChart').getContext('2d');
-        let contx2 = document.getElementById('productMonthChartId').getContext('2d');
+<!--        let contx2 = document.getElementById('productMonthChartId').getContext('2d');-->
         loadChart(contx,labels,data,'bar',colors,borderColors)
-        loadChart(contx2,labels2,data2,'line',colors2,borderColors2)
+<!--        loadChart(contx2,labels2,data2,'line',colors2,borderColors2)-->
     }
 
     function loadChart(ctx,labels,data,type,color,borderColors){

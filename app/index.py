@@ -165,7 +165,12 @@ def my_info():
 @app.route('/my_booked_tickets')
 def my_tickets():
     user_id = request.args.get('user_id')
-    tickets = dao.load_tickets(userid=user_id)
+    customer = dao.get_customer_by_id(id=user_id)
+    if customer:
+        print(f"yes")
+    else :
+        print('No cus')
+    tickets = dao.load_tickets(customerid=customer.__getattribute__('id'))
     seats = dao.load_seats()
     flights = dao.load_flights()
     routes  = dao.load_route()
@@ -238,7 +243,7 @@ def load_user(user_id):
 @app.route('/payment', methods=['GET', 'POST'])
 def payment_comfirm_page():
     flight_id = request.form.get('flightid')
-    customer_id = request.form.get('customerid')
+    user_id = request.form.get('userid')
     fareclass_id = request.form.get('fareclassid')
     quantity = int(request.form.get('ticket-quantity'))
     plane_id = request.form.get('plane')
@@ -246,14 +251,13 @@ def payment_comfirm_page():
     second_seats_avail = int(request.form.get('second_seats_avail'))
     # takeofftime = request.form.get('takeofftime')
     # landingtime = request.form.get('landingtime')
-
     fareclass_price = dao.get_price(id=fareclass_id)
     fareclass_name = dao.get_name_by_id(model=FareClass, id=fareclass_id)
-    customer_name = dao.get_name_by_id(User, id=customer_id)
+    customer_name = dao.get_name_by_id(User, id=user_id)
     plane_name = dao.get_name_by_id(Plane, id=plane_id)
 
     flight = Flight(id=flight_id)
-    customer = Customer(user_id=customer_id)
+    customer = Customer(user_id=user_id)
     fareclass = FareClass(id=fareclass_id)
     valid_time = utils.check_valid_time(flightid=flight_id)
     if not valid_time:
@@ -267,17 +271,17 @@ def payment_comfirm_page():
         seat_class_name = dao.get_name_by_id(model=FareClass,id=fareclass_id)
         flash(message=f"Không còn đủ chỗ trống cho {seat_class_name}.", category="Thông báo")
         return redirect('/bookticket')
-    booked_ticket = utils.checkduplicate_ticket(flightid=flight_id, customer_id=customer_id)
+    booked_ticket = utils.checkduplicate_ticket(flightid=flight_id, customer_id=user_id)
     if booked_ticket:
         flash(message="Bạn đã đặt vé cho chuyến bay này.",category="Thông báo")
         return redirect('/bookticket')
-    booked_flightid = check_pending_flighttime(flightid=flight_id, customerid=customer_id)
+    booked_flightid = check_pending_flighttime(flightid=flight_id, customerid=user_id)
     if booked_flightid:
         session['flightid_booked'] = booked_flightid
         flash(message="Bạn đã có chuyến bay đang chờ.",category="Thông báo")
         return redirect('/bookticket')
     ticket_info = {
-        'order_id': f"ticket-{customer_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+        'order_id': f"ticket-{user_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
         "flightid": flight.to_dict(),
         "customerid": customer.to_dict(),
         "customername":customer_name,
@@ -288,8 +292,8 @@ def payment_comfirm_page():
     }
     session['ticket_info'] = ticket_info
     seats = utils.get_seat_by_quantity(quantity=quantity, flightid=flight_id,fareclassid=fareclass_id)
-    return render_template('payment.html', seats=seats, quantity=quantity, price=fareclass_price,
-                               cus_name=customer_name,
+    return render_template('payment.html', quantity=quantity, price=fareclass_price,
+                               cus_name=customer_name,seats=seats,
                                fareclass_name=fareclass_name, plane_name=plane_name)
 
 
@@ -458,7 +462,9 @@ def get_airports_by_route(route_id):
     })
 
 
-
+@app.context_processor
+def inject_user_role_enum():
+    return dict(UserRoleEnum=UserRoleEnum)
 
 if __name__ == '__main__':
     from app import admin
