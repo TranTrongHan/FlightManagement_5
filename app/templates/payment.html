@@ -9,6 +9,7 @@
             {% for seat in seats %}
             <div>
                 <p>Mã ghế ngồi : <span>{{seat.id}}</span></p>
+
             </div>
             <div>
                 <p>Mã chuyến bay : <span>{{session.get("ticket_info").get("flightid").get("id")}}</span></p>
@@ -36,9 +37,9 @@
                 </h3>
             </div>
             <div class="row">
-                <form action="/payment_process" method="post">
-                    <div class="col-3 mt-3">
-                        <input type="submit" value="Thanh toan" class="btn btn-danger" >
+                <form class="col-3 mt-3" action="/payment_process" method="post">
+                    <div >
+                        <input type="submit" value="Thanh toán" class="btn btn-danger" onclick="addTicket()" >
                     </div>
                 </form>
 
@@ -50,6 +51,6 @@
     {% endif %}
 
 </div>
-<script src="{{url_for('static',filename='js/bookticket.js')}}"></script>
+<script src="{{url_for('static',filename='js/ticket.js')}}"></script>
 
 {% endblock %}

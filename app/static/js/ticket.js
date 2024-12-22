@@ -28,5 +28,38 @@ function view_ticket_info(flightid,customerid,fareclassid,quantity,plane){
         }
     })
 }
+async function addTicket(ticketInfo) {
+    const response = await fetch('/api/add-ticket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            idTicket: ticketInfo.id,
+            seatId: ticketInfo.seatId
+        })
+    });
 
+    if (response.ok) {
+        const data = await response.json();
+        console.log(data.message); // "Ticket added to session"
+    } else {
+        console.error('Error adding ticket:', response.statusText);
+    }
+}
+
+function deleteTicket(ticketId) {
+        alert('hi');
+        console.log('ticketId:', ticketId);
+
+        fetch('/api/delete-ticket/' + ticketId,{
+            method:'delete',
+            headers:{
+                'Content-Type':'application/json'
+            }
+        }).then(res => res.json()).then(data =>{
+            let e = document.getElementById("ticket" + ticketId)
+            e.style.display = 'none'
+        }).catch(err => console.error(err))
+}
 

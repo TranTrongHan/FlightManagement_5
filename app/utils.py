@@ -1,9 +1,9 @@
 from random import choice
 from flask_mail import Message
 from flask import session
-from six import print_
+
 from sqlalchemy import func, case, distinct
-from sqlalchemy.orm import aliased
+
 from sqlalchemy.sql import extract
 from datetime import datetime, timedelta
 from app import dao, db, app, mail
@@ -27,16 +27,14 @@ def get_seat_by_quantity(quantity, flightid, fareclassid=None):
                     "flightid": int(rand_seat.flight_id)
                 }
                 db.session.commit()
-
             elif not seats:
                 return selected_seats
         session['seats'] = seatinfo
         return selected_seats
 
 
+
 def add_ticket(ticket_info):
-
-
     selected_seats = session.get('seats')
     flight_dict = ticket_info.get('flightid')
     flight_obj = Flight.from_dict(flight_dict)
@@ -54,12 +52,13 @@ def add_ticket(ticket_info):
     flight_obj = existing_flight
     fareclass_obj = existing_fareclass
 
-    tickets = []
+
     for seat in selected_seats.values():
         seat_obj = dao.get_seat_by_id(id=seat['id'])
         ticket = Ticket(customer=customer_obj, flight=flight_obj, seat=seat_obj, created_date=datetime.now())
         db.session.add(ticket)
-        tickets.append(ticket)
+
+
     db.session.commit()
 
 

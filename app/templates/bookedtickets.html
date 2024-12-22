@@ -12,10 +12,11 @@
             <th>Chuyến bay</th>
             <th>Chỗ ngồi</th>
             <th>Ngày đặt vé</th>
+            <th></th>
         </tr>
         {% for ticket in tickets %}
-        <tr>
-            <td>{{ticket.id}}</td>
+        <tr id="ticket{{ticket.id}}">
+            <td class="ticketId">{{ticket.id}}</td>
             {% for fareclass in fareclass %}
             {% for seat in seats %}
             {% if ticket.seat_id == seat.id and seat.fareclass_id == fareclass.id %}
@@ -40,10 +41,14 @@
 
             {% for seat in seats %}
             {% if ticket.seat_id == seat.id %}
-            <td> {{seat.name}}</td>
+            <td > {{seat.name}}</td>
+            {% set seatId = seat.id %}
             {% endif %}
             {% endfor %}
             <td>{{ticket.created_date}}</td>
+            <td>
+                <input type="hidden" class="seatIdHidden" value="{{ ticket.seat_id }}">
+            </td>
         </tr>
         {% endfor %}
     </table>
@@ -55,5 +60,5 @@
 {% else %}
 <h1 class="text-danger text-center">BẠN CHƯA ĐĂNG NHẬP</h1>
 {% endif %}
-
+<script src="static/js/ticket.js"></script>
 {% endblock %}

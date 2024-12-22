@@ -7,7 +7,7 @@ import dao, utils
 from app import app, login, VNPAY_CONFIG,dao
 from flask_login import login_user, logout_user, login_required
 from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User, MidAirport, FlightSchedule, Route, \
-    Airport, Staff
+    Airport, Staff, Ticket
 from app.utils import check_pending_flighttime
 from dao import db
 
@@ -166,10 +166,6 @@ def my_info():
 def my_tickets():
     user_id = request.args.get('user_id')
     customer = dao.get_customer_by_id(id=user_id)
-    if customer:
-        print(f"yes")
-    else :
-        print('No cus')
     tickets = dao.load_tickets(customerid=customer.__getattribute__('id'))
     seats = dao.load_seats()
     flights = dao.load_flights()
@@ -336,11 +332,6 @@ def vnpay_return():
         flash(message="Đặt vé thành công", category="Thông báo")
     return redirect('/')
 
-
-@app.route('/api/checkavailseat', methods=['POST'])
-@login_required
-def checkavailseat():
-    pass
 
 
 @app.route('/create_flight_schedule', methods=['GET', 'POST'])
