@@ -11,14 +11,10 @@ class UserRoleEnum(RoleEnum):
     CUSTOMER = 1
     STAFF = 2
     ADMIN = 3
-
-
 class AirportRole(RoleEnum):
     DEPARTURE = 1
     ARRIVAL = 2
     INTERMEDIATE = 3
-
-
 class User(db.Model, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     # last_name = Column(String(50), nullable=False)
@@ -82,13 +78,13 @@ class Plane(db.Model):
     def __str__(self):
         return self.name
 
+
 #####################################
 class Airport(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(100), nullable=False, unique=True)
-    take_off_airport = relationship("Route", foreign_keys="Route.take_off_airport_id", backref="takeoff_airport")
-    landing_airport = relationship("Route", foreign_keys="Route.landing_airport_id", backref="landing_airport_ref")
-    flights = relationship("MidAirport", backref="airport", lazy=True)
+    id = Column(Integer,primary_key=True,autoincrement=True)
+    name = Column(String(100), nullable=False)
+    takeoff_airport = relationship("Route",foreign_keys='Route.take_off_airport_id', backref="takeoff_airport",lazy=True)
+    landing_airport = relationship("Route",foreign_keys='Route.landing_airport_id', backref="landing_airport",lazy=True)
 
     def __str__(self):
         return self.name
@@ -112,13 +108,10 @@ class Flight(db.Model):
     landing_time = Column(DateTime, nullable=True)
     first_seat_quantity = Column(Integer,nullable=False)
     second_seat_quantity = Column(Integer,nullable=False)
-    mid_airports = relationship("MidAirport", backref="flight", lazy=True)
-    ticket = relationship("Ticket", backref="flight", lazy=True)
     plane_id = Column(Integer, ForeignKey(Plane.id), nullable=False)
     route_id = Column(Integer, ForeignKey(Route.id), nullable=False)
-    flight_schedule_id = relationship("FlightSchedule", uselist=False)
-    seats =  relationship("Seat",backref = "flight",lazy=True)
-
+    mid_airport = relationship("MidAirport",backref="flight",lazy=True)
+    ticket = relationship("Ticket", backref="flight", lazy=True)
     def __str__(self):
         return self.name
 
@@ -133,13 +126,13 @@ class Flight(db.Model):
             id=data['id'],
         )
 
-#####################################
-class MidAirport(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    stop_time = Column(Float(), nullable=False)
-    note = Column(String(255), nullable=True)
-    mid_airport_id = Column(Integer, ForeignKey(Airport.id), nullable=False, primary_key=True)
-    flight_id = Column(Integer, ForeignKey(Flight.id), nullable=False, primary_key=True)
+class MidAirport(Airport):
+    mid_airport_id = Column(Integer,primary_key=True,autoincrement=True)
+    airport_id = Column(Integer,ForeignKey(Airport.id),nullable=True)
+    flight_id = Column(Integer,ForeignKey(Flight.id),nullable=False)
+    stop_time = Column(Float,nullable=True)
+    note = Column(String(200),nullable=True)
+
 
 class Rule(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -346,7 +339,7 @@ if __name__ == "__main__":
                          landing_time=datetime(2024, 12, 27, 23, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='3')
         flight14 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
-                         landing_time=datetime(2024, 12, 18, 11, 00, 00),
+                         landing_time=datetime(2024, 12, 27, 11, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='3')
         flight15 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 29, 23, 00, 00),
                          landing_time=datetime(2024, 12, 1, 12, 00, 00),
@@ -427,9 +420,9 @@ if __name__ == "__main__":
         db.session.commit()
 
 
-        mid_airport1 = MidAirport(stop_time=rule3.value, note='Dừng x giờ', mid_airport_id='5', flight_id='1')
-        mid_airport2 = MidAirport(stop_time=rule3.value, note='Dừng x giờ', mid_airport_id='6', flight_id='2')
-        db.session.add_all([mid_airport1, mid_airport2])
+        mid_airport1 = MidAirport(name='Sân bay Nội Bài (HAN)',airport_id='1', flight_id='1',stop_time=rule3.value, note='Dừng x giờ')
+        # mid_airport2 = MidAirport(name='Sân bay Nội Bài (HAN)',stop_time=rule3.value, note='Dừng x giờ', mid_airport_id='6', flight_id='2')
+        db.session.add_all([mid_airport1])
         db.session.commit()
 
         flight_schedule1 = FlightSchedule(staff_id='1', flight_id='2')

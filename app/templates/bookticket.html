@@ -88,10 +88,10 @@
             </div>
 
             <!-- Thời gian về -->
-            <div class="col-md-5 mb-3">
-                <label for="returnTime" class="fs-4 text-danger fw-bold">Thời gian về:</label>
-                <input id="returnTime" class="form-control form-control-lg" type="date" name="returnTime">
-            </div>
+<!--            <div class="col-md-5 mb-3">-->
+<!--                <label for="returnTime" class="fs-4 text-danger fw-bold">Thời gian về:</label>-->
+<!--                <input id="returnTime" class="form-control form-control-lg" type="date" name="returnTime">-->
+<!--            </div>-->
         </div>
 
         <hr class="my-4">
@@ -132,7 +132,7 @@
                         <td>{{flight.take_of_time}}</td>
                         <td>{{flight.landing_time}}</td>
                         <td>
-                            <a href="/bookticket_process?route={{ route.id }}&flight={{flight.id}}&flight_name={{flight.name}}&user={{current_user.id}}&takeoff_time={{flight.take_of_time}}&landing_time={{flight.landing_time}}&plane={{flight.plane_id}}"
+                            <a href="/bookticket_process?route={{ route.id }}&flight={{flight.id}}&flight_name={{flight.name}}&user={{current_user.id}}&takeoff_time={{flight.take_of_time}}&plane={{flight.plane_id}}"
                                class="btn btn-primary btn-sm fw-bold">Đặt vé</a>
                         </td>
                     </tr>

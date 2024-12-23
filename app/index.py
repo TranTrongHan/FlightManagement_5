@@ -192,15 +192,13 @@ def bookticket():
         # lấy danh sách chuyến bay có nơi đi, nơi đến theo yêu cầu
         route = dao.load_specific_routes(takeoffId=takeoff_airport1, landingairportId=landing_airport1)
 
-        if utils.check_valid_date(depart_time=departure_time, return_time=return_time):
-            flights = dao.load_flights(depart_time=departure_time)
-            planes = dao.load_plane()
-            return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
-                                   airports=airportsID, route=route, flights=flights, planes=planes,
-                                   fareclass=fareclass)
-        else:
-            flash(message="Thời gian về phải cách ít nhất 1 ngày",category="Thông báo")
-            return redirect('/bookticket')
+
+        flights = dao.load_flights(depart_time=departure_time)
+        planes = dao.load_plane()
+        return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
+                               airports=airportsID, route=route, flights=flights, planes=planes,
+                               fareclass=fareclass)
+
 
     return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
                            airports=airportsID, fareclass=fareclass)
@@ -230,11 +228,9 @@ def bookticket_process():
                            second_seats_avail= second_seats_avail)
 
 
-
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
-
 
 @app.route('/payment', methods=['GET', 'POST'])
 def payment_comfirm_page():

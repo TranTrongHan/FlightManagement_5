@@ -28,14 +28,14 @@ class LogoutView(AuthenticatedBaseView):
         logout_user()
         return redirect('/admin')
 
-
 class FlightView(AuthenticatedView):
-
-    column_searchable_list = ['name']
+    column_list = ['id','name','take_of_time','route_id','plane_id']
 
 class RouteView(AuthenticatedView):
-    column_list = ['name','flights','take_off_airport_id','landing_airport_id']
+    column_list = ['id','name','flights','take_off_airport_id','landing_airport_id']
 
+class AiportView(AuthenticatedView):
+    column_list = ['id','name']
 class StatsView(AuthenticatedBaseView):
     @expose("/")
     def __index__(self):
@@ -58,15 +58,12 @@ class FrequencyStats(AuthenticatedBaseView):
                            monthly_stats = utils.route_month_stats(year=year,month=month))
 
 
-
 admin.add_view(FlightView(Flight,db.session))
 admin.add_view(RouteView(Route,db.session))
-admin.add_view(AuthenticatedView(Rule,db.session))
-admin.add_view(AuthenticatedView(User,db.session))
-admin.add_view(AuthenticatedView(Plane,db.session))
-admin.add_view(AuthenticatedView(Airport,db.session))
+admin.add_view(AiportView(Airport,db.session))
+admin.add_view(StatsView(name='Thống kê'))
+admin.add_view(FrequencyStats(name='Thống kê tần suất'))
 admin.add_view(LogoutView(name="Đăng xuất"))
-admin.add_view(StatsView(name="Thống kê"))
-admin.add_view(FrequencyStats(name="Thống kê tần suất"))
+
 
 

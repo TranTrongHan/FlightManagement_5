@@ -41,16 +41,14 @@ def add_ticket(ticket_info):
 
     customer_dict = ticket_info.get('customerid')
     customer_obj = Customer.from_dict(customer_dict)
-    fareclass_dict = ticket_info.get('fareclassid')
-    fareclass_obj = FareClass.from_dict(fareclass_dict)
+
 
     existing_customer = db.session.query(Customer).filter_by(user_id=customer_obj.user_id).first()
     existing_flight = db.session.query(Flight).filter_by(id=flight_obj.id).first()
-    existing_fareclass = db.session.query(FareClass).filter_by(id=fareclass_obj.id).first()
+
     # Sử dụng đối tượng đã tồn tại
     customer_obj = existing_customer
     flight_obj = existing_flight
-    fareclass_obj = existing_fareclass
 
 
     for seat in selected_seats.values():
@@ -82,11 +80,14 @@ def check_pending_flighttime(flightid=None, customerid=None):
 
 def checkduplicate_ticket(flightid=None, customer_id=None):
     flight = dao.get_flight_by_id(id=flightid)
+    print(f"flight:{flight.id}")
     booked_flight = None
     # lấy thời gian bay vé đã đặt của khách hàng đó
     tickets = dao.load_tickets(customerid=customer_id)
     for ticket in tickets:
+        print(f"ticket:{ticket.flight_id}")
         if ticket.flight_id == flight.id:
+            print('yess')
             booked_flight = dao.get_flight_by_id(id=ticket.flight_id)
 
     return booked_flight

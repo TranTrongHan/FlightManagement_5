@@ -40,7 +40,7 @@ def load_tickets(customerid = None):
     if customerid:
         tickets = tickets.filter(Ticket.customer_id == customerid)
     return tickets.all()
-def load_flights(flight_id=None,depart_time=None,return_time=None,route_id=None,flight_id_of_ticket=None):
+def load_flights(flight_id=None,depart_time=None,route_id=None,flight_id_of_ticket=None):
     if flight_id:
         query = Flight.query.filter(Flight.id == flight_id).all()
         return query
