@@ -8,7 +8,7 @@
         </button>
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
             <!-- Các liên kết được căn trái -->
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav">
                 {% if not current_user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link custom-nav-btn {{ 'active' if request.endpoint == 'index' else '' }}" href="/">Trang
