@@ -7,6 +7,7 @@ import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 from flask_login import LoginManager
+
 app = Flask(__name__)
 
 app.secret_key='thisIsNOnSecret'

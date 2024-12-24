@@ -1,19 +1,27 @@
 import re
 from datetime import datetime, timedelta
-from zoneinfo import available_timezones
-
 from flask import render_template, request, redirect, jsonify, session, flash, url_for
-import dao, utils
-from app import app, login, VNPAY_CONFIG,dao
+from app import app, login, VNPAY_CONFIG,dao,utils
 from flask_login import login_user, logout_user, login_required
 from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User, MidAirport, FlightSchedule, Route, \
-    Airport, Staff, Ticket
+    Airport, Staff
 from app.utils import check_pending_flighttime
 from dao import db
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    cmts = dao.load_comments()
+    users = dao.load_users()
+    
+    for u in users:
+        for cmt in cmts:
+            if cmt.user == u.id:
+                print(f"text: '{cmt.text}' / cmt_user: {cmt.user}/ time:{cmt.time} /u_id:{u.id}")
+            else:
+                print('none')
+
+
+    return render_template('index.html',cmts = cmts,users=users)
 
 @app.route('/login', methods=['get', 'post'])
 def login_process():
@@ -457,6 +465,31 @@ def get_airports_by_route(route_id):
 def inject_user_role_enum():
     return dict(UserRoleEnum=UserRoleEnum)
 
+@app.route("/api/comments", methods=['POST'])
+def add_comment():
+    data = request.get_json()
+
+    if not data or 'content' not in data or not data['content'].strip():
+        return jsonify({"error": "Nội dung bình luận không hợp lệ"}), 400
+
+    try:
+        # Lưu bình luận vào database
+        new_comment = dao.save_comment(content=data['content'].strip())
+
+        # Lấy thông tin khách hàng (nếu có)
+        user = User.query.get(new_comment.user) if new_comment.user else None
+        # Trả về JSON để cập nhật giao diện
+        return jsonify({
+            "content": new_comment.text,
+            "time": new_comment.time.isoformat(),
+            # "fname": khach_hang.fname if khach_hang else None,
+            # "lname": khach_hang.lname if khach_hang else None,
+            "name": user.name if user else ''
+        }), 201
+
+    except Exception as e:
+        app.logger.error(f"Lỗi khi thêm bình luận: {e}")
+        return jsonify({"error": "Đã xảy ra lỗi từ phía server"}), 500
 if __name__ == '__main__':
     from app import admin
     app.run(debug=True)

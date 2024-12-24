@@ -7,12 +7,12 @@
             <!-- Modal Header -->
             <div class="modal-header">
                 {% with messages = get_flashed_messages(with_categories=True) %}
-                    {% if messages %}
-                        {% set first_message = messages[0] %}
-                        <h4 class="modal-title">{{ first_message[0] }}</h4>  <!-- Nội dung thông báo lỗi -->
-                    {% else %}
-                        <h4 class="modal-title">Thông báo</h4>  <!-- Tiêu đề mặc định -->
-                    {% endif %}
+                {% if messages %}
+                {% set first_message = messages[0] %}
+                <h4 class="modal-title">{{ first_message[0] }}</h4>  <!-- Nội dung thông báo lỗi -->
+                {% else %}
+                <h4 class="modal-title">Thông báo</h4>  <!-- Tiêu đề mặc định -->
+                {% endif %}
                 {% endwith %}
                 <a class="text-decoration-none text-light btn-close" href="/"></a>
             </div>
@@ -20,11 +20,11 @@
             <!-- Modal body -->
             <div class="modal-body">
                 {% with messages = get_flashed_messages(with_categories=True) %}
-                    {% if messages %}
-                        <p>{{ messages[0][1] }}</p>  <!-- Số lượng vé yêu cầu -->
-                    {% else %}
-                        <p>Không có thông báo.</p>
-                    {% endif %}
+                {% if messages %}
+                <p>{{ messages[0][1] }}</p>  <!-- Số lượng vé yêu cầu -->
+                {% else %}
+                <p>Không có thông báo.</p>
+                {% endif %}
                 {% endwith %}
                 <br>
                 Xem vé đã đặt tại<a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover
@@ -48,101 +48,171 @@
         </div>
     </div>
     <div class="row mt-2">
-       <div class="col-12">
-             <span class="text-capitalize fs-2 pt-3">Các chuyến bay phổ biến trong ngày</span>
-       </div>
+        <div class="col-12">
+            <span class="text-capitalize fs-2 pt-3">Các chuyến bay phổ biến trong ngày</span>
+        </div>
     </div>
-   <div class="container px-4 mt-2">
-       <div class="row ">
-           <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded  col-sm-12 ">
-               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
-                   <a href="/bookticket"><img src="/static/images/danang.png" style="width:300px;height:200px" class="rounded"></a>
-               </div>
-               <div class=" ms-4">
-                   <span class="fw-bold d-block">TP Hồ Chí Minh đến Đà Nẵng</span>
-                   <span class="fs-6 fw-lighter d-block">13/11/2024 - 14/11/2024</span>
-               </div>
-               <div class="d-flex flex-column align-items-end">
-                   <span class="fs-4 fw-lighter d-block ">Từ</span>
-                   <span class="fw-bold fs-3 d-block  ">666.000 VND</span>
-               </div>
-           </div>
-           <div class="col-1"></div>
-            <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12 ">
-               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
-                      <a href="/bookticket"><img src="/static/images/tphcm.png"  style="width:300px;height:200px" class="rounded"></a>
-               </div>
-               <div class=" ms-4">
-                   <span class="fw-bold d-block"> Hà Nội đến TP Hồ Chí Minh</span>
-                   <span class="fs-6 fw-lighter d-block">20/11/2024 - 21/11/2024</span>
-               </div>
-               <div class="d-flex flex-column align-items-end">
-                   <span class="fs-4 fw-lighter d-block ">Từ</span>
-                   <span class="fw-bold fs-3 d-block  ">979.000 VND</span>
-               </div>
-           </div>
+    <div class="container px-4 mt-2">
+        <div class="row ">
+            <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded  col-sm-12 ">
+                <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                    <a href="/bookticket"><img src="/static/images/danang.png" style="width:300px;height:200px"
+                                               class="rounded"></a>
+                </div>
+                <div class=" ms-4">
+                    <span class="fw-bold d-block">TP Hồ Chí Minh đến Đà Nẵng</span>
+                    <span class="fs-6 fw-lighter d-block">13/11/2024 - 14/11/2024</span>
+                </div>
+                <div class="d-flex flex-column align-items-end">
+                    <span class="fs-4 fw-lighter d-block ">Từ</span>
+                    <span class="fw-bold fs-3 d-block  ">666.000 VND</span>
+                </div>
+            </div>
             <div class="col-1"></div>
-           <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12   ">
-               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
-                      <a href="/bookticket"><img src="/static/images/hanoi.png"  style="width:300px;height:200px" class="rounded"></a>
-               </div>
-               <div class=" ms-4">
-                   <span class="fw-bold d-block">Đà Nẵng đến Hà Nội</span>
-                   <span class="fs-6 fw-lighter d-block">08/02/2025 - 09/02/2025</span>
-               </div>
-               <div class="d-flex flex-column align-items-end">
-                   <span class="fs-4 fw-lighter d-block ">Từ</span>
-                   <span class="fw-bold fs-3 d-block  ">1.085.000 VND</span>
-               </div>
-           </div>
-       </div>
-       <div class="row ">
-
-           <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12  ">
-               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
-                     <a href="/bookticket"><img src="/static/images/Da-Lat.png"  style="width:300px;height:200px" class="rounded"></a>
-               </div>
-               <div class=" ms-4">
-                   <span class="fw-bold d-block">TP Hồ Chí Minh đến Đà Lạt</span>
-                   <span class="fs-6 fw-lighter d-block">20/01/2025 - 21/01/2025</span>
-               </div>
-               <div class="d-flex flex-column align-items-end">
-                   <span class="fs-4 fw-lighter d-block ">Từ</span>
-                   <span class="fw-bold fs-3 d-block  ">1.072.000 VND</span>
-               </div>
-           </div>
-           <div class="col-1"></div>
             <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12 ">
-               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
-                     <a href="/bookticket"><img src="/static/images/hue.png"  style="width:300px;height:200px" class="rounded"></a>
-               </div>
-               <div class=" ms-4">
-                   <span class="fw-bold d-block"> TP Hồ Chí Minh đến Huế</span>
-                   <span class="fs-6 fw-lighter d-block">20/11/2024 - 21/11/2024</span>
-               </div>
-               <div class="d-flex flex-column align-items-end">
-                   <span class="fs-4 fw-lighter d-block ">Từ</span>
-                   <span class="fw-bold fs-3 d-block  ">666.000 VND</span>
-               </div>
-           </div>
+                <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                    <a href="/bookticket"><img src="/static/images/tphcm.png" style="width:300px;height:200px"
+                                               class="rounded"></a>
+                </div>
+                <div class=" ms-4">
+                    <span class="fw-bold d-block"> Hà Nội đến TP Hồ Chí Minh</span>
+                    <span class="fs-6 fw-lighter d-block">20/11/2024 - 21/11/2024</span>
+                </div>
+                <div class="d-flex flex-column align-items-end">
+                    <span class="fs-4 fw-lighter d-block ">Từ</span>
+                    <span class="fw-bold fs-3 d-block  ">979.000 VND</span>
+                </div>
+            </div>
             <div class="col-1"></div>
-           <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12  ">
-               <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
-                      <a href="/bookticket"><img src="/static/images/vungtau.png"  style="width:300px;height:200px" class="rounded"></a>
-               </div>
-               <div class=" ms-4">
-                   <span class="fw-bold d-block">TP Hồ Chí Minh đến Phú Quốc</span>
-                   <span class="fs-6 fw-lighter d-block">08/03/2025 - 09/03/2025</span>
-               </div>
-               <div class="d-flex flex-column align-items-end">
-                   <span class="fs-4 fw-lighter d-block ">Từ</span>
-                   <span class="fw-bold fs-3 d-block  ">892.000 VND</span>
-               </div>
-           </div>
-       </div>
-   </div>
+            <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12   ">
+                <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                    <a href="/bookticket"><img src="/static/images/hanoi.png" style="width:300px;height:200px"
+                                               class="rounded"></a>
+                </div>
+                <div class=" ms-4">
+                    <span class="fw-bold d-block">Đà Nẵng đến Hà Nội</span>
+                    <span class="fs-6 fw-lighter d-block">08/02/2025 - 09/02/2025</span>
+                </div>
+                <div class="d-flex flex-column align-items-end">
+                    <span class="fs-4 fw-lighter d-block ">Từ</span>
+                    <span class="fw-bold fs-3 d-block  ">1.085.000 VND</span>
+                </div>
+            </div>
+        </div>
+        <div class="row ">
+
+            <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12  ">
+                <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                    <a href="/bookticket"><img src="/static/images/Da-Lat.png" style="width:300px;height:200px"
+                                               class="rounded"></a>
+                </div>
+                <div class=" ms-4">
+                    <span class="fw-bold d-block">TP Hồ Chí Minh đến Đà Lạt</span>
+                    <span class="fs-6 fw-lighter d-block">20/01/2025 - 21/01/2025</span>
+                </div>
+                <div class="d-flex flex-column align-items-end">
+                    <span class="fs-4 fw-lighter d-block ">Từ</span>
+                    <span class="fw-bold fs-3 d-block  ">1.072.000 VND</span>
+                </div>
+            </div>
+            <div class="col-1"></div>
+            <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12 ">
+                <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                    <a href="/bookticket"><img src="/static/images/hue.png" style="width:300px;height:200px"
+                                               class="rounded"></a>
+                </div>
+                <div class=" ms-4">
+                    <span class="fw-bold d-block"> TP Hồ Chí Minh đến Huế</span>
+                    <span class="fs-6 fw-lighter d-block">20/11/2024 - 21/11/2024</span>
+                </div>
+                <div class="d-flex flex-column align-items-end">
+                    <span class="fs-4 fw-lighter d-block ">Từ</span>
+                    <span class="fw-bold fs-3 d-block  ">666.000 VND</span>
+                </div>
+            </div>
+            <div class="col-1"></div>
+            <div class="col-md-3 shadow-lg p-3 mb-5 bg-body rounded col-sm-12  ">
+                <div class="d-flex flex-column align-items-center pt-3 pb-3 ">
+                    <a href="/bookticket"><img src="/static/images/vungtau.png" style="width:300px;height:200px"
+                                               class="rounded"></a>
+                </div>
+                <div class=" ms-4">
+                    <span class="fw-bold d-block">TP Hồ Chí Minh đến Phú Quốc</span>
+                    <span class="fs-6 fw-lighter d-block">08/03/2025 - 09/03/2025</span>
+                </div>
+                <div class="d-flex flex-column align-items-end">
+                    <span class="fs-4 fw-lighter d-block ">Từ</span>
+                    <span class="fw-bold fs-3 d-block  ">892.000 VND</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
+</div>
+<div class="row  mt-3 mb-4">
+    <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
+        <!-- Indicators/dots -->
+        <div class="carousel-indicators ">
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active"
+                    aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1"
+                    aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2"
+                    aria-label="Slide 3"></button>
+        </div>
+         <!-- The slideshow/carousel -->
+        <div class="carousel-inner" id="comments-list">
+             {% for cmt in cmts %}
+             <div class="carousel-item {% if loop.index == 1 %}active{% endif %}" >
+                    <h4 class="text-danger fs-3 fw-bold text-center ">"{{cmt.text}}"<br>
+                        <span class="fs-4 fw-bold d-block">
+                            {% if cmt.user is none %}
+                                <span class="fs-4 fw-bold d-block">
+                                    Ẩn danh
+                                    - <em class="date" data-time="{{cmt.time}}">{{ cmt.time }}</em>
+                                </span>
+                            {% else %}
+                                {% for user in users %}
+                                <span class="fs-4 fw-bold d-block">
+                                    {% if cmt.user == user.id %}
+                                    {{user.name}}
+                                    - <em class="date" data-time="{{cmt.time}}">{{ cmt.time }}</em>
+                                    {% endif %}
+                                </span>
+                                {% endfor %}
+                            {% endif %}
+                        </span>
+                    </h4>
+             </div>
+            {% endfor %}
+        </div>
+        <!-- Left and right controls/icons -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel"
+                data-bs-slide="prev">
+            <span class="carousel-control-prev-icon bg-success" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#myCarousel"
+                data-bs-slide="next">
+            <span class="carousel-control-next-icon bg-success" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+<div class="container-fluid container-fluid-template bg-primary mt-3">
+    <h2 class="text-center">Để lại lời nhắn</h2>
+    <div class="row">
+        <div class="col-sm-7 slideanim">
+            <textarea class="form-control" id="comments" name="comments" placeholder="Comment"
+                      rows="5"></textarea><br>
+            <div class="row">
+                <div class="col-sm-12 form-group">
+                    <button class="btn btn-success pull-right" onclick="addComment()">Gửi</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
     window.onload = function() {
@@ -151,5 +221,90 @@
             myModal.show();
         {% endif %}
     };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.getElementById('comments-list');
+        const items = carousel.getElementsByClassName('carousel-item');
+
+        // Lắng nghe sự kiện khi slide được chuyển đổi
+        carousel.addEventListener('slide.bs.carousel', function(event) {
+            // Xóa class active khỏi tất cả các items
+            for (let item of items) {
+                item.classList.remove('active');
+            }
+
+            // Thêm class active cho item hiện tại
+            const activeIndex = event.to; // Chỉ số của slide hiện tại
+            items[activeIndex].classList.add('active');
+        });
+        // chuyển thành định dạng 2,3 ngày trước
+        document.querySelectorAll('.date').forEach(function(dateElement) {
+            const time = dateElement.getAttribute('data-time');
+            dateElement.innerText = moment(time).fromNow();
+        });
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.min.js"></script>
+
+<script>
+    // Đặt ngôn ngữ là tiếng Việt
+    moment.locale('vi');
+
+    // Duyệt qua tất cả các thẻ có class 'date'
+    document.querySelectorAll('.date').forEach(function(element) {
+        // Lấy giá trị từ thuộc tính data-time
+        const originalTime = element.getAttribute('data-time');
+        if (originalTime) {
+            // Chuyển đổi thời gian sang định dạng "3 giờ trước", "2 ngày trước"
+            const relativeTime = moment(originalTime).fromNow();
+            // Cập nhật nội dung hiển thị
+            element.textContent = relativeTime;
+        }
+    });
+
+    function addComment() {
+        const content = document.getElementById("comments").value.trim();
+        if (!content) {
+            alert("Nội dung bình luận không được để trống!");
+            return;
+        }
+        fetch('/api/comments', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ content }),
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('HTTP error! status: ${response.status}');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            // Thêm bình luận mới vào carousel
+            const commentsList = document.getElementById("comments-list");
+            const newComment = `
+                <div class="carousel-item  ">
+                    <h4 class="text-danger fs-3 fw-bold text-center ">"${data.content}"<br>
+                        <span class="fs-4 fw-bold d-block">
+                            ${data.name ? '${data.name}' : 'Ẩn danh'}
+                            - <em class="date" data-time="${data.time}">${moment(data.time).fromNow()}</em>
+                        </span>
+                    </h4>
+                </div>
+            `;
+            commentsList.innerHTML += newComment;
+
+            // Reset textarea
+            document.getElementById("comments").value = "";
+        })
+        .catch((error) => {
+            console.error("Error adding comment:", error);
+            alert("Không thể gửi bình luận. Vui lòng thử lại.");
+        });
+    }
+
 </script>
 {% endblock %}

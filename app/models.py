@@ -32,7 +32,7 @@ class User(db.Model, UserMixin):
     staff_id = relationship("Staff", uselist=False)
     admin_id = relationship("Admin", uselist=False)
     customer_id = relationship("Customer", uselist=False)
-
+    comments = relationship("Comment",backref='author',lazy=True)
     def __str__(self):
         return self.name
 
@@ -185,7 +185,18 @@ class Ticket(db.Model):
     flight_id = Column(Integer, ForeignKey(Flight.id), nullable=False, primary_key=True)
     seat_id = Column(Integer, ForeignKey(Seat.id), nullable=True, unique=True)
     created_date = Column(DateTime,nullable=False)
+#####################################
+class Comment(db.Model):
+    _tablename_ = 'Comment'
+    comment_id = Column(Integer, primary_key=True,autoincrement=True)
+    user = Column(Integer, ForeignKey(User.id), nullable=True)
+    text = Column(String(255), nullable=False)
+    time = Column(DateTime, default=datetime.now)
 
+    def __init__(self, user, text, **kwargs):
+        super().__init__(**kwargs)
+        self.user = user
+        self.text = text
 if __name__ == "__main__":
     with app.app_context():
         db.drop_all()

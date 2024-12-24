@@ -1,8 +1,10 @@
 import hmac
 import urllib
 from datetime import datetime
+from flask_login import login_user, current_user
 from app import db
-from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum, FareClass, Plane, Seat, Ticket
+from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum, FareClass, Plane, Seat, Ticket, \
+    Comment
 import hashlib
 def load_route(route_id = None):
     query = Route.query
@@ -159,6 +161,26 @@ def get_price(id):
     if fareclass:
         return fareclass.price
     return '0'
+def load_users():
+    return User.query.all()
+def load_comments():
+    return Comment.query.all()
+
+
+def save_comment(content):
+    user_id = current_user.id if current_user.is_authenticated else None
+
+    if user_id and not User.query.get(user_id):
+        raise ValueError("Khách hàng không hợp lệ")
+
+    new_comment = Comment(
+        user=user_id,
+        text=content,
+        time=datetime.now()
+    )
+    db.session.add(new_comment)
+    db.session.commit()
+    return new_comment
 class vnpay:
     requestData = {}
     responseData = {}
