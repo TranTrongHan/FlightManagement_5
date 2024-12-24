@@ -93,7 +93,7 @@ def register_process():
         phone = request.form.get('phone')
         address = request.form.get('address')
         email = request.form.get('email')
-        avatar = request.form.get('avatar')
+
         username = request.form.get('username')
         password = request.form.get('password')
         confirm = request.form.get('confirm')
@@ -122,7 +122,8 @@ def register_process():
                                    error_message=error_message,
                                    phone=phone, email=email, username=username)
         else:
-            dao.add_user(name=name, phone=phone, address=address,
+            avatar =request.files.get('avatar')
+            dao.add_user( name=name, phone=phone, address=address,
                          email=email, avatar=avatar, username=username, password=password)
             return redirect('/login')
 
@@ -138,7 +139,7 @@ def my_info():
         phone = request.form.get('phone')
         address = request.form.get('address')
         email = request.form.get('email')
-        avatar = request.form.get('avatar')
+
         passwd = request.form.get('passwd')
         passwd2 = request.form.get('passwd2')
         if len(phone) < 7 or len(phone) > 15:
@@ -158,7 +159,8 @@ def my_info():
                                    error_message=error_message,
                                    phone=phone, email=email)
         else:
-            dao.edit_user(name=name, phone=phone, address=address, email=email, passwd=passwd,user_id= user_id)
+            avatar = request.files.get('avatar')
+            dao.edit_user(name=name, phone=phone, address=address, email=email, passwd=passwd,user_id= user_id, avatar = avatar)
             return redirect('/myinfo')
 
     return render_template('user_page.html')

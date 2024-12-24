@@ -4,6 +4,7 @@ from datetime import datetime
 from app import db
 from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum, FareClass, Plane, Seat, Ticket
 import hashlib
+import cloudinary.uploader
 def load_route(route_id = None):
     query = Route.query
     if route_id:
@@ -83,17 +84,21 @@ def add_user(name, phone, address,email ,avatar ,username,password ):
     email = email.strip()
     username = username.strip()
     password = password.strip()
+
     u = User(name=name,phone = phone,address = address , email=email,
              avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg',
              user_role = UserRoleEnum.CUSTOMER,joined_date =datetime.now(),
              username = username,password = password)
+    if avatar:
+        res =cloudinary.uploader.upload(avatar)
+        u.avatar = res.get ('secure_url')
     db.session.add(u)
     db.session.commit()
     cus = Customer(user_id = u.id)
     db.session.add(cus)
     db.session.commit()
     print('added')
-def edit_user(name = None,phone=None,address=None,email = None,avartar = None,passwd = None,user_id=None):
+def edit_user(name = None,phone=None,address=None,email = None,avatar = None,passwd = None,user_id=None):
     user = User.query.get(user_id)
     if not user:
         raise ValueError("User not found.")
@@ -105,8 +110,9 @@ def edit_user(name = None,phone=None,address=None,email = None,avartar = None,pa
         user.address = address.strip()
     if email:
         user.email = email.strip()
-    if avartar:
-        user.avatar = avartar
+    if avatar:
+        res = cloudinary.uploader.upload(avatar)
+        user.avatar = res.get ('secure_url').strip()
     if passwd:
         user.password=str(hashlib.md5(passwd.strip().encode('utf-8')).hexdigest())
 
