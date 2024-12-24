@@ -69,7 +69,7 @@ def check_valid_date(depart_time=None, return_time=None):
 
 
 def check_pending_flighttime(flightid=None, customerid=None):
-    cus_tickets = dao.load_tickets(customerid=customerid)
+    cus_tickets = dao.get_tickets(customerid=customerid)
     pending_flight = dao.get_flight_by_id(id=flightid)
     for cus_ticket in cus_tickets:
         booked_flight = dao.get_flight_by_id(id=cus_ticket.flight_id)
@@ -80,14 +80,13 @@ def check_pending_flighttime(flightid=None, customerid=None):
 
 def checkduplicate_ticket(flightid=None, customer_id=None):
     flight = dao.get_flight_by_id(id=flightid)
-    print(f"flight:{flight.id}")
+
     booked_flight = None
     # lấy thời gian bay vé đã đặt của khách hàng đó
-    tickets = dao.load_tickets(customerid=customer_id)
+    tickets = dao.get_tickets(customerid=customer_id)
     for ticket in tickets:
-        print(f"ticket:{ticket.flight_id}")
         if ticket.flight_id == flight.id:
-            print('yess')
+
             booked_flight = dao.get_flight_by_id(id=ticket.flight_id)
 
     return booked_flight

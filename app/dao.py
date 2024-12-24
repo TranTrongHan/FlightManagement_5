@@ -35,7 +35,7 @@ def load_seats(flightid=None,fareclassid=None):
 
 def load_airport():
     return Airport.query.all()
-def load_tickets(customerid = None):
+def get_tickets(customerid = None):
     tickets = Ticket.query
     if customerid:
         tickets = tickets.filter(Ticket.customer_id == customerid)

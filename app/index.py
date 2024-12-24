@@ -166,7 +166,7 @@ def my_info():
 def my_tickets():
     user_id = request.args.get('user_id')
     customer = dao.get_customer_by_id(id=user_id)
-    tickets = dao.load_tickets(customerid=customer.__getattribute__('id'))
+    tickets = dao.get_tickets(customerid=customer.__getattribute__('id'))
     seats = dao.load_seats()
     flights = dao.load_flights()
     routes  = dao.load_route()
@@ -223,6 +223,8 @@ def bookticket_process():
     fareclass = dao.load_fareclass()
     first_seats_avail = utils.count_seat_of_flight(flightid=flight_id,fareclassid='1')
     second_seats_avail = utils.count_seat_of_flight(flightid=flight_id, fareclassid='2')
+
+
     return render_template('bookticket_process.html',
                                route=route, airports=airports, flight=flight, fareclass=fareclass, plane=plane,first_seats_avail= first_seats_avail,
                            second_seats_avail= second_seats_avail)
@@ -236,13 +238,14 @@ def load_user(user_id):
 def payment_comfirm_page():
     flight_id = request.form.get('flightid')
     user_id = request.form.get('userid')
+    cus_obj = dao.get_customer_by_id(id=user_id)
+
     fareclass_id = request.form.get('fareclassid')
     quantity = int(request.form.get('ticket-quantity'))
     plane_id = request.form.get('plane')
     first_seats_avail = int(request.form.get('first_seats_avail'))
     second_seats_avail = int(request.form.get('second_seats_avail'))
-    # takeofftime = request.form.get('takeofftime')
-    # landingtime = request.form.get('landingtime')
+
     fareclass_price = dao.get_price(id=fareclass_id)
     fareclass_name = dao.get_name_by_id(model=FareClass, id=fareclass_id)
     customer_name = dao.get_name_by_id(User, id=user_id)
@@ -250,6 +253,7 @@ def payment_comfirm_page():
 
     flight = Flight(id=flight_id)
     customer = Customer(user_id=user_id)
+
     fareclass = FareClass(id=fareclass_id)
     valid_time = utils.check_valid_time(flightid=flight_id)
     if not valid_time:
@@ -263,11 +267,11 @@ def payment_comfirm_page():
         seat_class_name = dao.get_name_by_id(model=FareClass,id=fareclass_id)
         flash(message=f"Không còn đủ chỗ trống cho {seat_class_name}.", category="Thông báo")
         return redirect('/bookticket')
-    booked_ticket = utils.checkduplicate_ticket(flightid=flight_id, customer_id=user_id)
+    booked_ticket = utils.checkduplicate_ticket(flightid=flight_id, customer_id=cus_obj.id)
     if booked_ticket:
         flash(message="Bạn đã đặt vé cho chuyến bay này.",category="Thông báo")
         return redirect('/bookticket')
-    booked_flightid = check_pending_flighttime(flightid=flight_id, customerid=user_id)
+    booked_flightid = check_pending_flighttime(flightid=flight_id, customerid=cus_obj.id)
     if booked_flightid:
         session['flightid_booked'] = booked_flightid
         flash(message="Bạn đã có chuyến bay đang chờ.",category="Thông báo")

@@ -32,7 +32,7 @@ class FlightView(AuthenticatedView):
     column_list = ['id','name','take_of_time','route_id','plane_id']
 
 class RouteView(AuthenticatedView):
-    column_list = ['id','name','flights','take_off_airport_id','landing_airport_id']
+    column_list = ['id','name','take_off_airport_id','landing_airport_id']
 
 class AiportView(AuthenticatedView):
     column_list = ['id','name']

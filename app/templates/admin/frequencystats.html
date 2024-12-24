@@ -15,25 +15,26 @@
             <tr>
                 <td>{{s[0]}}</td>
                 <td>{{ "{:,.1f}".format(s[1])}} VNĐ</td>
-                <td>{{ s[2] }} </td>
-                <td>{{ s[3] }} % </td>
+                <td>{{ s[2] }}</td>
+                <td>{{ s[3] }} %</td>
             </tr>
             {% endfor %}
+
         </table>
     </div>
     <div class="col-md-6 col-12">
         <form>
             <div class="form-group">
                 <div>
-                    <select class="form-select" aria-label="Chọn năm" name="year" id="year"required>
+                    <select class="form-select" aria-label="Chọn năm" name="year" id="year" required>
                         <option selected disabled>Chọn năm</option>
                         {% for year in range(2015, 2026) %}
                         <option value="{{ year }}">{{ year }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                 <div>
-                    <select class="form-select" aria-label="Chọn tháng" name="month" id="month"required>
+                <div>
+                    <select class="form-select" aria-label="Chọn tháng" name="month" id="month" required>
                         <option selected disabled>Chọn tháng</option>
                         {% for month in range(1, 13) %}
                         <option value="{{ month }}">{{ month }}</option>
@@ -69,7 +70,7 @@
 
     window.onload = function(){
         let contx = document.getElementById('MonthChartId').getContext('2d');
-        loadChart(contx,labels,data,'bar',colors,borderColors)
+        loadChart(contx,labels,data,'line',colors,borderColors)
     }
 
     function loadChart(ctx,labels,data,type,color,borderColors){
@@ -97,27 +98,27 @@
 
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Khôi phục lựa chọn từ localStorage
-    const savedYear = localStorage.getItem('selectedYear');
-    const savedMonth = localStorage.getItem('selectedMonth');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Khôi phục lựa chọn từ localStorage
+        const savedYear = localStorage.getItem('selectedYear');
+        const savedMonth = localStorage.getItem('selectedMonth');
 
-    if (savedYear) {
-        document.getElementById('year').value = savedYear;
-    }
-    if (savedMonth) {
-        document.getElementById('month').value = savedMonth;
-    }
+        if (savedYear) {
+            document.getElementById('year').value = savedYear;
+        }
+        if (savedMonth) {
+            document.getElementById('month').value = savedMonth;
+        }
 
-    // Lưu lựa chọn vào localStorage khi người dùng thay đổi
-    document.getElementById('year').addEventListener('change', function() {
-        localStorage.setItem('selectedYear', this.value);
+        // Lưu lựa chọn vào localStorage khi người dùng thay đổi
+        document.getElementById('year').addEventListener('change', function() {
+            localStorage.setItem('selectedYear', this.value);
+        });
+
+        document.getElementById('month').addEventListener('change', function() {
+            localStorage.setItem('selectedMonth', this.value);
+        });
     });
-
-    document.getElementById('month').addEventListener('change', function() {
-        localStorage.setItem('selectedMonth', this.value);
-    });
-});
 </script>
 
 {% endblock %}
