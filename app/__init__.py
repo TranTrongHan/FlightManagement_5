@@ -1,6 +1,8 @@
+import hmac
+
 from flask import Flask
 from urllib.parse import quote
-
+import hashlib
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 import cloudinary
@@ -11,17 +13,18 @@ from flask_login import LoginManager
 app = Flask(__name__)
 
 app.secret_key='thisIsNOnSecret'
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/flight_db?charset=utf8mb4" % quote('Admin@123')
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/flight_db?charset=utf8mb4" % quote('123456789')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 
 
 # Configuration
 cloudinary.config(
-    cloud_name = "dfi68mgij",
-    api_key = "894594157357848",
-    api_secret = "<your_api_secret>", # Click 'View API Keys' above to copy your API secret
+    cloud_name = "dkgcthbfj",
+    api_key = "182735838243574",
+    api_secret = "NHgnhBZO5DLGF8GMvlWtywy6AD8", # Click 'View API Keys' above to copy your API secret
     secure=True
 )
+
 VNPAY_CONFIG = {
     'vnp_TmnCode': 'JTUTARBA',
     'vnp_HashSecret': 'YGOTOHGJS772HDGA1KE690H64UK3SQTV',
