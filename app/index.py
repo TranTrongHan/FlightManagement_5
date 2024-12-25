@@ -4,7 +4,7 @@ from flask import render_template, request, redirect, jsonify, session, flash, u
 from app import app, login, VNPAY_CONFIG,dao,utils
 from flask_login import login_user, logout_user, login_required
 from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User, MidAirport, FlightSchedule, Route, \
-    Airport, Staff
+    Airport
 from app.utils import check_pending_flighttime
 from dao import db
 
@@ -50,24 +50,28 @@ def login_staff():
     if request.method.__eq__('POST'):
         username = request.form.get('username')
         password = request.form.get('password')
-        u = dao.auth_user(username=username, password=password)
+        u = dao.auth_user(username=username, password=password,role=UserRoleEnum.STAFF)
         if u:
-            role_check = dao.check_role(username=username, password=password, role=UserRoleEnum.STAFF)
-            if role_check:
-                login_user(u)
-                # Lưu staff_id vào session
-                staff = db.session.query(Staff).filter(Staff.user_id == u.id).first()
-                if staff:
-                    session['staff_id'] = staff.id  # Lưu staff_id vào session
-                return redirect('/staffpage')
-            elif not role_check:
-                flash(message="Người dùng không hợp lệ.", category="Thông báo")
-                return redirect('/login_staff')
-        elif not u:
-            flash(message="Tên đăng nhập hoặc mật khẩu không hợp lệ..", category="Thông báo")
-            return redirect('/login_staff')
+            login_user(user=u)
 
-    return render_template('login_staff.html')
+        return render_template('login_staff.html')
+        # if u:
+        #     role_check = dao.check_role(username=username, password=password, role=UserRoleEnum.STAFF)
+        #     if role_check:
+        #         login_user(u)
+        #         # Lưu staff_id vào session
+        #         staff = db.session.query(Staff).filter(Staff.user_id == u.id).first()
+        #         if staff:
+        #             session['staff_id'] = staff.id  # Lưu staff_id vào session
+        #         return redirect('/staffpage')
+        #     elif not role_check:
+        #         flash(message="Người dùng không hợp lệ.", category="Thông báo")
+        #         return redirect('/login_staff')
+        # elif not u:
+        #     flash(message="Tên đăng nhập hoặc mật khẩu không hợp lệ..", category="Thông báo")
+        #     return redirect('/login_staff')
+
+    # return render_template('login_staff.html')
 
 
 @app.route('/login_admin', methods=['post'])

@@ -19,19 +19,19 @@ class User(db.Model, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     # last_name = Column(String(50), nullable=False)
     # first_name = Column(String(50), nullable=False)
-    name = Column(String(50), nullable=False)
+    # name = Column(String(50), nullable=False)
     phone = Column(String(50), nullable=False)
     address = Column(String(50))
     email = Column(String(50), nullable=False, unique=True)
     avatar = Column(String(100),
                     default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg')
-    user_role = Column(Enum(UserRoleEnum), nullable=False)
+    user_role = Column(Enum(UserRoleEnum),default=UserRoleEnum.CUSTOMER)
     joined_date = Column(DateTime, default=datetime.now())
     username = Column(String(100), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
-    staff_id = relationship("Staff", uselist=False)
-    admin_id = relationship("Admin", uselist=False)
-    customer_id = relationship("Customer", uselist=False)
+    # staff_id = relationship("Staff", uselist=False)
+    # admin_id = relationship("Admin", uselist=False)
+    # customer_id = relationship("Customer",backref='user',lazy=True)
     comments = relationship("Comment",backref='author',lazy=True)
     def __str__(self):
         return self.name
@@ -39,36 +39,37 @@ class User(db.Model, UserMixin):
 
 
     #####################################
-class Customer(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(User.id),nullable=False,unique=True)
+class Customer(User):
+    Cus_id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id),nullable=False)
     ticket = relationship("Ticket", backref="customer", lazy=True)
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        return cls(
-            id=data['id'],
-            user_id=data['user_id'],
-        )
+    # def to_dict(self):
+    #     return {
+    #         'id': self.id,
+    #         'user_id': self.user_id,
+    #     }
+    #
+    # @classmethod
+    # def from_dict(cls, data):
+    #     return cls(
+    #         id=data['id'],
+    #         user_id=data['user_id'],
+    #     )
 
 #####################################
-class Staff(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
-    flight_schedules = relationship("FlightSchedule", backref="Staff", lazy=True)
+# class Staff(db.Model):
+#     id = Column(Integer, primary_key=True, autoincrement=True)
+#     user_id = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
+#     flight_schedules = relationship("FlightSchedule", backref="Staff", lazy=True)
 
     # user = relationship("User",uselist=False)
 
 #####################################
-class Admin(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
+# class Admin(db.Model):
+#     id = Column(Integer, primary_key=True, autoincrement=True)
+#     user_id = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
 
 #####################################
 class Plane(db.Model):
@@ -142,7 +143,7 @@ class Rule(db.Model):
 #####################################
 class FlightSchedule(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    staff_id = Column(Integer, ForeignKey(Staff.id), nullable=False)
+    staff_id = Column(Integer, ForeignKey(User.id), nullable=False)
     # flight_details = relationship("FlightDetails",backref="FlightSchedule",lazy=True)
     flight_id = Column(Integer, ForeignKey(Flight.id), nullable=False, unique=True)
 
@@ -152,6 +153,7 @@ class FareClass(db.Model):
     name = Column(String(50), nullable=False)
     price = Column(Float, nullable=False)
     seats = relationship("Seat", backref="fareclass", lazy=True)
+
 
     def __str__(self):
         return self.name
@@ -181,15 +183,16 @@ class Seat(db.Model):
 #####################################
 class Ticket(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    customer_id = Column(Integer, ForeignKey(Customer.id), nullable=False, primary_key=True)
-    flight_id = Column(Integer, ForeignKey(Flight.id), nullable=False, primary_key=True)
+    customer_id = Column(Integer, ForeignKey(Customer.Cus_id), nullable=False)
+    flight_id = Column(Integer, ForeignKey(Flight.id), nullable=False)
     seat_id = Column(Integer, ForeignKey(Seat.id), nullable=True, unique=True)
     created_date = Column(DateTime,nullable=False)
+
 #####################################
 class Comment(db.Model):
     _tablename_ = 'Comment'
     comment_id = Column(Integer, primary_key=True,autoincrement=True)
-    user = Column(Integer, ForeignKey(User.id), nullable=True)
+    cus_id= Column(Integer, ForeignKey(Customer.id), nullable=True)
     text = Column(String(255), nullable=False)
     time = Column(DateTime, default=datetime.now)
 
@@ -198,7 +201,7 @@ class Comment(db.Model):
         self.user = user
         self.text = text
 if __name__ == "__main__":
-    with app.app_context():
+    with (app.app_context()):
         db.drop_all()
         db.create_all()
 
@@ -207,53 +210,59 @@ if __name__ == "__main__":
         rule3 = Rule(name='thời gian dừng tối thiểu', value='20')
         rule4 = Rule(name='1st_seat_price', value=1500000)
         rule5 = Rule(name='2st_seat_price', value=1000000)
-        user1 = User(name='Nguyễn An', phone='0123456789', address='123 Street A', email='an.nguyen@example.com',
+        user1 = User( phone='0123456789', address='123 Street A', email='an.nguyen@example.com',
                      user_role=UserRoleEnum.ADMIN, username='admin1',
                      password=str(hashlib.md5('admin1'.encode('utf-8')).hexdigest()))
-        user2 = User(name='Trần Lê Bình', phone='0123456790', address='456 Street B', email='binh.tran@example.com',
+
+        user2 = User( phone='0123456790', address='456 Street B', email='binh.tran@example.com',
                      user_role=UserRoleEnum.ADMIN, username='admin2',
                      password=str(hashlib.md5('admin2'.encode('utf-8')).hexdigest()))
-        user3 = User(name='Lê Kim Cúc', phone='0123456791', address='789 Street C', email='cuc.le@example.com',
+
+        user3 = User( phone='0123456791', address='789 Street C', email='cuc.le@example.com',
                      user_role=UserRoleEnum.STAFF, username='staff1',
                      password=str(hashlib.md5('staff1'.encode('utf-8')).hexdigest()))
-        user4 = User(name='Phạm Hải Dương', phone='0123456792', address='101 Street D', email='duong.pham@example.com',
+
+        user4 = User( phone='0123456792', address='101 Street D', email='duong.pham@example.com',
                      user_role=UserRoleEnum.STAFF, username='staff2',
                      password=str(hashlib.md5('staff2'.encode('utf-8')).hexdigest()))
-        user5 = User(name='Nguyễn Duy Minh', phone='0123456793', address='202 Street W',
+
+        user5 = Customer(name='Nguyễn Duy Minh', phone='0123456793', address='202 Street W',
                      email='minh.nguyen@example.com', user_role=UserRoleEnum.CUSTOMER, username='customer1',
                      password=str(hashlib.md5('customer1'.encode('utf-8')).hexdigest()))
-        user6 = User(name='Hoàng Minh Tú', phone='0123456723', address='202 Street B', email='tu.hoang@example.com',
+
+        user6 = Customer(name='Hoàng Minh Tú', phone='0123456723', address='202 Street B', email='tu.hoang@example.com',
                      user_role=UserRoleEnum.CUSTOMER, username='customer2',
                      password=str(hashlib.md5('customer2'.encode('utf-8')).hexdigest()))
-        user7 = User(name='Trần Văn A', phone='0133456723', address='202 Street B', email='a.tran@example.com',
+
+        user7 = Customer(name='Trần Văn A', phone='0133456723', address='202 Street B', email='a.tran@example.com',
                      user_role=UserRoleEnum.CUSTOMER, username='customer3',
                      password=str(hashlib.md5('customer3'.encode('utf-8')).hexdigest()))
-        user8 = User(name='Cao Thị C', phone='0124456723', address='202 Street B', email='c.cao@example.com',
+        user8 = Customer(name='Cao Thị C', phone='0124456723', address='202 Street B', email='c.cao@example.com',
                      user_role=UserRoleEnum.CUSTOMER, username='customer4',
                      password=str(hashlib.md5('customer4'.encode('utf-8')).hexdigest()))
-        user9 = User(name='Nguyễn Minh Khải', phone='01255456723', address='202 Street B', email='khai.nguyen@example.com',
+        user9 =Customer(name='Nguyễn Minh Khải', phone='01255456723', address='202 Street B', email='khai.nguyen@example.com',
                      user_role=UserRoleEnum.CUSTOMER, username='customer5',
                      password=str(hashlib.md5('customer5'.encode('utf-8')).hexdigest()))
         db.session.add_all([user1, user2, user3, user4, user5, user6,user7,user8,user9])
         db.session.commit()
 
-        admin1 = Admin(user_id='1')
-        admin2 = Admin(user_id='2')
-        db.session.add_all([admin1, admin2])
-        db.session.commit()
+        # admin1 = Admin(user_id='1')
+        # admin2 = Admin(user_id='2')
+        # db.session.add_all([admin1, admin2])
+        # db.session.commit()
+        #
+        # staff1 = Staff(user_id='3')
+        # staff2 = Staff(user_id='4')
+        # db.session.add_all([staff1])
+        # db.session.commit()
 
-        staff1 = Staff(user_id='3')
-        staff2 = Staff(user_id='4')
-        db.session.add_all([staff1])
-        db.session.commit()
-
-        customer1 = Customer(user_id='5')
-        customer2 = Customer(user_id='6')
-        customer3 = Customer(user_id='7')
-        customer4 = Customer(user_id='8')
-        customer5 = Customer(user_id='9')
-        db.session.add_all([customer1, customer2,customer3,customer4,customer5])
-        db.session.commit()
+        # customer1 = Customer(user_id='5')
+        # customer2 = Customer(user_id='6')
+        # customer3 = Customer(user_id='7')
+        # customer4 = Customer(user_id='8')
+        # customer5 = Customer(user_id='9')
+        # db.session.add_all([customer1, customer2,customer3,customer4,customer5])
+        # db.session.commit()
 
         plane1 = Plane(name='VietNam Airlines')
         plane2 = Plane(name='Vietjet Air')

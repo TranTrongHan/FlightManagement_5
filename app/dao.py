@@ -3,7 +3,7 @@ import urllib
 from datetime import datetime
 from flask_login import login_user, current_user
 from app import db
-from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum, FareClass, Plane, Seat, Ticket, \
+from app.models import Flight, Route, Airport, Customer, User, UserRoleEnum, FareClass, Plane, Seat, Ticket, \
     Comment
 import hashlib
 import cloudinary.uploader
@@ -64,12 +64,14 @@ def load_plane():
     return Plane.query.all()
 def load_empty_seat_by_plane(planeid):
     return Seat.query.filter(Seat.plane_id == planeid,Seat.status==0)
+
 def auth_user(username,password,role=None):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     u = User.query.filter(User.username.__eq__(username),User.password.__eq__(password))
     if role:
         u = u.filter(User.user_role.__eq__(role))
     return u.first()
+
 def check_role(username , password,role):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     u =  User.query.filter(User.username.__eq__(username.strip()),
@@ -87,19 +89,23 @@ def add_user(name, phone, address,email ,avatar ,username,password ):
     username = username.strip()
     password = password.strip()
 
-    u = User(name=name,phone = phone,address = address , email=email,
+    # u = User(name=name,phone = phone,address = address , email=email,
+    #          avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg',
+    #          user_role = UserRoleEnum.CUSTOMER,joined_date =datetime.now(),
+    #          username = username,password = password)
+    u = Customer(name=name, phone=phone, address=address, email=email,
              avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg',
-             user_role = UserRoleEnum.CUSTOMER,joined_date =datetime.now(),
-             username = username,password = password)
+             user_role=UserRoleEnum.CUSTOMER, joined_date=datetime.now(),
+             username=username, password=password)
     if avatar:
         res =cloudinary.uploader.upload(avatar)
         u.avatar = res.get ('secure_url')
     db.session.add(u)
     db.session.commit()
-    cus = Customer(user_id = u.id)
-    db.session.add(cus)
-    db.session.commit()
-    print('added')
+    # cus = Customer(user_id = u.id)
+    # db.session.add(cus)
+    # db.session.commit()
+    # print('added')
 def edit_user(name = None,phone=None,address=None,email = None,avatar = None,passwd = None,user_id=None):
     user = User.query.get(user_id)
     if not user:
@@ -140,8 +146,10 @@ def existence_check(attribute ,value):
 
 def get_user_by_id(id):
     return User.query.get(id)
+
 def get_customer_by_id(id):
     return Customer.query.filter(Customer.user_id==id).first()
+
 def get_flight_by_id(id):
     return Flight.query.get(id)
 def get_plane_by_id(id):
