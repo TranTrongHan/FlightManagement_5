@@ -3,7 +3,7 @@ import urllib
 from datetime import datetime
 from flask_login import login_user, current_user
 from app import db
-from app.models import Flight, Route, Airport, Customer, User, Admin, UserRoleEnum, FareClass, Plane, Seat, Ticket, \
+from app.models import Flight, Route, Airport, Customer, User, UserRoleEnum, FareClass, Plane, Seat, Ticket, \
     Comment
 import hashlib
 import cloudinary.uploader
@@ -78,16 +78,17 @@ def check_role(username , password,role):
         return True
     return False
 
-def add_user(name, phone, address,email ,avatar ,username,password ):
+def add_user(name, phone,card_id, address,email ,avatar ,username,password ):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     name = name.strip()
     phone = phone.strip()
+    card_id = card_id.strip()
     address = address.strip()
     email = email.strip()
     username = username.strip()
     password = password.strip()
 
-    u = User(name=name,phone = phone,address = address , email=email,
+    u = Customer(name=name,phone = phone,card_id = card_id,address = address , email=email,
              avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg',
              user_role = UserRoleEnum.CUSTOMER,joined_date =datetime.now(),
              username = username,password = password)
@@ -96,11 +97,8 @@ def add_user(name, phone, address,email ,avatar ,username,password ):
         u.avatar = res.get ('secure_url')
     db.session.add(u)
     db.session.commit()
-    cus = Customer(user_id = u.id)
-    db.session.add(cus)
-    db.session.commit()
-    print('added')
-def edit_user(name = None,phone=None,address=None,email = None,avatar = None,passwd = None,user_id=None):
+
+def edit_user(name = None,phone=None,card_id =None,address=None,email = None,avatar = None,passwd = None,user_id=None):
     user = User.query.get(user_id)
     if not user:
         raise ValueError("User not found.")
@@ -108,6 +106,8 @@ def edit_user(name = None,phone=None,address=None,email = None,avatar = None,pas
         user.name=name.strip()
     if phone:
         user.phone = phone.strip()
+    if card_id:
+        user.card_id = card_id.strip()
     if address:
         user.address = address.strip()
     if email:

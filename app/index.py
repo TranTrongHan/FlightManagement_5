@@ -1,10 +1,11 @@
 import re
+
 from datetime import datetime, timedelta
 from flask import render_template, request, redirect, jsonify, session, flash, url_for
 from app import app, login, VNPAY_CONFIG,dao,utils
 from flask_login import login_user, logout_user, login_required
 from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User, MidAirport, FlightSchedule, Route, \
-    Airport, Staff
+    Airport
 from app.utils import check_pending_flighttime
 from dao import db
 
@@ -55,10 +56,6 @@ def login_staff():
             role_check = dao.check_role(username=username, password=password, role=UserRoleEnum.STAFF)
             if role_check:
                 login_user(u)
-                # Lưu staff_id vào session
-                staff = db.session.query(Staff).filter(Staff.user_id == u.id).first()
-                if staff:
-                    session['staff_id'] = staff.id  # Lưu staff_id vào session
                 return redirect('/staffpage')
             elif not role_check:
                 flash(message="Người dùng không hợp lệ.", category="Thông báo")
@@ -99,17 +96,20 @@ def register_process():
     if request.method.__eq__('POST'):
         name = request.form.get('name')
         phone = request.form.get('phone')
+        card_id = request.form.get('card_id')
         address = request.form.get('address')
         email = request.form.get('email')
-
         username = request.form.get('username')
         password = request.form.get('password')
         confirm = request.form.get('confirm')
 
-        if len(phone) < 7 or len(phone) > 15:
-            error_message['err_phone'] = 'Phone number must be between 7-15 digits.'
+        if len(phone)  < 10:
+            error_message['err_phone'] = 'Số điện thoại phải là 10 kí tự.'
         elif dao.existence_check('phone', phone):
             error_message['err_phone'] = 'Số điện thoại đã được sử dụng.'
+
+        if len(card_id)<12 :
+            error_message['err_card_id'] = "Số CCCD phải có đủ 12 kí tự"
 
         if '@' not in email:
             error_message['err_email'] = 'Email is invalid.'
@@ -131,7 +131,7 @@ def register_process():
                                    phone=phone, email=email, username=username)
         else:
             avatar =request.files.get('avatar')
-            dao.add_user( name=name, phone=phone, address=address,
+            dao.add_user( name=name,card_id=card_id, phone=phone, address=address,
                          email=email, avatar=avatar, username=username, password=password)
             return redirect('/login')
 
@@ -144,6 +144,7 @@ def my_info():
         error_message = {}
         user_id = request.form.get('userid')
         name = request.form.get('fullname')
+        card_id = request.form.get('card_id')
         phone = request.form.get('phone')
         address = request.form.get('address')
         email = request.form.get('email')
@@ -466,7 +467,20 @@ def get_airports_by_route(route_id):
 @app.context_processor
 def inject_user_role_enum():
     return dict(UserRoleEnum=UserRoleEnum)
-
+# @app.route("/api/findflights/",methods=['POST'])
+# def findflights ():
+#     takeoff_airport1 = request.form.get('takeoff1')
+#     landing_airport1 = request.form.get('landing1')
+#     departure_time = request.form.get('departureTime')
+#     flight_details = session.get('flight_details')
+#     if not flight_details:
+#         flight_details = {}
+#     flight_details = {
+#         'takeoff_airport':takeoff_airport1,
+#         'landing_aiport':landing_airport1,
+#         'departure_time':departure_time
+#     }
+#     return jsonify(flight_details)
 @app.route("/api/comments", methods=['POST'])
 def add_comment():
     data = request.get_json()

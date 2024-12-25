@@ -22,6 +22,14 @@
             <p class="text-danger error-message">{{ error_message['err_phone'] }}</p>
             {% endif %}
         </div>
+        <!-- Số CCCD -->
+         <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="card_id" placeholder="Số CCCD" name="card_id">
+            <label for="card_id">Số CCCD</label>
+            {% if error_message and error_message.get('err_card_id') %}
+            <p class="text-danger error-message">{{ error_message['err_card_id'] }}</p>
+            {% endif %}
+        </div>
 
         <!-- Địa chỉ -->
         <div class="form-floating mb-3">

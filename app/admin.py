@@ -30,12 +30,15 @@ class LogoutView(AuthenticatedBaseView):
 
 class FlightView(AuthenticatedView):
     column_list = ['id','name','take_of_time','route_id','plane_id']
+    page_size = '10'
 
 class RouteView(AuthenticatedView):
-    column_list = ['id','name','take_off_airport_id','landing_airport_id']
-
+    column_list = ['id','name','flights','take_off_airport_id','landing_airport_id']
+    page_size = '10'
 class AiportView(AuthenticatedView):
-    column_list = ['id','name']
+    column_list = ['id','name','takeoff_airport','landing_airport']
+class PlaneView(AuthenticatedView):
+    column_list = ['id','name','flights']
 class StatsView(AuthenticatedBaseView):
     @expose("/")
     def __index__(self):
@@ -61,6 +64,7 @@ class FrequencyStats(AuthenticatedBaseView):
 admin.add_view(FlightView(Flight,db.session))
 admin.add_view(RouteView(Route,db.session))
 admin.add_view(AiportView(Airport,db.session))
+admin.add_view(PlaneView(Plane,db.session))
 admin.add_view(StatsView(name='Thống kê'))
 admin.add_view(FrequencyStats(name='Thống kê tần suất'))
 admin.add_view(LogoutView(name="Đăng xuất"))
