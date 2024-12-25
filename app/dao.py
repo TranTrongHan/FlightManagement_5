@@ -4,7 +4,7 @@ from datetime import datetime
 from flask_login import login_user, current_user
 from app import db
 from app.models import Flight, Route, Airport, Customer, User, UserRoleEnum, FareClass, Plane, Seat, Ticket, \
-    Comment
+    Comment,Rule
 import hashlib
 import cloudinary.uploader
 def load_route(route_id = None):
@@ -35,29 +35,44 @@ def load_seats(flightid=None,fareclassid=None):
     if flightid and fareclassid:
         seat = seat.filter(Seat.flight_id == flightid,Seat.fareclass_id == fareclassid)
     return seat.all()
-
+def get_rule_by_id(id):
+    return Rule.query.get(id)
 def load_airport():
     return Airport.query.all()
-def get_tickets(customerid = None):
+def get_tickets(userid = None):
     tickets = Ticket.query
-    if customerid:
-        tickets = tickets.filter(Ticket.customer_id == customerid)
+    if userid:
+        tickets = tickets.filter(Ticket.customer_id == userid)
     return tickets.all()
+# hàm chuyển chuỗi thành kiểu dữ liệu datetime
+def convert_to_datetime(date_input):
+    if isinstance(date_input, str):  # Nếu là chuỗi
+        try:
+            return datetime.strptime(date_input, '%Y-%m-%d')
+        except ValueError as e:
+            # Nếu không thể chuyển đổi chuỗi, xử lý lỗi ở đây
+            print(f"Error converting date: {e}")
+            return None
+    elif isinstance(date_input, datetime):  # Nếu đã là đối tượng datetime
+        return date_input
+    else:
+        print("Invalid input type. Expected string or datetime.")
+        return None
+
 def load_flights(flight_id=None,depart_time=None,route_id=None,flight_id_of_ticket=None):
     if flight_id:
         query = Flight.query.filter(Flight.id == flight_id).all()
         return query
-    if route_id:
-        flights = Flight.query.filter(Flight.route_id == route_id).all()
-        return flights()
-    if depart_time:
+    if depart_time and route_id:
         depart_time = datetime.strptime(depart_time, '%Y-%m-%d')
         # return_time = datetime.strptime(return_time, '%Y-%m-%d')
-        flights = Flight.query.filter(Flight.take_of_time >= depart_time).all()
+        flights = Flight.query.filter(Flight.take_off_time >= depart_time,Flight.route_id==route_id).all()
         return flights
     if flight_id_of_ticket:
         flights = Flight.query.filter(Flight.id== flight_id_of_ticket)
     return Flight.query.all()
+
+
 def load_fareclass():
     return FareClass.query.all()
 def load_plane():
@@ -142,6 +157,8 @@ def get_user_by_id(id):
     return User.query.get(id)
 def get_customer_by_id(id):
     return Customer.query.filter(Customer.user_id==id).first()
+def get_route_by_id(id):
+    return Route.query.get(id)
 def get_flight_by_id(id):
     return Flight.query.get(id)
 def get_plane_by_id(id):
@@ -171,7 +188,6 @@ def load_users():
     return User.query.all()
 def load_comments():
     return Comment.query.all()
-
 
 def save_comment(content):
     user_id = current_user.id if current_user.is_authenticated else None
