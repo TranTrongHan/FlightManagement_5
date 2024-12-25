@@ -17,8 +17,6 @@ class AirportRole(RoleEnum):
     INTERMEDIATE = 3
 class User(db.Model, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    # last_name = Column(String(50), nullable=False)
-    # first_name = Column(String(50), nullable=False)
     name = Column(String(50), nullable=False)
     phone = Column(String(50), nullable=False)
     address = Column(String(50))
@@ -29,19 +27,17 @@ class User(db.Model, UserMixin):
     joined_date = Column(DateTime, default=datetime.now())
     username = Column(String(100), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
-    staff_id = relationship("Staff", uselist=False)
-    admin_id = relationship("Admin", uselist=False)
-    customer_id = relationship("Customer", uselist=False)
     comments = relationship("Comment",backref='author',lazy=True)
     def __str__(self):
         return self.name
 
 
 
-    #####################################
-class Customer(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(User.id),nullable=False,unique=True)
+#####################################
+class Customer(User):
+    Cus_id = Column(Integer, primary_key=True, autoincrement=True)
+    card_id = Column(String(12),nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
     ticket = relationship("Ticket", backref="customer", lazy=True)
 
     def to_dict(self):
@@ -56,19 +52,6 @@ class Customer(db.Model):
             id=data['id'],
             user_id=data['user_id'],
         )
-
-#####################################
-class Staff(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
-    flight_schedules = relationship("FlightSchedule", backref="Staff", lazy=True)
-
-    # user = relationship("User",uselist=False)
-
-#####################################
-class Admin(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
 
 #####################################
 class Plane(db.Model):
@@ -94,8 +77,8 @@ class Route(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
     flights = relationship("Flight", backref="route", lazy=True)
-    take_off_airport_id = Column(Integer, ForeignKey(Airport.id), nullable=False)
-    landing_airport_id = Column(Integer, ForeignKey(Airport.id), nullable=False)
+    take_off_airport_id = Column(Integer, ForeignKey(Airport.id), nullable=True)
+    landing_airport_id = Column(Integer, ForeignKey(Airport.id), nullable=True)
 
     def __str__(self):
         return self.name
@@ -104,12 +87,12 @@ class Route(db.Model):
 class Flight(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
-    take_of_time = Column(DateTime, nullable=True)
-    landing_time = Column(DateTime, nullable=True)
+    take_of_time = Column(DateTime, nullable=False)
+    landing_time = Column(DateTime, nullable=False)
     first_seat_quantity = Column(Integer,nullable=False)
     second_seat_quantity = Column(Integer,nullable=False)
-    plane_id = Column(Integer, ForeignKey(Plane.id), nullable=False)
-    route_id = Column(Integer, ForeignKey(Route.id), nullable=False)
+    plane_id = Column(Integer, ForeignKey(Plane.id), nullable=True)
+    route_id = Column(Integer, ForeignKey(Route.id), nullable=True)
     mid_airport = relationship("MidAirport",backref="flight",lazy=True)
     ticket = relationship("Ticket", backref="flight", lazy=True)
     def __str__(self):
@@ -142,8 +125,7 @@ class Rule(db.Model):
 #####################################
 class FlightSchedule(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    staff_id = Column(Integer, ForeignKey(Staff.id), nullable=False)
-    # flight_details = relationship("FlightDetails",backref="FlightSchedule",lazy=True)
+    staff_id = Column(Integer, ForeignKey(User.id), nullable=False)
     flight_id = Column(Integer, ForeignKey(Flight.id), nullable=False, unique=True)
 
 #####################################
@@ -202,6 +184,7 @@ if __name__ == "__main__":
         db.drop_all()
         db.create_all()
 
+
         rule1 = Rule(name='Số lượng ghế hạng 1',value ='5')
         rule2 = Rule(name='Số lượng ghế hạng 2', value='5')
         rule3 = Rule(name='thời gian dừng tối thiểu', value='20')
@@ -219,42 +202,34 @@ if __name__ == "__main__":
         user4 = User(name='Phạm Hải Dương', phone='0123456792', address='101 Street D', email='duong.pham@example.com',
                      user_role=UserRoleEnum.STAFF, username='staff2',
                      password=str(hashlib.md5('staff2'.encode('utf-8')).hexdigest()))
-        user5 = User(name='Nguyễn Duy Minh', phone='0123456793', address='202 Street W',
+        user5 = Customer(name='Nguyễn Duy Minh',card_id='012345678910', phone='0123456793', address='202 Street W',
                      email='minh.nguyen@example.com', user_role=UserRoleEnum.CUSTOMER, username='customer1',
                      password=str(hashlib.md5('customer1'.encode('utf-8')).hexdigest()))
-        user6 = User(name='Hoàng Minh Tú', phone='0123456723', address='202 Street B', email='tu.hoang@example.com',
+        user6 = Customer(name='Hoàng Minh Tú',card_id='012345678710', phone='0123456723', address='202 Street B', email='tu.hoang@example.com',
                      user_role=UserRoleEnum.CUSTOMER, username='customer2',
                      password=str(hashlib.md5('customer2'.encode('utf-8')).hexdigest()))
-        user7 = User(name='Trần Văn A', phone='0133456723', address='202 Street B', email='a.tran@example.com',
+        user7 = Customer(name='Trần Văn A',card_id='012345678810', phone='0133456723', address='202 Street B', email='a.tran@example.com',
                      user_role=UserRoleEnum.CUSTOMER, username='customer3',
                      password=str(hashlib.md5('customer3'.encode('utf-8')).hexdigest()))
-        user8 = User(name='Cao Thị C', phone='0124456723', address='202 Street B', email='c.cao@example.com',
+        user8 = Customer(name='Cao Thị C',card_id='012345672410', phone='0124456723', address='202 Street B', email='c.cao@example.com',
                      user_role=UserRoleEnum.CUSTOMER, username='customer4',
                      password=str(hashlib.md5('customer4'.encode('utf-8')).hexdigest()))
-        user9 = User(name='Nguyễn Minh Khải', phone='01255456723', address='202 Street B', email='khai.nguyen@example.com',
+        user9 = Customer(name='Nguyễn Minh Khải',card_id='012345678110', phone='01255456723', address='202 Street B', email='khai.nguyen@example.com',
                      user_role=UserRoleEnum.CUSTOMER, username='customer5',
                      password=str(hashlib.md5('customer5'.encode('utf-8')).hexdigest()))
         db.session.add_all([user1, user2, user3, user4, user5, user6,user7,user8,user9])
+
+
+        cmt1 = Comment(user=None, text='that  tuyet voi')
+        cmt2 = Comment(user='1', text='toi vua moi dat ve')
+        cmt3 = Comment(user='2', text='cứu tôiiiii')
+        cmt4 = Comment(user='3', text='tôi đau đơn')
+        cmt5 = Comment(user=None, text='tôi gục ngã')
+        db.session.add_all([cmt1, cmt2, cmt3, cmt4, cmt5])
         db.session.commit()
 
-        admin1 = Admin(user_id='1')
-        admin2 = Admin(user_id='2')
-        db.session.add_all([admin1, admin2])
-        db.session.commit()
 
-        staff1 = Staff(user_id='3')
-        staff2 = Staff(user_id='4')
-        db.session.add_all([staff1])
-        db.session.commit()
-
-        customer1 = Customer(user_id='5')
-        customer2 = Customer(user_id='6')
-        customer3 = Customer(user_id='7')
-        customer4 = Customer(user_id='8')
-        customer5 = Customer(user_id='9')
-        db.session.add_all([customer1, customer2,customer3,customer4,customer5])
-        db.session.commit()
-
+        #
         plane1 = Plane(name='VietNam Airlines')
         plane2 = Plane(name='Vietjet Air')
         plane3 = Plane(name='Jetstar Pacific')

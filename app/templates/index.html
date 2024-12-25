@@ -174,12 +174,12 @@
                                 </span>
                             {% else %}
                                 {% for user in users %}
-                                <span class="fs-4 fw-bold d-block">
+
                                     {% if cmt.user == user.id %}
                                     {{user.name}}
                                     - <em class="date" data-time="{{cmt.time}}">{{ cmt.time }}</em>
                                     {% endif %}
-                                </span>
+
                                 {% endfor %}
                             {% endif %}
                         </span>
@@ -228,14 +228,21 @@
 
         // Lắng nghe sự kiện khi slide được chuyển đổi
         carousel.addEventListener('slide.bs.carousel', function(event) {
-            // Xóa class active khỏi tất cả các items
-            for (let item of items) {
-                item.classList.remove('active');
-            }
-
             // Thêm class active cho item hiện tại
             const activeIndex = event.to; // Chỉ số của slide hiện tại
             items[activeIndex].classList.add('active');
+        });
+        // Lắng nghe sự kiện khi slide đã hoàn tất chuyển đổi
+        carousel.addEventListener('slid.bs.carousel', function(event) {
+        const activeIndex = event.to; // Chỉ số của slide hiện tại
+        console.log('Đã chuyển đến slide:', activeIndex);
+
+        // Nếu đã đến slide cuối cùng, quay lại slide đầu tiên sau một khoảng thời gian
+        if (activeIndex === items.length - 1) {
+            setTimeout(() => {
+                carousel.carousel(0); // Quay lại slide đầu tiên
+            }, 2000); // Thời gian chờ trước khi quay lại (nếu cần)
+        }
         });
         // chuyển thành định dạng 2,3 ngày trước
         document.querySelectorAll('.date').forEach(function(dateElement) {
