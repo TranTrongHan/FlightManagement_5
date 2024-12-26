@@ -3,9 +3,8 @@ from datetime import datetime, timedelta
 from flask import render_template, request, redirect, jsonify, session, flash, url_for
 from app import app, login, VNPAY_CONFIG,dao,utils
 from flask_login import login_user, logout_user, login_required, current_user
-from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User, MidAirport, FlightSchedule, Route, \
+from app.models import UserRoleEnum, Flight, FareClass, Plane, User, MidAirport, FlightSchedule, Route, \
     Airport, Rule
-from app.utils import check_pending_flighttime
 from dao import db
 
 @app.route('/')
