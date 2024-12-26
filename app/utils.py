@@ -89,7 +89,16 @@ def check_booking_exists(flightid=None, userid=None):
            return True
     return False
 
-
+def check_valid_ticket(takeofftime=None):
+    # takeofftime = datetime.strptime(takeofftime, '%Y-%m-%d %H:%M:%S')
+    current_time = datetime.now()
+    # lấy thời gian khởi hành của chuyến bay - 4 ra thời gian dc phép bán vé
+    rule = dao.get_rule_by_id(id='10')
+    cut_off_time = takeofftime - timedelta(hours=rule.value)
+    # so sánh nếu thời gian hiện tại nhỏ hơn thời gian dc phép bán => ko đc bán vé
+    if current_time > cut_off_time:
+        return False
+    return True
 def check_valid_time(takeofftime=None):
     takeofftime = datetime.strptime(takeofftime, '%Y-%m-%d %H:%M:%S')
     current_time = datetime.now()

@@ -1,0 +1,137 @@
+{% extends 'layout/staffbase.html' %}
+
+{% block staffcontent %}
+<div style="width: 1000px; background-color: rgba(240, 248, 255, 0.9); padding: 30px; margin: 100px auto; border-radius: 10px;  box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    <form  class="d-grid gap-3 px-4">
+        <h1 class="text-center text-primary mt-4 mb-4">XỬ LÍ BÁN VÉ</h1>
+        <!-- Chuyến bay -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label for="flightName" class="fw-bold fs-5 text-danger">Chuyến bay:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input id="flightName" class="form-control form-control-lg" type="text" value="{{flight.name}}" name="flightname" readonly>
+                <input id="planeid" type="hidden" name="plane" value="{{ flight.plane_id }}">
+                <input id="flightid" type="hidden" name="flightid" value="{{ flight.id }}">
+            </div>
+        </div>
+
+        <!-- Số ghế trống -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Số ghế trống hạng 1:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{first_seats_avail}}" name="first_seats_avail" readonly>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Số ghế trống hạng 2:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{second_seats_avail}}" name="second_seats_avail" readonly>
+            </div>
+        </div>
+
+        <!-- Nơi đi -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Nơi đi:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                {% for airport in airports %}
+                {% if route.take_off_airport_id == airport.id %}
+                <input class="form-control form-control-lg" type="text" value="{{airport.name}}" readonly>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Nơi đến -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Nơi đến:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                {% for airport in airports %}
+                {% if route.landing_airport_id == airport.id %}
+                <input class="form-control form-control-lg" type="text" value="{{airport.name}}" readonly>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Thời gian cất cánh -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Thời gian cất cánh:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{flight.take_off_time}}" readonly>
+            </div>
+        </div>
+
+        <!-- Thời gian hạ cánh -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Thời gian hạ cánh:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="text" value="{{flight.landing_time}}" readonly>
+            </div>
+        </div>
+
+        <!-- Số lượng vé -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Số lượng vé:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <input class="form-control form-control-lg" type="number" id="ticket-quantity" name="ticket-quantity" min="1" value="1" required>
+                <input type="hidden" name="count" value="{{ count }}">
+            </div>
+        </div>
+
+        <!-- Hạng vé -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Hạng vé:</label>
+            </div>
+            <div class="col-12 col-md-8">
+                <select id="fareClassSelect" class="form-select form-select-lg" name="fareclassid">
+                    {% for fareclass in fareclass %}
+                    <option data-price="{{ fareclass.price }}" {% if loop.index == 1 %}selected{% endif %} value="{{fareclass.id}}">{{fareclass.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Tên khách hàng -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <label class="fw-bold fs-5 text-danger">Tên khách hàng:</label>
+            </div>
+            <div class="col-12 col-md-8">
+               <select id="customerSelect" class="form-select form-select-lg" name="customerSelect">
+                    {% for c in customers %}
+                    <option {% if loop.index == 1 %}selected{% endif %} value="{{c.id}}">{{c.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+
+
+
+        <!-- Bán vé -->
+        <hr class="border-3 border-top-3 border-light">
+        <div class="row">
+            <div class="col-12 d-flex justify-content-center">
+                <input type="submit" value="Bán vé" class="btn" style="background-color: #0078FF; color: white; font-size: 1.25rem; padding: 12px 24px; border: none; border-radius: 5px;"/>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

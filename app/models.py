@@ -1,3 +1,4 @@
+
 from app import db, app
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, Enum, DateTime, values, false
 from sqlalchemy.orm import relationship, backref
@@ -222,7 +223,8 @@ if __name__ == "__main__":
         rule7 = Rule(name='Maximum_downtime', value='30')
         rule8 = Rule(name='Minimum_flight_time', value='0.5')
         rule9 = Rule(name='Max_transit_airports', value='2')
-        db.session.add_all([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9])
+        rule10 = Rule(name='khoảng thời gian cho phép bán vé',value='4')
+        db.session.add_all([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9,rule10])
         db.session.commit()
         user1 = User(name='Nguyễn An', phone='0123456789', address='123 Street A', email='an.nguyen@example.com',
                      user_role=UserRoleEnum.ADMIN, username='admin1',
@@ -311,8 +313,7 @@ if __name__ == "__main__":
                             route11, route12, route13])
         db.session.commit()
 
-        db.session.add_all([rule1,rule2,rule6])
-        db.session.commit()
+
         #         ==============================Tuyến Hà Nội(HAN) - Hồ Chí Minh(SGN) ======================================
         flight1 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_off_time=datetime(2024, 12, 27, 11, 00, 00),
                          landing_time=datetime(2024, 12, 28, 23, 00, 00),

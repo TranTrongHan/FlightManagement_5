@@ -188,7 +188,8 @@ def load_users():
     return User.query.all()
 def load_comments():
     return Comment.query.all()
-
+def load_customers():
+    return User.query.filter(User.user_role == UserRoleEnum.CUSTOMER)
 def save_comment(content):
     user_id = current_user.id if current_user.is_authenticated else None
 

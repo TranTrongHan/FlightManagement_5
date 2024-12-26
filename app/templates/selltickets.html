@@ -1,0 +1,110 @@
+{% extends 'layout/staffbase.html' %}
+
+{% block staffcontent %}
+
+<div class="container-fluid">
+     <h2 style="color: #0078FF; margin-bottom: 20px;text-align: center;">TÌM KIẾM CHUYẾN BAY</h2>
+        <div class="row">
+            <!-- Nơi đi -->
+            <div class="col-md-5 mb-3">
+                <label for="takeoff1" class="fs-4 text-danger fw-bold">Nơi đi:</label>
+                <select name="takeoff1" class="form-select form-select-lg" id="takeoff1">
+                    {% for airport in take_off_airports %}
+                    {% for airportName in airports %}
+                    {% if airport.id == airportName.id %}
+                    <option value="{{airport.id}}">{{airportName.name}}</option>
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Nơi đến -->
+            <div class="col-md-5 mb-3">
+                <label for="landing1" class="fs-4 text-danger fw-bold">Nơi đến:</label>
+                <select name="landing1" class="form-select form-select-lg" id="landing1">
+                    {% for airport in landing_airports %}
+                    {% for airportName in airports %}
+                    {% if airport.id == airportName.id %}
+                    <option value="{{airport.id}}">{{airportName.name}}</option>
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Button Tìm kiếm -->
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                <button class="btn btn-s btn-primary w-100 fw-bold" type="button" onclick="selltickets()">Tìm kiếm
+                </button>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <!-- Thời gian đi -->
+            <div class="col-md-5 mb-3">
+                <label for="departureTime" class="fs-4 text-danger fw-bold">Thời gian đi:</label>
+                <input id="departureTime" class="form-control form-control-lg" type="date" name="departureTime">
+            </div>
+
+        </div>
+        <hr class="my-4">
+        <div class="row mt-3">
+            <div class="col-12" id="flightList">
+                <table class="table table-hover table-bordered">
+                    <thead class="table-primary" >
+                    <tr class="text-center">
+                        <th >Tuyến bay</th>
+                        <th>Mã chuyến bay</th>
+                        <th>Tên chuyến bay</th>
+                        <th>Tên máy bay</th>
+                        <th>Ngày giờ cất cánh</th>
+                        <th>Ngày giờ hạ cánh</th>
+                        <th>Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody id="flightTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </form>
+</div>
+<script src="{{url_for('static',filename='js/ticket.js')}}"></script>
+<script>
+<!--    window.onload = function() {-->
+<!--       var myModal = new bootstrap.Modal(document.getElementById('myModal'));-->
+<!--       {% if get_flashed_messages() %}-->
+<!--           myModal.show();-->
+<!--       {% endif %}-->
+<!--   };-->
+
+   document.addEventListener('DOMContentLoaded', function() {
+       // Tải lại giá trị từ localStorage
+       if (localStorage.getItem('takeoff')) {
+           document.querySelector('select[name="takeoff1"]').value = localStorage.getItem('takeoff');
+       }
+       if (localStorage.getItem('landing')) {
+           document.querySelector('select[name="landing1"]').value = localStorage.getItem('landing');
+       }
+       if (localStorage.getItem('departureTime')) {
+           document.getElementById('departureTime').value = localStorage.getItem('departureTime');
+       }
+
+
+   });
+    document.addEventListener('DOMContentLoaded', function() {
+      // Ngăn người dùng chọn thời gian đi của quá khứ
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+        const year = today.getFullYear();
+        const formattedDate = `${year}-${month}-${day}`;
+
+        document.getElementById('departureTime').setAttribute('min', formattedDate);
+   });
+
+
+</script>
+
+{% endblock %}
