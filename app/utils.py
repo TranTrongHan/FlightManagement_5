@@ -133,17 +133,6 @@ def send_ticket_email(ticket_info):
     # Tạo nội dung email với bảng thông tin vé
     msg.html = f"""
     <h3>Chúc mừng bạn đã đặt vé thành công!</h3>
-    <table border="1" style="border-collapse: collapse; width: 100%;">
-        <tr>
-            <th>Thông Tin</th>
-            <th>Giá Trị</th>
-        </tr>
-        <tr>
-            <td>{ticket_info.get('customername')}</td>
-            <td>{ticket_info.get('customername')}</td>
-        </tr>
-       
-    </table>
     <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
     """
     # Gửi email
