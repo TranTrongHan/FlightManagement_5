@@ -73,7 +73,7 @@ class Plane(db.Model):
 #####################################
 class Airport(db.Model):
     id = Column(Integer,primary_key=True,autoincrement=True)
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=True)
     takeoff_airport = relationship("Route",foreign_keys='Route.take_off_airport_id', backref="takeoff_airport",lazy=True)
     landing_airport = relationship("Route",foreign_keys='Route.landing_airport_id', backref="landing_airport",lazy=True)
 
@@ -217,10 +217,15 @@ if __name__ == "__main__":
 
         rule1 = Rule(name='Số lượng ghế hạng 1',value ='5')
         rule2 = Rule(name='Số lượng ghế hạng 2', value='5')
-        rule3 = Rule(name='thời gian dừng tối thiểu', value='20')
+        rule3 = Rule(name='Minimum_downtime', value='20')
         rule4 = Rule(name='1st_seat_price', value=1500000)
         rule5 = Rule(name='2st_seat_price', value=1000000)
         rule6 = Rule(name='khoảng thời gian cho phép đặt vé',value='12')
+        rule7 = Rule(name='Maximum_downtime', value='30')
+        rule8 = Rule(name='Minimum_flight_time', value='0.5')
+        rule9 = Rule(name='Max_transit_airports', value='2')
+        db.session.add_all([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9])
+        db.session.commit()
         user1 = User(name='Nguyễn An', phone='0123456789', address='123 Street A', email='an.nguyen@example.com',
                      user_role=UserRoleEnum.ADMIN, username='admin1',
                      password=str(hashlib.md5('admin1'.encode('utf-8')).hexdigest()))

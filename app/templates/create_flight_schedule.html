@@ -68,22 +68,23 @@
         <div class="row g-5 mt-2">
             <!-- Ngày và giờ bay -->
             <div class="col-md-6">
-                <label for="take_of_time" class="form-label">Ngày và giờ bay:</label>
-                <input type="datetime-local" class="form-control" id="take_of_time" name="take_of_time" required>
+                <label for="take_off_time" class="form-label">Ngày và giờ bay:</label>
+                <input type="datetime-local" class="form-control" id="take_off_time" name="take_off_time" required>
             </div>
              <!-- Thời gian bay -->
             <div class="col-md-6">
                 <label for="flight_duration" class="form-label">Thời gian bay (giờ):</label>
-                <input type="number" class="form-control" id="flight_duration" name="flight_duration" placeholder="(giờ)" min="0.5" step="0.1" required>
+                <input type="number" class="form-control" id="flight_duration" name="flight_duration" placeholder="(giờ)" min="" step="0.1" required>
+
             </div>
 
         </div>
-
+        {% for i in range(1, max_transit_airports + 1) %}
         <div class="row g-5 mt-2">
             <!-- Sân bay trung gian 1 -->
             <div class="col-md-6">
-                <label for="transit_airport_1" class="form-label">Sân bay trung gian 1:</label>
-                <select class="form-control" id="transit_airport_1" name="transit_airport_1" >
+                <label for="transit_airport_{{i}}" class="form-label">Sân bay trung gian {{i}}:</label>
+                <select class="form-control" id="transit_airport_{{i}}" name="transit_airport_{{i}}" >
                     <option value="" disabled selected>Chọn sân bay</option>
                     {% for airport in airports %}
                     <option value="{{ airport.id }}">{{ airport.name }}</option>
@@ -92,46 +93,46 @@
             </div>
             <!-- Thời gian dừng tại trung gian 1 -->
             <div class="col-md-6">
-                <label for="stopover_time_1" class="form-label">Thời gian dừng tại trung gian 1 (phút):</label>
-                <input type="number" class="form-control" id="stopover_time_1" name="stopover_time_1" placeholder="(phút)" min="20" max="30">
-                <small class="text-muted">Từ 20 đến 30 phút.</small>
+                <label for="stopover_time_{{i}}" class="form-label">Thời gian dừng tại trung gian {{i}} (phút):</label>
+                <input type="number" class="form-control" id="stopover_time_{{i}}" name="stopover_time_{{i}}" placeholder="(phút)" min="" max="">
+
             </div>
         </div>
 
         <div class="row g-5 mt-2">
             <!-- Ghi chú trung gian 1 -->
             <div class="col-12">
-                <label for="note_transit_1" class="form-label">Ghi chú cho trung gian 1:</label>
-                <textarea class="form-control" id="note_transit_1" name="note_transit_1" rows="3"></textarea>
+                <label for="note_transit_{{i}}" class="form-label">Ghi chú cho trung gian {{i}}:</label>
+                <textarea class="form-control" id="note_transit_{{i}}" name="note_transit_{{i}}" rows="3"></textarea>
             </div>
         </div>
+        {% endfor %}
+<!--        <div class="row g-5 mt-2">-->
+<!--            &lt;!&ndash; Sân bay trung gian 2 &ndash;&gt;-->
+<!--            <div class="col-md-6">-->
+<!--                <label for="transit_airport_2" class="form-label">Sân bay trung gian 2:</label>-->
+<!--                <select class="form-control" id="transit_airport_2" name="transit_airport_2" >-->
+<!--                    <option value="" disabled selected>Chọn sân bay</option>-->
+<!--                    {% for airport in airports %}-->
+<!--                    <option value="{{ airport.id }}">{{ airport.name }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            &lt;!&ndash; Thời gian dừng tại trung gian 2 &ndash;&gt;-->
+<!--            <div class="col-md-6">-->
+<!--                <label for="stopover_time_2" class="form-label">Thời gian dừng tại trung gian 2 (phút):</label>-->
+<!--                <input type="number" class="form-control" id="stopover_time_2" name="stopover_time_2" placeholder="(phút)" min="" max="">-->
 
-        <div class="row g-5 mt-2">
-            <!-- Sân bay trung gian 2 -->
-            <div class="col-md-6">
-                <label for="transit_airport_2" class="form-label">Sân bay trung gian 2:</label>
-                <select class="form-control" id="transit_airport_2" name="transit_airport_2" >
-                    <option value="" disabled selected>Chọn sân bay</option>
-                    {% for airport in airports %}
-                    <option value="{{ airport.id }}">{{ airport.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <!-- Thời gian dừng tại trung gian 2 -->
-            <div class="col-md-6">
-                <label for="stopover_time_2" class="form-label">Thời gian dừng tại trung gian 2 (phút):</label>
-                <input type="number" class="form-control" id="stopover_time_2" name="stopover_time_2" placeholder="(phút)" min="20" max="30">
-                <small class="text-muted">Từ 20 đến 30 phút.</small>
-            </div>
-        </div>
+<!--            </div>-->
+<!--        </div>-->
 
-        <div class="row g-5 mt-2">
-            <!-- Ghi chú trung gian 2 -->
-            <div class="col-12">
-                <label for="note_transit_2" class="form-label">Ghi chú cho trung gian 2:</label>
-                <textarea class="form-control" id="note_transit_2" name="note_transit_2" rows="3"></textarea>
-            </div>
-        </div>
+<!--        <div class="row g-5 mt-2">-->
+<!--            &lt;!&ndash; Ghi chú trung gian 2 &ndash;&gt;-->
+<!--            <div class="col-12">-->
+<!--                <label for="note_transit_2" class="form-label">Ghi chú cho trung gian 2:</label>-->
+<!--                <textarea class="form-control" id="note_transit_2" name="note_transit_2" rows="3"></textarea>-->
+<!--            </div>-->
+<!--        </div>-->
 
         <div class="row g-5 mt-2">
             <!-- Số lượng vé hạng 1 -->
