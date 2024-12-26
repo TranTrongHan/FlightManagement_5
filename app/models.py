@@ -31,8 +31,6 @@ class User(db.Model, UserMixin):
     def __str__(self):
         return self.name
 
-
-
 #####################################
 class Customer(User):
     Cus_id = Column(Integer, primary_key=True, autoincrement=True)
