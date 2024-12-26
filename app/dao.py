@@ -64,7 +64,7 @@ def load_flights(flight_id=None,depart_time=None,route_id=None,flight_id_of_tick
         query = Flight.query.filter(Flight.id == flight_id).all()
         return query
     if depart_time and route_id:
-        depart_time = datetime.strptime(depart_time, '%Y-%m-%d')
+        # depart_time = datetime.strptime(depart_time, '%Y-%m-%d')
         # return_time = datetime.strptime(return_time, '%Y-%m-%d')
         flights = Flight.query.filter(Flight.take_off_time >= depart_time,Flight.route_id==route_id).all()
         return flights

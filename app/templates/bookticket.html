@@ -174,16 +174,18 @@
        if (localStorage.getItem('departureTime')) {
            document.getElementById('departureTime').value = localStorage.getItem('departureTime');
        }
-       if (localStorage.getItem('returnTime')) {
-           document.getElementById('returnTime').value = localStorage.getItem('returnTime');
-       }
+
 
    });
-   // Ngăn người dùng chọn thời gian đi và thời gian về của quá khứ
     document.addEventListener('DOMContentLoaded', function() {
-       var today = new Date().toISOString().split('T')[0];
-       document.getElementById('departureTime').setAttribute('min', today);
-       document.getElementById('returnTime').setAttribute('min', today);
+      // Ngăn người dùng chọn thời gian đi của quá khứ
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+        const year = today.getFullYear();
+        const formattedDate = `${year}-${month}-${day}`;
+
+        document.getElementById('departureTime').setAttribute('min', formattedDate);
    });
 
 

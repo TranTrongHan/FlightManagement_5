@@ -239,18 +239,19 @@ def api_bookticket():
 def handlebooking():
     flight_id = request.json.get('flight_id')
     user_id = request.json.get('user_id')
-
+    takeoff_time = request.json.get('takeoff_time')
     # Kiểm tra xem khách hàng đã đặt chuyến bay này chưa hoặc đã đặt vé có thời gian khởi hành trước đó
     booking_exists = utils.check_booking_exists( flightid=flight_id,userid=user_id)
     print(booking_exists)
-    valid_time = utils.check_valid_time(flightid=flight_id)
+    valid_time = utils.check_valid_time(takeofftime=takeoff_time)
     print(valid_time)
     if booking_exists:
-        return jsonify({'error': 'Bạn đã đặt chuyến bay này trước đó hoặc có chuyến bay trong vòng 12 giờ.'}), 400
+        return jsonify({'error': 'Bạn đã đặt chuyến bay này trước đó'}), 400
     if not valid_time:
-        return jsonify({'error': 'Bạn đã đặt vi phạm thời gian đặt vé.'}), 400
+        return jsonify({'error': 'Bạn chỉ được phép đặt vé trước 12 tiếng.'}), 400
 
-    return jsonify()
+    return jsonify({'success': True})
+
 @app.route('/bookticket_process', methods=['GET', 'POST'])
 @login_required
 def bookticket_process():
@@ -294,27 +295,11 @@ def payment_comfirm_page():
     plane_name = dao.get_name_by_id(Plane, id=plane_id)
 
     fareclass = FareClass(id=fareclass_id)
-    # valid_time = utils.check_valid_time(flightid=flight_id)
-    # if not valid_time:
-    #     flash(message="Thời gian không hợp lệ.",category="Lỗi chọn thời gian")
-    #     return redirect('/bookticket')
-    # if int(first_seats_avail==0) and int(second_seats_avail) == 0:
-    #     flash(message="Không còn chỗ trống.Vui lòng đặt chuyến khác",category="Thông báo")
-    #     return redirect('/bookticket')
-    # checkseat = utils.check_seat(flightid=flight_id,quantity=quantity,fareclassid=fareclass_id)
-    # if checkseat == False:
-    #     seat_class_name = dao.get_name_by_id(model=FareClass,id=fareclass_id)
-    #     flash(message=f"Không còn đủ chỗ trống cho {seat_class_name}.", category="Thông báo")
-    #     return redirect('/bookticket')
-    # booked_ticket = utils.checkduplicate_ticket(flightid=flight_id, customer_id=cus_obj.id)
-    # if booked_ticket:
-    #     flash(message="Bạn đã đặt vé cho chuyến bay này.",category="Thông báo")
-    #     return redirect('/bookticket')
-    # booked_flightid = check_pending_flighttime(flightid=flight_id, customerid=cus_obj.id)
-    # if booked_flightid:
-    #     session['flightid_booked'] = booked_flightid
-    #     flash(message="Bạn đã có chuyến bay đang chờ.",category="Thông báo")
-    #     return redirect('/bookticket')
+
+    if int(first_seats_avail==0) and int(second_seats_avail) == 0:
+        flash(message="Không còn chỗ trống.Vui lòng đặt chuyến khác",category="Thông báo")
+        return redirect('/bookticket')
+
     ticket_info = {
         'order_id': f"ticket-{user_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
         "flightid": flight_id,
@@ -492,20 +477,8 @@ def get_airports_by_route(route_id):
 @app.context_processor
 def inject_user_role_enum():
     return dict(UserRoleEnum=UserRoleEnum)
-# @app.route("/api/findflights/",methods=['POST'])
-# def findflights ():
-#     takeoff_airport1 = request.form.get('takeoff1')
-#     landing_airport1 = request.form.get('landing1')
-#     departure_time = request.form.get('departureTime')
-#     flight_details = session.get('flight_details')
-#     if not flight_details:
-#         flight_details = {}
-#     flight_details = {
-#         'takeoff_airport':takeoff_airport1,
-#         'landing_aiport':landing_airport1,
-#         'departure_time':departure_time
-#     }
-#     return jsonify(flight_details)
+
+
 @app.route("/api/comments", methods=['POST'])
 def add_comment():
     data = request.get_json()

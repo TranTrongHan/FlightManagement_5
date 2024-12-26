@@ -31,7 +31,6 @@ function findflights(){
     }).then(data => {
         const flights = data.flights;
         const route = data.route;
-        console.log('helloơqd')
         flights.forEach(flight => {
             const flightName = flight.name; // Truy xuất thuộc tính name
             const routeId = flight.route_id; // Truy xuất thuộc tính route_id
@@ -59,7 +58,7 @@ function findflights(){
                         <td>${formattedTakeOffTime}</td>
                         <td>${formattedLandingTime}</td>
                         <td>
-                            <input type="button" value="Đặt vé" onclick="pendingpayment(${flight.id},${data.user_id},${data.route.id})"
+                            <input type="button" value="Đặt vé" onclick="pendingpayment(${flight.id},${data.user_id},${data.route.id},'${formattedTakeOffTime}')"
                              style="background-color: #0078FF; color: white; padding: 12px 24px; border: none; border-radius: 5px;"/>
                         </td>
                     </tr>
@@ -73,22 +72,25 @@ function findflights(){
         }
     }).catch(error => console.error('Error:', error));
 }
-function formatDate(date) {
+function formatDate(dateString) {
     const pad = (num) => String(num).padStart(2, '0'); // Hàm thêm số 0 vào trước nếu cần
+
+    // Chuyển đổi chuỗi thành đối tượng Date
+    const date = new Date(dateString);
+
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
 
 
-function pendingpayment(flightId,userId,routeId){
-    console.log(flightId)
-    console.log(userId)
-    console.log(routeId)
+function pendingpayment(flightId,userId,routeId,takeOffTime){
     fetch('/api/handlebooking', {
         method:'post',
         body: JSON.stringify({
             'flight_id': flightId,
-            'user_id' : userId
+            'user_id' : userId,
+            'route_id':routeId,
+            'takeoff_time':takeOffTime
         }),
         headers:{
             'Content-Type':'application/json'
@@ -104,7 +106,11 @@ function pendingpayment(flightId,userId,routeId){
         // Chuyển hướng đến trang mới nếu không có lỗi
         window.location.href = `/bookticket_process?flight_id=${flightId}&route_id=${routeId}&user_id=${userId}`; // Cập nhật nội dung
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        alert(error.message); // Hiển thị lỗi dưới dạng alert
+//         Chuyển hướng về trang bookticket
+        window.location.href = '/bookticket';
+    })
 }
 
 

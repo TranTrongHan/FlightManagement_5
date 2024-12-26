@@ -251,11 +251,11 @@ if __name__ == "__main__":
         db.session.add_all([user1, user2, user3, user4, user5, user6,user7,user8,user9])
 
 
-        cmt1 = Comment(user=None, text='that  tuyet voi')
-        cmt2 = Comment(user='1', text='toi vua moi dat ve')
-        cmt3 = Comment(user='2', text='cứu tôiiiii')
-        cmt4 = Comment(user='3', text='tôi đau đơn')
-        cmt5 = Comment(user=None, text='tôi gục ngã')
+        cmt1 = Comment(user=None, text='thật tuyệt vời')
+        cmt2 = Comment(user='1', text='tôi vừa đặt vé')
+        cmt3 = Comment(user='2', text='test bình luận')
+        cmt4 = Comment(user='3', text='giao diện chưa đẹp')
+        cmt5 = Comment(user=None, text='web thiếu nhiều')
         db.session.add_all([cmt1, cmt2, cmt3, cmt4, cmt5])
         db.session.commit()
 
