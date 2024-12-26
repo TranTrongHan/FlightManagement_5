@@ -61,6 +61,14 @@ class Plane(db.Model):
     def __str__(self):
         return self.name
 
+    def __init__(self, name):
+        self.name = name
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
 
 #####################################
 class Airport(db.Model):
@@ -82,15 +90,26 @@ class Route(db.Model):
 
     def __str__(self):
         return self.name
+    def __init__(self, name,take_off_airport_id,landing_airport_id):
+        self.name = name
+        self.take_off_airport_id =take_off_airport_id,
+        self.landing_airport_id = landing_airport_id
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'take_off_airport_id':self.take_off_airport_id,
+            'landing_airport_id':self.landing_airport_id
+        }
 #####################################
 class Flight(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
-    take_of_time = Column(DateTime, nullable=False)
+    take_off_time = Column(DateTime, nullable=False)
     landing_time = Column(DateTime, nullable=False)
-    first_seat_quantity = Column(Integer,nullable=False)
-    second_seat_quantity = Column(Integer,nullable=False)
+    first_seat_quantity = Column(Integer,nullable=True)
+    second_seat_quantity = Column(Integer,nullable=True)
     plane_id = Column(Integer, ForeignKey(Plane.id), nullable=True)
     route_id = Column(Integer, ForeignKey(Route.id), nullable=True)
     mid_airport = relationship("MidAirport",backref="flight",lazy=True)
@@ -98,16 +117,27 @@ class Flight(db.Model):
     def __str__(self):
         return self.name
 
+    def __init__(self, name, take_off_time, landing_time, first_seat_quantity, second_seat_quantity, plane_id,
+                 route_id):
+        self.name = name
+        self.take_off_time = take_off_time
+        self.landing_time = landing_time
+        self.first_seat_quantity = first_seat_quantity
+        self.second_seat_quantity = second_seat_quantity
+        self.plane_id = plane_id
+        self.route_id = route_id
+
     def to_dict(self):
         return {
             'id': self.id,
+            'name': self.name,
+            'take_off_time': self.take_off_time,
+            'landing_time':self.landing_time,
+            'first_seat_quantity':self.first_seat_quantity,
+            'second_seat_quantity':self.second_seat_quantity,
+            'plane_id':self.plane_id,
+            'route_id': self.route_id
         }
-
-    @classmethod
-    def from_dict(cls, data):
-        return cls(
-            id=data['id'],
-        )
 
 class MidAirport(Airport):
     mid_airport_id = Column(Integer,primary_key=True,autoincrement=True)
@@ -190,6 +220,7 @@ if __name__ == "__main__":
         rule3 = Rule(name='thời gian dừng tối thiểu', value='20')
         rule4 = Rule(name='1st_seat_price', value=1500000)
         rule5 = Rule(name='2st_seat_price', value=1000000)
+        rule6 = Rule(name='khoảng thời gian cho phép đặt vé',value='12')
         user1 = User(name='Nguyễn An', phone='0123456789', address='123 Street A', email='an.nguyen@example.com',
                      user_role=UserRoleEnum.ADMIN, username='admin1',
                      password=str(hashlib.md5('admin1'.encode('utf-8')).hexdigest()))
@@ -220,11 +251,11 @@ if __name__ == "__main__":
         db.session.add_all([user1, user2, user3, user4, user5, user6,user7,user8,user9])
 
 
-        cmt1 = Comment(user=None, text='that  tuyet voi')
-        cmt2 = Comment(user='1', text='toi vua moi dat ve')
-        cmt3 = Comment(user='2', text='cứu tôiiiii')
-        cmt4 = Comment(user='3', text='tôi đau đơn')
-        cmt5 = Comment(user=None, text='tôi gục ngã')
+        cmt1 = Comment(user=None, text='thật tuyệt vời')
+        cmt2 = Comment(user='1', text='tôi vừa đặt vé')
+        cmt3 = Comment(user='2', text='test bình luận')
+        cmt4 = Comment(user='3', text='giao diện chưa đẹp')
+        cmt5 = Comment(user=None, text='web thiếu nhiều')
         db.session.add_all([cmt1, cmt2, cmt3, cmt4, cmt5])
         db.session.commit()
 
@@ -277,120 +308,120 @@ if __name__ == "__main__":
                             route11, route12, route13])
         db.session.commit()
 
-        db.session.add_all([rule1,rule2])
+        db.session.add_all([rule1,rule2,rule6])
         db.session.commit()
         #         ==============================Tuyến Hà Nội(HAN) - Hồ Chí Minh(SGN) ======================================
-        flight1 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+        flight1 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_off_time=datetime(2024, 12, 25, 11, 00, 00),
                          landing_time=datetime(2024, 12, 27, 23, 00, 00),
                             first_seat_quantity = rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='1')
-        flight2 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+        flight2 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_off_time=datetime(2024, 12, 26, 12, 00, 00),
                          landing_time=datetime(2024, 12, 27 , 11, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='1')
-        flight3 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 26, 23, 00, 00),
+        flight3 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_off_time=datetime(2024, 12, 26, 23, 00, 00),
                          landing_time=datetime(2024, 12, 27, 12, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='3', route_id='1')
-        flight4 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_of_time=datetime(2024, 12, 26, 5, 00, 00),
+        flight4 = Flight(name='Hà Nội(HAN) - Hồ Chí Minh(SGN)', take_off_time=datetime(2024, 12, 26, 5, 00, 00),
                          landing_time=datetime(2024, 12, 26, 10, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='4', route_id='1')
         #         ==============================Tuyến Hà Nội(HAN) - Đà Nẵng(DAD) ======================================
-        flight5 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_of_time=datetime(2024, 12, 26, 10, 00, 00),
+        flight5 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_off_time=datetime(2024, 12, 26, 10, 00, 00),
                          landing_time=datetime(2024, 12, 26, 23, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='2')
-        flight6 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_of_time=datetime(2024, 12, 26, 8, 00, 00),
+        flight6 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_off_time=datetime(2024, 12, 26, 8, 00, 00),
                          landing_time=datetime(2024, 12, 26, 11, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='2')
-        flight7 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_of_time=datetime(2024, 12, 26, 10, 00, 00),
+        flight7 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_off_time=datetime(2024, 12, 26, 10, 00, 00),
                          landing_time=datetime(2024, 12, 26, 12, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='3', route_id='1')
-        flight8 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_of_time=datetime(2024, 12, 26, 5, 00, 00),
+        flight8 = Flight(name='Hà Nội(HAN) - Đà Nẵng(DAD)', take_off_time=datetime(2024, 12, 26, 5, 00, 00),
                          landing_time=datetime(2024, 12, 26, 10, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='4', route_id='2')
 
         #         ==============================Tuyến Hà Nội(HAN) - Nha Trang(CXR) ======================================
-        flight9 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
+        flight9 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_off_time=datetime(2024, 12, 26, 11, 00, 00),
                          landing_time=datetime(2024, 12, 26, 23, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='4')
-        flight10 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+        flight10 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_off_time=datetime(2024, 12, 26, 12, 00, 00),
                          landing_time=datetime(2024, 12, 27, 11, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='4')
-        flight11 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_of_time=datetime(2024, 12, 26, 23, 00, 00),
+        flight11 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_off_time=datetime(2024, 12, 26, 23, 00, 00),
                          landing_time=datetime(2024, 12, 27, 12, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='3', route_id='4')
-        flight12 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_of_time=datetime(2024, 12, 26, 5, 00, 00),
+        flight12 = Flight(name='Hà Nội(HAN) - Nha Trang(CXR)', take_off_time=datetime(2024, 12, 26, 5, 00, 00),
                          landing_time=datetime(2024, 12, 26, 10, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='4', route_id='4')
 
         #         ==============================Tuyến Đà Nẵng(DAD) - TP HCM(SG) ======================================
-        flight13 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
+        flight13 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_off_time=datetime(2024, 12, 26, 11, 00, 00),
                          landing_time=datetime(2024, 12, 26, 23, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='3')
-        flight14 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+        flight14 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_off_time=datetime(2024, 12, 26, 12, 00, 00),
                          landing_time=datetime(2024, 12, 26, 21, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='3')
-        flight15 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 26, 23, 00, 00),
+        flight15 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_off_time=datetime(2024, 12, 26, 23, 00, 00),
                          landing_time=datetime(2024, 12, 27, 1, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='3', route_id='3')
-        flight16 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_of_time=datetime(2024, 12, 26, 5, 00, 00),
+        flight16 = Flight(name='Đà Nẵng(DAD) - TP HCM(SG)', take_off_time=datetime(2024, 12, 26, 5, 00, 00),
                          landing_time=datetime(2024, 12, 26, 10, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='4', route_id='3')
 
         #         ==============================Tuyến TP HCM(SG)- Nha Trang(CXR) ======================================
-        flight17 = Flight(name='TP HCM(SG)- Nha Trang(CXR)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+        flight17 = Flight(name='TP HCM(SG)- Nha Trang(CXR)', take_off_time=datetime(2024, 12, 25, 11, 00, 00),
                          landing_time=datetime(2024, 12, 26, 23, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='5')
-        flight18 = Flight(name='TP HCM(SG)- Nha Trang(CXR)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+        flight18 = Flight(name='TP HCM(SG)- Nha Trang(CXR)', take_off_time=datetime(2024, 12, 26, 12, 00, 00),
                          landing_time=datetime(2024, 12, 26, 20, 00, 00),
                          first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='5')
 
         #         ==============================Tuyến Hà Nội(HAN) - Phú Quốc(PQH) ======================================
-        flight19 = Flight(name='Hà Nội(HAN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
+        flight19 = Flight(name='Hà Nội(HAN) - Phú Quốc(PQH)', take_off_time=datetime(2024, 12, 26, 11, 00, 00),
                           landing_time=datetime(2024, 12, 26, 15, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='6')
-        flight20 = Flight(name='Hà Nội(HAN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+        flight20 = Flight(name='Hà Nội(HAN) - Phú Quốc(PQH)', take_off_time=datetime(2024, 12, 26, 12, 00, 00),
                           landing_time=datetime(2024, 12, 26, 15, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='6')
 
         #         ==============================Tuyến Hồ Chí Minh(SGN) - Phú Quốc(PQH) ======================================
-        flight21 = Flight(name='Hồ Chí Minh(SGN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
+        flight21 = Flight(name='Hồ Chí Minh(SGN) - Phú Quốc(PQH)', take_off_time=datetime(2024, 12, 26, 11, 00, 00),
                           landing_time=datetime(2024, 12, 27, 12, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='7')
-        flight22 = Flight(name='Hồ Chí Minh(SGN) - Phú Quốc(PQH)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+        flight22 = Flight(name='Hồ Chí Minh(SGN) - Phú Quốc(PQH)', take_off_time=datetime(2024, 12, 26, 12, 00, 00),
                           landing_time=datetime(2024, 12, 26, 16, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='7')
 
         #         ==============================Tuyến Hà Nội(HAN) - Quy Nhơn(UIH) ======================================
-        flight23 = Flight(name='Hà Nội(HAN) - Quy Nhơn(UIH)', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
+        flight23 = Flight(name='Hà Nội(HAN) - Quy Nhơn(UIH)', take_off_time=datetime(2024, 12, 26, 11, 00, 00),
                           landing_time=datetime(2024, 12, 26, 19, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='8')
 
         #         ==============================Tuyến Hồ Chí Minh(SGN) - Đà Lạt(DLI) ======================================
-        flight24 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
+        flight24 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_off_time=datetime(2024, 12, 26, 11, 00, 00),
                           landing_time=datetime(2024, 12, 26, 20, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='9')
-        flight25 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+        flight25 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_off_time=datetime(2024, 12, 26, 12, 00, 00),
                           landing_time=datetime(2024, 12, 26, 19, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='9')
 
         #         ==============================Tuyến Hà Nội(HAN) - Hải Phòng(HPH) ======================================
-        flight26 = Flight(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_of_time=datetime(2024, 12, 26, 11, 00, 00),
+        flight26 = Flight(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_off_time=datetime(2024, 12, 26, 11, 00, 00),
                           landing_time=datetime(2024, 12, 26, 15, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='10')
-        flight27 = Flight(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_of_time=datetime(2024, 12, 26, 12, 00, 00),
+        flight27 = Flight(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_off_time=datetime(2024, 12, 26, 12, 00, 00),
                           landing_time=datetime(2024, 12, 26, 18, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='2', route_id='10')
 
         #         ==============================Tuyến Hà Nội(HAN) - Điện Biên Phủ(DIN) ======================================
-        flight28 = Flight(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+        flight28 = Flight(name='Hà Nội(HAN) - Hải Phòng(HPH)', take_off_time=datetime(2024, 12, 25, 11, 00, 00),
                           landing_time=datetime(2024, 12, 27, 23, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='11')
 
         #         ==============================Tuyến Hồ Chí Minh(SGN) - Côn Đảo(VCS) ======================================
-        flight29 = Flight(name='Hồ Chí Minh(SGN) - Côn Đảo(VCS)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+        flight29 = Flight(name='Hồ Chí Minh(SGN) - Côn Đảo(VCS)', take_off_time=datetime(2024, 12, 25, 11, 00, 00),
                           landing_time=datetime(2024, 12, 27, 23, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='12')
 
         #         ==============================Tuyến Hà Nội(HAN) - Phú Yên(UIH) ======================================
-        flight30 = Flight(name='Hà Nội(HAN) - Phú Yên(UIH)', take_of_time=datetime(2024, 12, 25, 11, 00, 00),
+        flight30 = Flight(name='Hà Nội(HAN) - Phú Yên(UIH)', take_off_time=datetime(2024, 12, 25, 11, 00, 00),
                           landing_time=datetime(2024, 12, 27, 23, 00, 00),
                           first_seat_quantity=rule1.value,second_seat_quantity = rule2.value, plane_id='1', route_id='13')
 
@@ -831,7 +862,7 @@ if __name__ == "__main__":
 
 
         # CHUYEN BAY THANG 10
-        flight31 = Flight(name='Hà Nội(HAN) - Phú Yên(UIH)', take_of_time=datetime(2024, 10, 15, 11, 00, 00),
+        flight31 = Flight(name='Hà Nội(HAN) - Phú Yên(UIH)', take_off_time=datetime(2024, 10, 15, 11, 00, 00),
                           landing_time=datetime(2024, 10, 27, 23, 00, 00),
                           first_seat_quantity=rule1.value, second_seat_quantity=rule2.value, plane_id='1',
                           route_id='1')
@@ -859,7 +890,7 @@ if __name__ == "__main__":
         db.session.add_all([ticket1,ticket2,ticket3,ticket4,ticket5])
         db.session.commit()
         # CHUYEN BAY THANG 11
-        flight32 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 11, 15, 11, 00, 00),
+        flight32 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_off_time=datetime(2024, 11, 15, 11, 00, 00),
                           landing_time=datetime(2024, 11, 27, 23, 00, 00),
                           first_seat_quantity=rule1.value, second_seat_quantity=rule2.value, plane_id='1', route_id='2')
         db.session.add(flight32)
@@ -887,7 +918,7 @@ if __name__ == "__main__":
         db.session.commit()
         #
         # CHUYEN BAY THANG 8
-        flight33 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_of_time=datetime(2024, 8, 15, 11, 00, 00),
+        flight33 = Flight(name='Hồ Chí Minh(SGN) - Đà Lạt(DLI)', take_off_time=datetime(2024, 8, 15, 11, 00, 00),
                           landing_time=datetime(2024, 8, 27, 23, 00, 00),
                           first_seat_quantity=rule1.value, second_seat_quantity=rule2.value, plane_id='1', route_id='13')
         db.session.add(flight33)

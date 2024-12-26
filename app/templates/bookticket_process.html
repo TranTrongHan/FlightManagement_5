@@ -13,7 +13,7 @@
             </div>
             <div class="col-12 col-md-8">
                 <input id="flightName" class="form-control form-control-lg" type="text" value="{{flight.name}}" name="flightname" readonly>
-                <input id="planeid" type="hidden" name="plane" value="{{ plane.id }}">
+                <input id="planeid" type="hidden" name="plane" value="{{ flight.plane_id }}">
                 <input id="flightid" type="hidden" name="flightid" value="{{ flight.id }}">
             </div>
         </div>
@@ -42,12 +42,10 @@
                 <label class="fw-bold fs-5 text-danger">Nơi đi:</label>
             </div>
             <div class="col-12 col-md-8">
-                {% for route in route %}
                 {% for airport in airports %}
                 {% if route.take_off_airport_id == airport.id %}
                 <input class="form-control form-control-lg" type="text" value="{{airport.name}}" readonly>
                 {% endif %}
-                {% endfor %}
                 {% endfor %}
             </div>
         </div>
@@ -58,12 +56,10 @@
                 <label class="fw-bold fs-5 text-danger">Nơi đến:</label>
             </div>
             <div class="col-12 col-md-8">
-                {% for route in route %}
                 {% for airport in airports %}
                 {% if route.landing_airport_id == airport.id %}
                 <input class="form-control form-control-lg" type="text" value="{{airport.name}}" readonly>
                 {% endif %}
-                {% endfor %}
                 {% endfor %}
             </div>
         </div>
@@ -74,7 +70,7 @@
                 <label class="fw-bold fs-5 text-danger">Thời gian cất cánh:</label>
             </div>
             <div class="col-12 col-md-8">
-                <input class="form-control form-control-lg" type="text" value="{{flight.take_of_time}}" readonly>
+                <input class="form-control form-control-lg" type="text" value="{{flight.take_off_time}}" readonly>
             </div>
         </div>
 
@@ -119,8 +115,8 @@
                 <label class="fw-bold fs-5 text-danger">Tên khách hàng:</label>
             </div>
             <div class="col-12 col-md-8">
-                <input class="form-control form-control-lg" type="text" value="{{current_user.name}}" name="fullname" readonly>
-                <input id="customerid" type="hidden" name="userid" value="{{ current_user.id }}">
+                <input class="form-control form-control-lg" type="text" value="{{user.name}}" name="fullname" readonly>
+                <input id="customerid" type="hidden" name="userid" value="{{user.id }}">
             </div>
         </div>
 
@@ -130,19 +126,10 @@
                 <label class="fw-bold fs-5 text-danger">Email:</label>
             </div>
             <div class="col-12 col-md-8">
-                <input class="form-control form-control-lg" type="text" value="{{current_user.email}}" name="email" readonly>
+                <input class="form-control form-control-lg" type="text" value="{{user.email}}" name="email" readonly>
             </div>
         </div>
 
-        <!-- Số điện thoại -->
-        <div class="row mb-3">
-            <div class="col-12 col-md-4">
-                <label class="fw-bold fs-5 text-danger">Số điện thoại:</label>
-            </div>
-            <div class="col-12 col-md-8">
-                <input class="form-control form-control-lg" type="text" value="{{current_user.phone}}" readonly>
-            </div>
-        </div>
 
         <!-- Thanh toán -->
         <hr class="border-3 border-top-3 border-light">
@@ -156,39 +143,7 @@
 
 
 <script src="{{url_for('static',filename='js/bookticket.js')}}"></script>
-<!--<script>-->
-<!--    // Lắng nghe sự kiện thay đổi trên input-->
-<!--    document.getElementById('ticket-quantity').addEventListener('input', function() {-->
-<!--        // Lấy giá trị mới từ input-->
-<!--        const quantity = this.value;-->
-<!--        // Cập nhật giá trị vào span hiển thị-->
-<!--        document.getElementById('quantity').textContent = quantity;-->
-<!--    });-->
 
-<!--    // Hàm định dạng số với dấu phân cách-->
-<!--   function formatCurrency(value) {-->
-<!--       return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ';-->
-<!--   }-->
-
-<!--   // Lắng nghe sự kiện thay đổi trên dropdown-->
-<!--   document.getElementById('fareClassSelect').addEventListener('change', function() {-->
-<!--       // Lấy tên hạng vé và giá từ option được chọn-->
-<!--       const selectedOption = this.options[this.selectedIndex];-->
-<!--       const fareClassName = selectedOption.text;-->
-<!--       const fareClassPrice = selectedOption.getAttribute('data-price');-->
-<!--       const quantity = parseFloat(document.getElementById('quantity').textContent)-->
-<!--       const total = quantity * fareClassPrice-->
-
-<!--   // Cập nhật tên hạng vé và đơn giá,tổng tiền-->
-<!--      document.getElementById('fareClassName').textContent = fareClassName;-->
-<!--      document.getElementById('fareClassPrice').textContent = formatCurrency(fareClassPrice);-->
-<!--      document.getElementById('totalPrice').textContent = formatCurrency(total)-->
-
-
-<!--   });-->
-<!--   // Gọi hàm để hiển thị giá khởi đầu-->
-<!--    document.getElementById('fareClassPrice').textContent = document.getElementById('fareClassSelect').getAttribute('data-price');-->
-<!--</script>-->
 <script>
     function handlePayment(){
         var customer_id = document.getElementById('customerid').value;

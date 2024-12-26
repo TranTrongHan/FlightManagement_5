@@ -9,10 +9,9 @@
             {% for seat in seats %}
             <div>
                 <p>Mã ghế ngồi : <span>{{seat.id}}</span></p>
-
             </div>
             <div>
-                <p>Mã chuyến bay : <span>{{session.get("ticket_info").get("flightid").get("id")}}</span></p>
+                <p>Mã chuyến bay : <span>{{session.get("ticket_info").get("flightid")}}</span></p>
             </div>
             <div>
                 <p>Khách hàng : <span>{{cus_name}}</span></p>
@@ -22,9 +21,6 @@
             </div>
             <div>
                 <p>Giá vé : <span>{{"{:,.0f}".format(price)}} VNĐ</span></p>
-            </div>
-            <div>
-                <p>Mã máy bay: <span>{{session.get("ticket_info").get("planeid")}}</span></p>
             </div>
             <div>
                 <p>Tên máy bay: <span>{{plane_name}}</span></p>

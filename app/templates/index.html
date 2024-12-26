@@ -153,38 +153,33 @@
 <div class="row  mt-3 mb-4">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
         <!-- Indicators/dots -->
-        <div class="carousel-indicators ">
-            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active"
-                    aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1"
-                    aria-label="Slide 2"></button>
-            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2"
-                    aria-label="Slide 3"></button>
+        <div class="carousel-indicators pt-3">
+            {% for cmt in cmts %}
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="{{ loop.index0 }}"
+                    class="{% if loop.first %}active{% endif %}" aria-label="Slide {{ loop.index }}"
+                     style="background-color: #000;">
+            </button>
+            {% endfor %}
         </div>
-         <!-- The slideshow/carousel -->
+        <!-- The slideshow/carousel -->
         <div class="carousel-inner" id="comments-list">
-             {% for cmt in cmts %}
-             <div class="carousel-item {% if loop.index == 1 %}active{% endif %}" >
-                    <h4 class="text-danger fs-3 fw-bold text-center ">"{{cmt.text}}"<br>
-                        <span class="fs-4 fw-bold d-block">
-                            {% if cmt.user is none %}
-                                <span class="fs-4 fw-bold d-block">
-                                    Ẩn danh
-                                    - <em class="date" data-time="{{cmt.time}}">{{ cmt.time }}</em>
-                                </span>
-                            {% else %}
-                                {% for user in users %}
-
-                                    {% if cmt.user == user.id %}
+            {% for cmt in cmts %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                <h4 class="text-danger fs-3 fw-bold text-center">"{{ cmt.text }}"<br>
+                    <span class="fs-4 fw-bold d-block">
+                        {% if cmt.user %}
+                            {% for user in users %}
+                                {% if cmt.user ==  user.id %}
                                     {{user.name}}
-                                    - <em class="date" data-time="{{cmt.time}}">{{ cmt.time }}</em>
-                                    {% endif %}
-
-                                {% endfor %}
-                            {% endif %}
-                        </span>
-                    </h4>
-             </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            Ẩn danh
+                        {% endif %}
+                        -<em class="date" data-time="{{ cmt.time }}">{{ cmt.time }}</em>
+                    </span>
+                </h4>
+            </div>
             {% endfor %}
         </div>
         <!-- Left and right controls/icons -->
@@ -200,14 +195,18 @@
         </button>
     </div>
 </div>
-<div class="container-fluid container-fluid-template bg-primary mt-3">
-    <h2 class="text-center">Để lại lời nhắn</h2>
+
+
+
+<div class="container-fluid container-fluid-template  mt-3">
+    <h2 class="text-center">Để lại lời nhắn cho chúng tôi</h2>
     <div class="row">
-        <div class="col-sm-7 slideanim">
-            <textarea class="form-control" id="comments" name="comments" placeholder="Comment"
-                      rows="5"></textarea><br>
+
+        <div class="mb-3  slideanim">
+          <textarea class="form-control" id="comments" name="comments" placeholder="Comment"
+                    rows="5"></textarea><br>
             <div class="row">
-                <div class="col-sm-12 form-group">
+                <div class="col-sm-12 form-group ">
                     <button class="btn btn-success pull-right" onclick="addComment()">Gửi</button>
                 </div>
             </div>
@@ -222,38 +221,19 @@
         {% endif %}
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const carousel = document.getElementById('comments-list');
-        const items = carousel.getElementsByClassName('carousel-item');
+<!--    document.addEventListener('DOMContentLoaded', function() {-->
+<!--        // chuyển thành định dạng 2,3 ngày trước-->
+<!--        document.querySelectorAll('.date').forEach(function(dateElement) {-->
+<!--            const time = dateElement.getAttribute('data-time');-->
+<!--            dateElement.innerText = moment(time).fromNow();-->
+<!--        });-->
+<!--    })-->
 
-        // Lắng nghe sự kiện khi slide được chuyển đổi
-        carousel.addEventListener('slide.bs.carousel', function(event) {
-            // Thêm class active cho item hiện tại
-            const activeIndex = event.to; // Chỉ số của slide hiện tại
-            items[activeIndex].classList.add('active');
-        });
-        // Lắng nghe sự kiện khi slide đã hoàn tất chuyển đổi
-        carousel.addEventListener('slid.bs.carousel', function(event) {
-        const activeIndex = event.to; // Chỉ số của slide hiện tại
-        console.log('Đã chuyển đến slide:', activeIndex);
 
-        // Nếu đã đến slide cuối cùng, quay lại slide đầu tiên sau một khoảng thời gian
-        if (activeIndex === items.length - 1) {
-            setTimeout(() => {
-                carousel.carousel(0); // Quay lại slide đầu tiên
-            }, 2000); // Thời gian chờ trước khi quay lại (nếu cần)
-        }
-        });
-        // chuyển thành định dạng 2,3 ngày trước
-        document.querySelectorAll('.date').forEach(function(dateElement) {
-            const time = dateElement.getAttribute('data-time');
-            dateElement.innerText = moment(time).fromNow();
-        });
-    });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.min.js"></script>
-
+<!--<script src="{{url_for('static',filename='js/comment.js')}}"></script>-->
 <script>
     // Đặt ngôn ngữ là tiếng Việt
     moment.locale('vi');

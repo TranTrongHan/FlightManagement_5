@@ -1,9 +1,8 @@
 import re
-
 from datetime import datetime, timedelta
 from flask import render_template, request, redirect, jsonify, session, flash, url_for
 from app import app, login, VNPAY_CONFIG,dao,utils
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from app.models import UserRoleEnum, Flight, Customer, FareClass, Plane, User, MidAirport, FlightSchedule, Route, \
     Airport
 from app.utils import check_pending_flighttime
@@ -13,14 +12,6 @@ from dao import db
 def index():
     cmts = dao.load_comments()
     users = dao.load_users()
-    
-    for u in users:
-        for cmt in cmts:
-            if cmt.user == u.id:
-                print(f"text: '{cmt.text}' / cmt_user: {cmt.user}/ time:{cmt.time} /u_id:{u.id}")
-            else:
-                print('none')
-
 
     return render_template('index.html',cmts = cmts,users=users)
 
@@ -177,7 +168,7 @@ def my_info():
 def my_tickets():
     user_id = request.args.get('user_id')
     customer = dao.get_customer_by_id(id=user_id)
-    tickets = dao.get_tickets(customerid=customer.__getattribute__('id'))
+    tickets = dao.get_tickets(userid=customer.__getattribute__('id'))
     seats = dao.load_seats()
     flights = dao.load_flights()
     routes  = dao.load_route()
@@ -198,37 +189,79 @@ def bookticket():
         takeoff_airport1 = request.form.get('takeoff1')
         landing_airport1 = request.form.get('landing1')
         departure_time = request.form.get('departureTime')
-        return_time = request.form.get('returnTime')
 
         # lấy danh sách chuyến bay có nơi đi, nơi đến theo yêu cầu
         route = dao.load_specific_routes(takeoffId=takeoff_airport1, landingairportId=landing_airport1)
-
-
-        flights = dao.load_flights(depart_time=departure_time)
+        route_dict = route.to_dict()
+        flights = dao.load_flights(depart_time=departure_time,route_id=route.id)
+        flights_dict = [flight.to_dict() for flight in flights]
         planes = dao.load_plane()
-        return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
-                               airports=airportsID, route=route, flights=flights, planes=planes,
-                               fareclass=fareclass)
+        planes_dict = [plane.to_dict() for plane in planes]
+        response_data = {
+            'route':route_dict,
+            'flights':flights_dict,
+            'planes':planes_dict
+        }
+
+        return jsonify(response_data)
 
 
     return render_template('bookticket.html', take_off_airports=airports, landing_airports=airports2,
                            airports=airportsID, fareclass=fareclass)
+@app.route('/api/bookticket',methods=['POST'])
+def api_bookticket():
+    takeoff_airport = request.json.get('takeoff')
+    landing_airport = request.json.get('landing')
+    departure_time = request.json.get('departureTime')
+    user_id = current_user.id
+
+    # Lấy danh sách chuyến bay
+    route = dao.load_specific_routes(takeoffId=takeoff_airport, landingairportId=landing_airport)
+    route_dict = route.to_dict()
+
+    flights = dao.load_flights(depart_time=departure_time, route_id=route.id)
+    flights_dict = [flight.to_dict() for flight in flights]
+
+    planes = dao.load_plane()
+    planes_dict = [plane.to_dict() for plane in planes]
 
 
+    response_data = {
+        'route': route_dict,
+        'flights': flights_dict,
+        'planes': planes_dict,
+        'user_id':user_id
+    }
+
+    return jsonify(response_data)
+
+@app.route('/api/handlebooking',methods=['POST'])
+def handlebooking():
+    flight_id = request.json.get('flight_id')
+    user_id = request.json.get('user_id')
+    takeoff_time = request.json.get('takeoff_time')
+    # Kiểm tra xem khách hàng đã đặt chuyến bay này chưa hoặc đã đặt vé có thời gian khởi hành trước đó
+    booking_exists = utils.check_booking_exists( flightid=flight_id,userid=user_id)
+    print(booking_exists)
+    valid_time = utils.check_valid_time(takeofftime=takeoff_time)
+    print(valid_time)
+    if booking_exists:
+        return jsonify({'error': 'Bạn đã đặt chuyến bay này trước đó'}), 400
+    if not valid_time:
+        return jsonify({'error': 'Bạn chỉ được phép đặt vé trước 12 tiếng.'}), 400
+
+    return jsonify({'success': True})
 
 @app.route('/bookticket_process', methods=['GET', 'POST'])
 @login_required
 def bookticket_process():
-    flight_id = request.args.get('flight')
-    plane_id = request.args.get('plane')
-    route_id = request.args.get('route')
+    flight_id = request.args.get('flight_id')
+    user_id = request.args.get('user_id')
+    route_id = request.args.get('route_id')
 
-    # lấy thời gian của chuyến bay đang đặt vé
-    takeoff_time = request.args.get('takeoff_time')
-    landing_time = request.args.get('landing_time')
     flight = dao.get_flight_by_id(id=flight_id)
-    route = dao.load_route(route_id=route_id)
-    plane = dao.get_plane_by_id(id=plane_id)
+    route = dao.get_route_by_id(id=route_id)
+    user = dao.get_user_by_id(id=user_id)
 
     airports = dao.load_airport()
     fareclass = dao.load_fareclass()
@@ -237,9 +270,8 @@ def bookticket_process():
 
 
     return render_template('bookticket_process.html',
-                               route=route, airports=airports, flight=flight, fareclass=fareclass, plane=plane,first_seats_avail= first_seats_avail,
-                           second_seats_avail= second_seats_avail)
-
+                               route=route, airports=airports, flight=flight, fareclass=fareclass,first_seats_avail= first_seats_avail,
+                           second_seats_avail= second_seats_avail,user=user)
 
 @login.user_loader
 def load_user(user_id):
@@ -249,7 +281,7 @@ def load_user(user_id):
 def payment_comfirm_page():
     flight_id = request.form.get('flightid')
     user_id = request.form.get('userid')
-    cus_obj = dao.get_customer_by_id(id=user_id)
+
 
     fareclass_id = request.form.get('fareclassid')
     quantity = int(request.form.get('ticket-quantity'))
@@ -262,39 +294,17 @@ def payment_comfirm_page():
     customer_name = dao.get_name_by_id(User, id=user_id)
     plane_name = dao.get_name_by_id(Plane, id=plane_id)
 
-    flight = Flight(id=flight_id)
-    customer = Customer(user_id=user_id)
-
     fareclass = FareClass(id=fareclass_id)
-    valid_time = utils.check_valid_time(flightid=flight_id)
-    if not valid_time:
-        flash(message="Thời gian không hợp lệ.",category="Lỗi chọn thời gian")
-        return redirect('/bookticket')
+
     if int(first_seats_avail==0) and int(second_seats_avail) == 0:
         flash(message="Không còn chỗ trống.Vui lòng đặt chuyến khác",category="Thông báo")
         return redirect('/bookticket')
-    checkseat = utils.check_seat(flightid=flight_id,quantity=quantity,fareclassid=fareclass_id)
-    if checkseat == False:
-        seat_class_name = dao.get_name_by_id(model=FareClass,id=fareclass_id)
-        flash(message=f"Không còn đủ chỗ trống cho {seat_class_name}.", category="Thông báo")
-        return redirect('/bookticket')
-    booked_ticket = utils.checkduplicate_ticket(flightid=flight_id, customer_id=cus_obj.id)
-    if booked_ticket:
-        flash(message="Bạn đã đặt vé cho chuyến bay này.",category="Thông báo")
-        return redirect('/bookticket')
-    booked_flightid = check_pending_flighttime(flightid=flight_id, customerid=cus_obj.id)
-    if booked_flightid:
-        session['flightid_booked'] = booked_flightid
-        flash(message="Bạn đã có chuyến bay đang chờ.",category="Thông báo")
-        return redirect('/bookticket')
+
     ticket_info = {
         'order_id': f"ticket-{user_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
-        "flightid": flight.to_dict(),
-        "customerid": customer.to_dict(),
-        "customername":customer_name,
-        "fareclassid": fareclass.to_dict(),
-        "quantity": quantity,
-        "planeid":plane_id,
+        "flightid": flight_id,
+        "customerid": user_id,
+        "quantity":quantity,
         "price":fareclass_price
     }
     session['ticket_info'] = ticket_info
@@ -467,20 +477,8 @@ def get_airports_by_route(route_id):
 @app.context_processor
 def inject_user_role_enum():
     return dict(UserRoleEnum=UserRoleEnum)
-# @app.route("/api/findflights/",methods=['POST'])
-# def findflights ():
-#     takeoff_airport1 = request.form.get('takeoff1')
-#     landing_airport1 = request.form.get('landing1')
-#     departure_time = request.form.get('departureTime')
-#     flight_details = session.get('flight_details')
-#     if not flight_details:
-#         flight_details = {}
-#     flight_details = {
-#         'takeoff_airport':takeoff_airport1,
-#         'landing_aiport':landing_airport1,
-#         'departure_time':departure_time
-#     }
-#     return jsonify(flight_details)
+
+
 @app.route("/api/comments", methods=['POST'])
 def add_comment():
     data = request.get_json()

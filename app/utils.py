@@ -36,15 +36,15 @@ def get_seat_by_quantity(quantity, flightid, fareclassid=None):
 
 def add_ticket(ticket_info):
     selected_seats = session.get('seats')
-    flight_dict = ticket_info.get('flightid')
-    flight_obj = Flight.from_dict(flight_dict)
+    flightid = ticket_info.get('flightid')
+    flight_obj = dao.get_flight_by_id(id=flightid)
 
-    customer_dict = ticket_info.get('customerid')
-    customer_obj = Customer.from_dict(customer_dict)
+    customerid  = ticket_info.get('customerid')
+    customer_obj = dao.get_user_by_id(id=customerid)
 
 
-    existing_customer = db.session.query(Customer).filter_by(user_id=customer_obj.user_id).first()
-    existing_flight = db.session.query(Flight).filter_by(id=flight_obj.id).first()
+    existing_customer = db.session.query(Customer).filter_by(user_id=customerid).first()
+    existing_flight = db.session.query(Flight).filter_by(id=flightid).first()
 
     # Sử dụng đối tượng đã tồn tại
     customer_obj = existing_customer
@@ -78,25 +78,24 @@ def check_pending_flighttime(flightid=None, customerid=None):
     return None
 
 
-def checkduplicate_ticket(flightid=None, customer_id=None):
+def check_booking_exists(flightid=None, userid=None):
     flight = dao.get_flight_by_id(id=flightid)
 
     booked_flight = None
     # lấy thời gian bay vé đã đặt của khách hàng đó
-    tickets = dao.get_tickets(customerid=customer_id)
+    tickets = dao.get_tickets(userid=userid)
     for ticket in tickets:
         if ticket.flight_id == flight.id:
-
-            booked_flight = dao.get_flight_by_id(id=ticket.flight_id)
-
-    return booked_flight
+           return True
+    return False
 
 
-def check_valid_time(flightid=None):
-    pending_flight = dao.get_flight_by_id(id=flightid)
+def check_valid_time(takeofftime=None):
+    takeofftime = datetime.strptime(takeofftime, '%Y-%m-%d %H:%M:%S')
     current_time = datetime.now()
     # lấy thời gian khởi hành của chuyến bay - 12 ra thời gian dc phép đặt vé
-    cut_off_time = pending_flight.take_of_time - timedelta(hours=12)
+    rule = dao.get_rule_by_id(id='3')
+    cut_off_time = takeofftime - timedelta(hours=rule.value)
     # so sánh nếu thời gian hiện tại nhỏ hơn thời gian dc phép đặt vé => ko đc đặt vé
     if current_time > cut_off_time:
         return False

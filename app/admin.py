@@ -55,9 +55,9 @@ class FrequencyStats(AuthenticatedBaseView):
         year = request.args.get('year',default=datetime.now().year)
         month = request.args.get('month',default=datetime.now().month)
 
-        routes = dao.load_route()
 
-        return self.render('admin/frequencystats.html', routes=routes,year = year,
+
+        return self.render('admin/frequencystats.html',year = year,
                            monthly_stats = utils.route_month_stats(year=year,month=month))
 
 
